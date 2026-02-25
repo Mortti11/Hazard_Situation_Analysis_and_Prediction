@@ -1,0 +1,16 @@
+[project]
+name = "hazard-situation-analysis-and-prediction"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "astral>=3.2",
+    "geopy>=2.4.1",
+    "matplotlib>=3.10.8",
+    "numpy>=2.4.2",
+    "pandas>=3.0.1",
+    "scikit-learn>=1.8.0",
+    "scipy>=1.17.1",
+    "seaborn>=0.13.2",
+]
