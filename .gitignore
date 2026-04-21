@@ -1,0 +1,13 @@
+# WFS disk cache (auto-generated, up to ~100 MB)
+route_risk_backend/_wfs_disk_cache/
+
+# Secrets
+.env
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+
+# Temp benchmarks
+tmp/

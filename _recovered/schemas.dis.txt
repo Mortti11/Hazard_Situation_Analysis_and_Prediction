@@ -1,0 +1,1520 @@
+  3           0 LOAD_CONST               0 (0)
+              2 LOAD_CONST               1 (('annotations',))
+              4 IMPORT_NAME              0 (__future__)
+              6 IMPORT_FROM              1 (annotations)
+              8 STORE_NAME               1 (annotations)
+             10 POP_TOP
+
+  5          12 LOAD_CONST               0 (0)
+             14 LOAD_CONST               2 (('datetime',))
+             16 IMPORT_NAME              2 (datetime)
+             18 IMPORT_FROM              2 (datetime)
+             20 STORE_NAME               2 (datetime)
+             22 POP_TOP
+
+  7          24 LOAD_CONST               0 (0)
+             26 LOAD_CONST               3 (('BaseModel', 'Field'))
+             28 IMPORT_NAME              3 (pydantic)
+             30 IMPORT_FROM              4 (BaseModel)
+             32 STORE_NAME               4 (BaseModel)
+             34 IMPORT_FROM              5 (Field)
+             36 STORE_NAME               5 (Field)
+             38 POP_TOP
+
+ 11          40 LOAD_BUILD_CLASS
+             42 LOAD_CONST               4 (<code object JourneyRequest at 0x00000140FE5EA6B0, file "E:\Projects\School_projects\Hazard_Situation_Analysis_and_Prediction\route_risk_backend\app\schemas.py", line 11>)
+             44 LOAD_CONST               5 ('JourneyRequest')
+             46 MAKE_FUNCTION            0
+             48 LOAD_CONST               5 ('JourneyRequest')
+             50 LOAD_NAME                4 (BaseModel)
+             52 CALL_FUNCTION            3
+             54 STORE_NAME               6 (JourneyRequest)
+
+ 20          56 LOAD_BUILD_CLASS
+             58 LOAD_CONST               6 (<code object RoutePreview at 0x00000140FE5EA340, file "E:\Projects\School_projects\Hazard_Situation_Analysis_and_Prediction\route_risk_backend\app\schemas.py", line 20>)
+             60 LOAD_CONST               7 ('RoutePreview')
+             62 MAKE_FUNCTION            0
+             64 LOAD_CONST               7 ('RoutePreview')
+             66 LOAD_NAME                4 (BaseModel)
+             68 CALL_FUNCTION            3
+             70 STORE_NAME               7 (RoutePreview)
+
+ 27          72 LOAD_BUILD_CLASS
+             74 LOAD_CONST               8 (<code object RouteOptionsResponse at 0x00000140FE608920, file "E:\Projects\School_projects\Hazard_Situation_Analysis_and_Prediction\route_risk_backend\app\schemas.py", line 27>)
+             76 LOAD_CONST               9 ('RouteOptionsResponse')
+             78 MAKE_FUNCTION            0
+             80 LOAD_CONST               9 ('RouteOptionsResponse')
+             82 LOAD_NAME                4 (BaseModel)
+             84 CALL_FUNCTION            3
+             86 STORE_NAME               8 (RouteOptionsResponse)
+
+ 34          88 LOAD_BUILD_CLASS
+             90 LOAD_CONST              10 (<code object SampledPoint at 0x00000140FE608A80, file "E:\Projects\School_projects\Hazard_Situation_Analysis_and_Prediction\route_risk_backend\app\schemas.py", line 34>)
+             92 LOAD_CONST              11 ('SampledPoint')
+             94 MAKE_FUNCTION            0
+             96 LOAD_CONST              11 ('SampledPoint')
+             98 LOAD_NAME                4 (BaseModel)
+            100 CALL_FUNCTION            3
+            102 STORE_NAME               9 (SampledPoint)
+
+ 44         104 LOAD_BUILD_CLASS
+            106 LOAD_CONST              12 (<code object RouteSummary at 0x00000140FE608450, file "E:\Projects\School_projects\Hazard_Situation_Analysis_and_Prediction\route_risk_backend\app\schemas.py", line 44>)
+            108 LOAD_CONST              13 ('RouteSummary')
+            110 MAKE_FUNCTION            0
+            112 LOAD_CONST              13 ('RouteSummary')
+            114 LOAD_NAME                4 (BaseModel)
+            116 CALL_FUNCTION            3
+            118 STORE_NAME              10 (RouteSummary)
+
+ 57         120 LOAD_BUILD_CLASS
+            122 LOAD_CONST              14 (<code object DarknessTransition at 0x00000140FE609210, file "E:\Projects\School_projects\Hazard_Situation_Analysis_and_Prediction\route_risk_backend\app\schemas.py", line 57>)
+            124 LOAD_CONST              15 ('DarknessTransition')
+            126 MAKE_FUNCTION            0
+            128 LOAD_CONST              15 ('DarknessTransition')
+            130 LOAD_NAME                4 (BaseModel)
+            132 CALL_FUNCTION            3
+            134 STORE_NAME              11 (DarknessTransition)
+
+ 66         136 LOAD_BUILD_CLASS
+            138 LOAD_CONST              16 (<code object SurfaceChange at 0x00000140FE609370, file "E:\Projects\School_projects\Hazard_Situation_Analysis_and_Prediction\route_risk_backend\app\schemas.py", line 66>)
+            140 LOAD_CONST              17 ('SurfaceChange')
+            142 MAKE_FUNCTION            0
+            144 LOAD_CONST              17 ('SurfaceChange')
+            146 LOAD_NAME                4 (BaseModel)
+            148 CALL_FUNCTION            3
+            150 STORE_NAME              12 (SurfaceChange)
+
+ 76         152 LOAD_BUILD_CLASS
+            154 LOAD_CONST              18 (<code object SpeedZoneChange at 0x00000140FE609580, file "E:\Projects\School_projects\Hazard_Situation_Analysis_and_Prediction\route_risk_backend\app\schemas.py", line 76>)
+            156 LOAD_CONST              19 ('SpeedZoneChange')
+            158 MAKE_FUNCTION            0
+            160 LOAD_CONST              19 ('SpeedZoneChange')
+            162 LOAD_NAME                4 (BaseModel)
+            164 CALL_FUNCTION            3
+            166 STORE_NAME              13 (SpeedZoneChange)
+
+ 86         168 LOAD_BUILD_CLASS
+            170 LOAD_CONST              20 (<code object TrafficIncident at 0x00000140FE609790, file "E:\Projects\School_projects\Hazard_Situation_Analysis_and_Prediction\route_risk_backend\app\schemas.py", line 86>)
+            172 LOAD_CONST              21 ('TrafficIncident')
+            174 MAKE_FUNCTION            0
+            176 LOAD_CONST              21 ('TrafficIncident')
+            178 LOAD_NAME                4 (BaseModel)
+            180 CALL_FUNCTION            3
+            182 STORE_NAME              14 (TrafficIncident)
+
+102         184 LOAD_BUILD_CLASS
+            186 LOAD_CONST              22 (<code object SegmentRisk at 0x00000140FE609B00, file "E:\Projects\School_projects\Hazard_Situation_Analysis_and_Prediction\route_risk_backend\app\schemas.py", line 102>)
+            188 LOAD_CONST              23 ('SegmentRisk')
+            190 MAKE_FUNCTION            0
+            192 LOAD_CONST              23 ('SegmentRisk')
+            194 LOAD_NAME                4 (BaseModel)
+            196 CALL_FUNCTION            3
+            198 STORE_NAME              15 (SegmentRisk)
+
+141         200 LOAD_BUILD_CLASS
+            202 LOAD_CONST              24 (<code object JourneyRiskSummary at 0x00000140FE60A080, file "E:\Projects\School_projects\Hazard_Situation_Analysis_and_Prediction\route_risk_backend\app\schemas.py", line 141>)
+            204 LOAD_CONST              25 ('JourneyRiskSummary')
+            206 MAKE_FUNCTION            0
+            208 LOAD_CONST              25 ('JourneyRiskSummary')
+            210 LOAD_NAME                4 (BaseModel)
+            212 CALL_FUNCTION            3
+            214 STORE_NAME              16 (JourneyRiskSummary)
+
+168         216 LOAD_BUILD_CLASS
+            218 LOAD_CONST              26 (<code object TopRiskyPart at 0x00000140FE223E10, file "E:\Projects\School_projects\Hazard_Situation_Analysis_and_Prediction\route_risk_backend\app\schemas.py", line 168>)
+            220 LOAD_CONST              27 ('TopRiskyPart')
+            222 MAKE_FUNCTION            0
+            224 LOAD_CONST              27 ('TopRiskyPart')
+            226 LOAD_NAME                4 (BaseModel)
+            228 CALL_FUNCTION            3
+            230 STORE_NAME              17 (TopRiskyPart)
+
+179         232 LOAD_BUILD_CLASS
+            234 LOAD_CONST              28 (<code object EvidenceForLlm at 0x00000140FE223EC0, file "E:\Projects\School_projects\Hazard_Situation_Analysis_and_Prediction\route_risk_backend\app\schemas.py", line 179>)
+            236 LOAD_CONST              29 ('EvidenceForLlm')
+            238 MAKE_FUNCTION            0
+            240 LOAD_CONST              29 ('EvidenceForLlm')
+            242 LOAD_NAME                4 (BaseModel)
+            244 CALL_FUNCTION            3
+            246 STORE_NAME              18 (EvidenceForLlm)
+
+206         248 LOAD_BUILD_CLASS
+            250 LOAD_CONST              30 (<code object JourneyPresentation at 0x00000140FE222760, file "E:\Projects\School_projects\Hazard_Situation_Analysis_and_Prediction\route_risk_backend\app\schemas.py", line 206>)
+            252 LOAD_CONST              31 ('JourneyPresentation')
+            254 MAKE_FUNCTION            0
+            256 LOAD_CONST              31 ('JourneyPresentation')
+            258 LOAD_NAME                4 (BaseModel)
+            260 CALL_FUNCTION            3
+            262 STORE_NAME              19 (JourneyPresentation)
+
+232         264 LOAD_BUILD_CLASS
+            266 LOAD_CONST              32 (<code object AiSummary at 0x00000140FE6221E0, file "E:\Projects\School_projects\Hazard_Situation_Analysis_and_Prediction\route_risk_backend\app\schemas.py", line 232>)
+            268 LOAD_CONST              33 ('AiSummary')
+            270 MAKE_FUNCTION            0
+            272 LOAD_CONST              33 ('AiSummary')
+            274 LOAD_NAME                4 (BaseModel)
+            276 CALL_FUNCTION            3
+            278 STORE_NAME              20 (AiSummary)
+
+240         280 LOAD_BUILD_CLASS
+            282 LOAD_CONST              34 (<code object JourneyAnalysisResponse at 0x00000140FE621F20, file "E:\Projects\School_projects\Hazard_Situation_Analysis_and_Prediction\route_risk_backend\app\schemas.py", line 240>)
+            284 LOAD_CONST              35 ('JourneyAnalysisResponse')
+            286 MAKE_FUNCTION            0
+            288 LOAD_CONST              35 ('JourneyAnalysisResponse')
+            290 LOAD_NAME                4 (BaseModel)
+            292 CALL_FUNCTION            3
+            294 STORE_NAME              21 (JourneyAnalysisResponse)
+            296 LOAD_CONST              36 (None)
+            298 RETURN_VALUE
+
+Disassembly of <code object JourneyRequest at 0x00000140FE5EA6B0, file "E:\Projects\School_projects\Hazard_Situation_Analysis_and_Prediction\route_risk_backend\app\schemas.py", line 11>:
+ 11           0 LOAD_NAME                0 (__name__)
+              2 STORE_NAME               1 (__module__)
+              4 LOAD_CONST               0 ('JourneyRequest')
+              6 STORE_NAME               2 (__qualname__)
+              8 SETUP_ANNOTATIONS
+
+ 12          10 LOAD_CONST               1 ('str')
+             12 LOAD_NAME                3 (__annotations__)
+             14 LOAD_CONST               2 ('departure')
+             16 STORE_SUBSCR
+
+ 13          18 LOAD_CONST               1 ('str')
+             20 LOAD_NAME                3 (__annotations__)
+             22 LOAD_CONST               3 ('destination')
+             24 STORE_SUBSCR
+
+ 14          26 LOAD_CONST               4 ('datetime')
+             28 LOAD_NAME                3 (__annotations__)
+             30 LOAD_CONST               5 ('departure_time')
+             32 STORE_SUBSCR
+
+ 15          34 LOAD_NAME                4 (Field)
+             36 LOAD_CONST               6 (5)
+             38 LOAD_CONST               7 (1)
+             40 LOAD_CONST               8 (60)
+             42 LOAD_CONST               9 (('default', 'ge', 'le'))
+             44 CALL_FUNCTION_KW         3
+             46 STORE_NAME               5 (sampling_minutes)
+             48 LOAD_CONST              10 ('int')
+             50 LOAD_NAME                3 (__annotations__)
+             52 LOAD_CONST              11 ('sampling_minutes')
+             54 STORE_SUBSCR
+
+ 16          56 LOAD_NAME                4 (Field)
+             58 LOAD_CONST              12 (0)
+             60 LOAD_CONST              12 (0)
+             62 LOAD_CONST              13 ('Which ORS route alternative to use')
+             64 LOAD_CONST              14 (('default', 'ge', 'description'))
+             66 CALL_FUNCTION_KW         3
+             68 STORE_NAME               6 (route_index)
+             70 LOAD_CONST              10 ('int')
+             72 LOAD_NAME                3 (__annotations__)
+             74 LOAD_CONST              15 ('route_index')
+             76 STORE_SUBSCR
+             78 LOAD_CONST              16 (None)
+             80 RETURN_VALUE
+
+Disassembly of <code object RoutePreview at 0x00000140FE5EA340, file "E:\Projects\School_projects\Hazard_Situation_Analysis_and_Prediction\route_risk_backend\app\schemas.py", line 20>:
+ 20           0 LOAD_NAME                0 (__name__)
+              2 STORE_NAME               1 (__module__)
+              4 LOAD_CONST               0 ('RoutePreview')
+              6 STORE_NAME               2 (__qualname__)
+              8 SETUP_ANNOTATIONS
+
+ 21          10 LOAD_CONST               1 ('int')
+             12 LOAD_NAME                3 (__annotations__)
+             14 LOAD_CONST               2 ('index')
+             16 STORE_SUBSCR
+
+ 22          18 LOAD_CONST               3 ('float')
+             20 LOAD_NAME                3 (__annotations__)
+             22 LOAD_CONST               4 ('distance_km')
+             24 STORE_SUBSCR
+
+ 23          26 LOAD_CONST               3 ('float')
+             28 LOAD_NAME                3 (__annotations__)
+             30 LOAD_CONST               5 ('duration_minutes')
+             32 STORE_SUBSCR
+
+ 24          34 LOAD_CONST               6 ('str')
+             36 LOAD_NAME                3 (__annotations__)
+             38 LOAD_CONST               7 ('encoded_polyline')
+             40 STORE_SUBSCR
+             42 LOAD_CONST               8 (None)
+             44 RETURN_VALUE
+
+Disassembly of <code object RouteOptionsResponse at 0x00000140FE608920, file "E:\Projects\School_projects\Hazard_Situation_Analysis_and_Prediction\route_risk_backend\app\schemas.py", line 27>:
+ 27           0 LOAD_NAME                0 (__name__)
+              2 STORE_NAME               1 (__module__)
+              4 LOAD_CONST               0 ('RouteOptionsResponse')
+              6 STORE_NAME               2 (__qualname__)
+              8 SETUP_ANNOTATIONS
+
+ 28          10 LOAD_CONST               1 ('str')
+             12 LOAD_NAME                3 (__annotations__)
+             14 LOAD_CONST               2 ('departure')
+             16 STORE_SUBSCR
+
+ 29          18 LOAD_CONST               1 ('str')
+             20 LOAD_NAME                3 (__annotations__)
+             22 LOAD_CONST               3 ('destination')
+             24 STORE_SUBSCR
+
+ 30          26 LOAD_CONST               4 ('list[RoutePreview]')
+             28 LOAD_NAME                3 (__annotations__)
+             30 LOAD_CONST               5 ('routes')
+             32 STORE_SUBSCR
+             34 LOAD_CONST               6 (None)
+             36 RETURN_VALUE
+
+Disassembly of <code object SampledPoint at 0x00000140FE608A80, file "E:\Projects\School_projects\Hazard_Situation_Analysis_and_Prediction\route_risk_backend\app\schemas.py", line 34>:
+ 34           0 LOAD_NAME                0 (__name__)
+              2 STORE_NAME               1 (__module__)
+              4 LOAD_CONST               0 ('SampledPoint')
+              6 STORE_NAME               2 (__qualname__)
+              8 SETUP_ANNOTATIONS
+
+ 35          10 LOAD_CONST               1 ('int')
+             12 LOAD_NAME                3 (__annotations__)
+             14 LOAD_CONST               2 ('index')
+             16 STORE_SUBSCR
+
+ 36          18 LOAD_CONST               3 ('float')
+             20 LOAD_NAME                3 (__annotations__)
+             22 LOAD_CONST               4 ('lat')
+             24 STORE_SUBSCR
+
+ 37          26 LOAD_CONST               3 ('float')
+             28 LOAD_NAME                3 (__annotations__)
+             30 LOAD_CONST               5 ('lon')
+             32 STORE_SUBSCR
+
+ 38          34 LOAD_CONST               3 ('float')
+             36 LOAD_NAME                3 (__annotations__)
+             38 LOAD_CONST               6 ('elapsed_minutes')
+             40 STORE_SUBSCR
+
+ 39          42 LOAD_CONST               7 (0.0)
+             44 STORE_NAME               4 (elapsed_seconds)
+             46 LOAD_CONST               3 ('float')
+             48 LOAD_NAME                3 (__annotations__)
+             50 LOAD_CONST               8 ('elapsed_seconds')
+             52 STORE_SUBSCR
+
+ 40          54 LOAD_CONST               9 (None)
+             56 STORE_NAME               5 (estimated_timestamp)
+             58 LOAD_CONST              10 ('datetime | None')
+             60 LOAD_NAME                3 (__annotations__)
+             62 LOAD_CONST              11 ('estimated_timestamp')
+             64 STORE_SUBSCR
+
+ 41          66 LOAD_CONST               7 (0.0)
+             68 STORE_NAME               6 (cumulative_distance_km)
+             70 LOAD_CONST               3 ('float')
+             72 LOAD_NAME                3 (__annotations__)
+             74 LOAD_CONST              12 ('cumulative_distance_km')
+             76 STORE_SUBSCR
+             78 LOAD_CONST               9 (None)
+             80 RETURN_VALUE
+
+Disassembly of <code object RouteSummary at 0x00000140FE608450, file "E:\Projects\School_projects\Hazard_Situation_Analysis_and_Prediction\route_risk_backend\app\schemas.py", line 44>:
+ 44           0 LOAD_NAME                0 (__name__)
+              2 STORE_NAME               1 (__module__)
+              4 LOAD_CONST               0 ('RouteSummary')
+              6 STORE_NAME               2 (__qualname__)
+              8 SETUP_ANNOTATIONS
+
+ 45          10 LOAD_CONST               1 ('str')
+             12 LOAD_NAME                3 (__annotations__)
+             14 LOAD_CONST               2 ('route_id')
+             16 STORE_SUBSCR
+
+ 46          18 LOAD_CONST               1 ('str')
+             20 LOAD_NAME                3 (__annotations__)
+             22 LOAD_CONST               3 ('departure')
+             24 STORE_SUBSCR
+
+ 47          26 LOAD_CONST               1 ('str')
+             28 LOAD_NAME                3 (__annotations__)
+             30 LOAD_CONST               4 ('destination')
+             32 STORE_SUBSCR
+
+ 48          34 LOAD_CONST               5 ('datetime')
+             36 LOAD_NAME                3 (__annotations__)
+             38 LOAD_CONST               6 ('departure_time')
+             40 STORE_SUBSCR
+
+ 49          42 LOAD_CONST               7 (None)
+             44 STORE_NAME               4 (arrival_time)
+             46 LOAD_CONST               8 ('datetime | None')
+             48 LOAD_NAME                3 (__annotations__)
+             50 LOAD_CONST               9 ('arrival_time')
+             52 STORE_SUBSCR
+
+ 50          54 LOAD_CONST              10 ('float')
+             56 LOAD_NAME                3 (__annotations__)
+             58 LOAD_CONST              11 ('total_distance_km')
+             60 STORE_SUBSCR
+
+ 51          62 LOAD_CONST              10 ('float')
+             64 LOAD_NAME                3 (__annotations__)
+             66 LOAD_CONST              12 ('estimated_duration_minutes')
+             68 STORE_SUBSCR
+
+ 52          70 LOAD_CONST              13 ('int')
+             72 LOAD_NAME                3 (__annotations__)
+             74 LOAD_CONST              14 ('sampled_point_count')
+             76 STORE_SUBSCR
+
+ 53          78 LOAD_CONST               7 (None)
+             80 STORE_NAME               5 (encoded_polyline)
+             82 LOAD_CONST              15 ('str | None')
+             84 LOAD_NAME                3 (__annotations__)
+             86 LOAD_CONST              16 ('encoded_polyline')
+             88 STORE_SUBSCR
+             90 LOAD_CONST               7 (None)
+             92 RETURN_VALUE
+
+Disassembly of <code object DarknessTransition at 0x00000140FE609210, file "E:\Projects\School_projects\Hazard_Situation_Analysis_and_Prediction\route_risk_backend\app\schemas.py", line 57>:
+ 57           0 LOAD_NAME                0 (__name__)
+              2 STORE_NAME               1 (__module__)
+              4 LOAD_CONST               0 ('DarknessTransition')
+              6 STORE_NAME               2 (__qualname__)
+              8 SETUP_ANNOTATIONS
+
+ 58          10 LOAD_CONST               1 ('float')
+             12 LOAD_NAME                3 (__annotations__)
+             14 LOAD_CONST               2 ('km')
+             16 STORE_SUBSCR
+
+ 59          18 LOAD_CONST               3 ('str')
+             20 LOAD_NAME                3 (__annotations__)
+             22 LOAD_CONST               4 ('timestamp')
+             24 STORE_SUBSCR
+
+ 60          26 LOAD_CONST               3 ('str')
+             28 LOAD_NAME                3 (__annotations__)
+             30 LOAD_CONST               5 ('event')
+             32 STORE_SUBSCR
+
+ 61          34 LOAD_CONST               1 ('float')
+             36 LOAD_NAME                3 (__annotations__)
+             38 LOAD_CONST               6 ('lat')
+             40 STORE_SUBSCR
+
+ 62          42 LOAD_CONST               1 ('float')
+             44 LOAD_NAME                3 (__annotations__)
+             46 LOAD_CONST               7 ('lon')
+             48 STORE_SUBSCR
+
+ 63          50 LOAD_CONST               8 ('')
+             52 STORE_NAME               4 (road_name)
+             54 LOAD_CONST               3 ('str')
+             56 LOAD_NAME                3 (__annotations__)
+             58 LOAD_CONST               9 ('road_name')
+             60 STORE_SUBSCR
+             62 LOAD_CONST              10 (None)
+             64 RETURN_VALUE
+
+Disassembly of <code object SurfaceChange at 0x00000140FE609370, file "E:\Projects\School_projects\Hazard_Situation_Analysis_and_Prediction\route_risk_backend\app\schemas.py", line 66>:
+ 66           0 LOAD_NAME                0 (__name__)
+              2 STORE_NAME               1 (__module__)
+              4 LOAD_CONST               0 ('SurfaceChange')
+              6 STORE_NAME               2 (__qualname__)
+              8 SETUP_ANNOTATIONS
+
+ 67          10 LOAD_CONST               1 ('float')
+             12 LOAD_NAME                3 (__annotations__)
+             14 LOAD_CONST               2 ('km')
+             16 STORE_SUBSCR
+
+ 68          18 LOAD_CONST               3 ('str')
+             20 LOAD_NAME                3 (__annotations__)
+             22 LOAD_CONST               4 ('timestamp')
+             24 STORE_SUBSCR
+
+ 69          26 LOAD_CONST               3 ('str')
+             28 LOAD_NAME                3 (__annotations__)
+             30 LOAD_CONST               5 ('from_condition')
+             32 STORE_SUBSCR
+
+ 70          34 LOAD_CONST               3 ('str')
+             36 LOAD_NAME                3 (__annotations__)
+             38 LOAD_CONST               6 ('to_condition')
+             40 STORE_SUBSCR
+
+ 71          42 LOAD_CONST               1 ('float')
+             44 LOAD_NAME                3 (__annotations__)
+             46 LOAD_CONST               7 ('lat')
+             48 STORE_SUBSCR
+
+ 72          50 LOAD_CONST               1 ('float')
+             52 LOAD_NAME                3 (__annotations__)
+             54 LOAD_CONST               8 ('lon')
+             56 STORE_SUBSCR
+
+ 73          58 LOAD_CONST               9 ('')
+             60 STORE_NAME               4 (road_name)
+             62 LOAD_CONST               3 ('str')
+             64 LOAD_NAME                3 (__annotations__)
+             66 LOAD_CONST              10 ('road_name')
+             68 STORE_SUBSCR
+             70 LOAD_CONST              11 (None)
+             72 RETURN_VALUE
+
+Disassembly of <code object SpeedZoneChange at 0x00000140FE609580, file "E:\Projects\School_projects\Hazard_Situation_Analysis_and_Prediction\route_risk_backend\app\schemas.py", line 76>:
+ 76           0 LOAD_NAME                0 (__name__)
+              2 STORE_NAME               1 (__module__)
+              4 LOAD_CONST               0 ('SpeedZoneChange')
+              6 STORE_NAME               2 (__qualname__)
+              8 SETUP_ANNOTATIONS
+
+ 77          10 LOAD_CONST               1 ('float')
+             12 LOAD_NAME                3 (__annotations__)
+             14 LOAD_CONST               2 ('km')
+             16 STORE_SUBSCR
+
+ 78          18 LOAD_CONST               3 ('str')
+             20 LOAD_NAME                3 (__annotations__)
+             22 LOAD_CONST               4 ('timestamp')
+             24 STORE_SUBSCR
+
+ 79          26 LOAD_CONST               1 ('float')
+             28 LOAD_NAME                3 (__annotations__)
+             30 LOAD_CONST               5 ('from_speed')
+             32 STORE_SUBSCR
+
+ 80          34 LOAD_CONST               1 ('float')
+             36 LOAD_NAME                3 (__annotations__)
+             38 LOAD_CONST               6 ('to_speed')
+             40 STORE_SUBSCR
+
+ 81          42 LOAD_CONST               1 ('float')
+             44 LOAD_NAME                3 (__annotations__)
+             46 LOAD_CONST               7 ('lat')
+             48 STORE_SUBSCR
+
+ 82          50 LOAD_CONST               1 ('float')
+             52 LOAD_NAME                3 (__annotations__)
+             54 LOAD_CONST               8 ('lon')
+             56 STORE_SUBSCR
+
+ 83          58 LOAD_CONST               9 ('')
+             60 STORE_NAME               4 (road_name)
+             62 LOAD_CONST               3 ('str')
+             64 LOAD_NAME                3 (__annotations__)
+             66 LOAD_CONST              10 ('road_name')
+             68 STORE_SUBSCR
+             70 LOAD_CONST              11 (None)
+             72 RETURN_VALUE
+
+Disassembly of <code object TrafficIncident at 0x00000140FE609790, file "E:\Projects\School_projects\Hazard_Situation_Analysis_and_Prediction\route_risk_backend\app\schemas.py", line 86>:
+ 86           0 LOAD_NAME                0 (__name__)
+              2 STORE_NAME               1 (__module__)
+              4 LOAD_CONST               0 ('TrafficIncident')
+              6 STORE_NAME               2 (__qualname__)
+              8 SETUP_ANNOTATIONS
+
+ 87          10 LOAD_CONST               1 ('str')
+             12 LOAD_NAME                3 (__annotations__)
+             14 LOAD_CONST               2 ('situation_id')
+             16 STORE_SUBSCR
+
+ 88          18 LOAD_CONST               1 ('str')
+             20 LOAD_NAME                3 (__annotations__)
+             22 LOAD_CONST               3 ('title')
+             24 STORE_SUBSCR
+
+ 89          26 LOAD_CONST               4 ('')
+             28 STORE_NAME               4 (announcement_type)
+             30 LOAD_CONST               1 ('str')
+             32 LOAD_NAME                3 (__annotations__)
+             34 LOAD_CONST               5 ('announcement_type')
+             36 STORE_SUBSCR
+
+ 90          38 LOAD_CONST               6 (None)
+             40 STORE_NAME               5 (start_time)
+             42 LOAD_CONST               7 ('str | None')
+             44 LOAD_NAME                3 (__annotations__)
+             46 LOAD_CONST               8 ('start_time')
+             48 STORE_SUBSCR
+
+ 91          50 LOAD_CONST               6 (None)
+             52 STORE_NAME               6 (end_time)
+             54 LOAD_CONST               7 ('str | None')
+             56 LOAD_NAME                3 (__annotations__)
+             58 LOAD_CONST               9 ('end_time')
+             60 STORE_SUBSCR
+
+ 92          62 LOAD_CONST              10 ('unknown')
+             64 STORE_NAME               7 (status)
+             66 LOAD_CONST               1 ('str')
+             68 LOAD_NAME                3 (__annotations__)
+             70 LOAD_CONST              11 ('status')
+             72 STORE_SUBSCR
+
+ 93          74 LOAD_CONST              12 (True)
+             76 STORE_NAME               8 (is_active)
+             78 LOAD_CONST              13 ('bool')
+             80 LOAD_NAME                3 (__annotations__)
+             82 LOAD_CONST              14 ('is_active')
+             84 STORE_SUBSCR
+
+ 94          86 LOAD_NAME                9 (Field)
+             88 LOAD_NAME               10 (list)
+             90 LOAD_CONST              15 (('default_factory',))
+             92 CALL_FUNCTION_KW         1
+             94 STORE_NAME              11 (features)
+             96 LOAD_CONST              16 ('list[str]')
+             98 LOAD_NAME                3 (__annotations__)
+            100 LOAD_CONST              17 ('features')
+            102 STORE_SUBSCR
+
+ 95         104 LOAD_CONST              18 (0.0)
+            106 STORE_NAME              12 (lat)
+            108 LOAD_CONST              19 ('float')
+            110 LOAD_NAME                3 (__annotations__)
+            112 LOAD_CONST              20 ('lat')
+            114 STORE_SUBSCR
+
+ 96         116 LOAD_CONST              18 (0.0)
+            118 STORE_NAME              13 (lon)
+            120 LOAD_CONST              19 ('float')
+            122 LOAD_NAME                3 (__annotations__)
+            124 LOAD_CONST              21 ('lon')
+            126 STORE_SUBSCR
+
+ 97         128 LOAD_CONST              18 (0.0)
+            130 STORE_NAME              14 (distance_from_route_m)
+            132 LOAD_CONST              19 ('float')
+            134 LOAD_NAME                3 (__annotations__)
+            136 LOAD_CONST              22 ('distance_from_route_m')
+            138 STORE_SUBSCR
+            140 LOAD_CONST               6 (None)
+            142 RETURN_VALUE
+
+Disassembly of <code object SegmentRisk at 0x00000140FE609B00, file "E:\Projects\School_projects\Hazard_Situation_Analysis_and_Prediction\route_risk_backend\app\schemas.py", line 102>:
+102           0 LOAD_NAME                0 (__name__)
+              2 STORE_NAME               1 (__module__)
+              4 LOAD_CONST               0 ('SegmentRisk')
+              6 STORE_NAME               2 (__qualname__)
+              8 SETUP_ANNOTATIONS
+
+103          10 LOAD_CONST               1 ('int')
+             12 LOAD_NAME                3 (__annotations__)
+             14 LOAD_CONST               2 ('segment_id')
+             16 STORE_SUBSCR
+
+104          18 LOAD_CONST               1 ('int')
+             20 LOAD_NAME                3 (__annotations__)
+             22 LOAD_CONST               3 ('from_point_index')
+             24 STORE_SUBSCR
+
+105          26 LOAD_CONST               1 ('int')
+             28 LOAD_NAME                3 (__annotations__)
+             30 LOAD_CONST               4 ('to_point_index')
+             32 STORE_SUBSCR
+
+106          34 LOAD_CONST               5 ('float')
+             36 LOAD_NAME                3 (__annotations__)
+             38 LOAD_CONST               6 ('length_km')
+             40 STORE_SUBSCR
+
+107          42 LOAD_CONST               7 (None)
+             44 STORE_NAME               4 (speed_limit_kmh)
+             46 LOAD_CONST               8 ('float | None')
+             48 LOAD_NAME                3 (__annotations__)
+             50 LOAD_CONST               9 ('speed_limit_kmh')
+             52 STORE_SUBSCR
+
+108          54 LOAD_CONST               7 (None)
+             56 STORE_NAME               5 (road_width_m)
+             58 LOAD_CONST               8 ('float | None')
+             60 LOAD_NAME                3 (__annotations__)
+             62 LOAD_CONST              10 ('road_width_m')
+             64 STORE_SUBSCR
+
+109          66 LOAD_CONST               7 (None)
+             68 STORE_NAME               6 (is_dark)
+             70 LOAD_CONST              11 ('bool | None')
+             72 LOAD_NAME                3 (__annotations__)
+             74 LOAD_CONST              12 ('is_dark')
+             76 STORE_SUBSCR
+
+110          78 LOAD_CONST               7 (None)
+             80 STORE_NAME               7 (is_twilight)
+             82 LOAD_CONST              11 ('bool | None')
+             84 LOAD_NAME                3 (__annotations__)
+             86 LOAD_CONST              13 ('is_twilight')
+             88 STORE_SUBSCR
+
+111          90 LOAD_CONST               7 (None)
+             92 STORE_NAME               8 (road_weather)
+             94 LOAD_CONST              14 ('str | None')
+             96 LOAD_NAME                3 (__annotations__)
+             98 LOAD_CONST              15 ('road_weather')
+            100 STORE_SUBSCR
+
+112         102 LOAD_CONST               7 (None)
+            104 STORE_NAME               9 (surface_condition)
+            106 LOAD_CONST              14 ('str | None')
+            108 LOAD_NAME                3 (__annotations__)
+            110 LOAD_CONST              16 ('surface_condition')
+            112 STORE_SUBSCR
+
+113         114 LOAD_CONST               7 (None)
+            116 STORE_NAME              10 (grip)
+            118 LOAD_CONST               8 ('float | None')
+            120 LOAD_NAME                3 (__annotations__)
+            122 LOAD_CONST              17 ('grip')
+            124 STORE_SUBSCR
+
+114         126 LOAD_CONST               7 (None)
+            128 STORE_NAME              11 (grip_proxy)
+            130 LOAD_CONST               8 ('float | None')
+            132 LOAD_NAME                3 (__annotations__)
+            134 LOAD_CONST              18 ('grip_proxy')
+            136 STORE_SUBSCR
+
+115         138 LOAD_CONST               7 (None)
+            140 STORE_NAME              12 (solar_elevation_deg)
+            142 LOAD_CONST               8 ('float | None')
+            144 LOAD_NAME                3 (__annotations__)
+            146 LOAD_CONST              19 ('solar_elevation_deg')
+            148 STORE_SUBSCR
+
+116         150 LOAD_CONST              20 (False)
+            152 STORE_NAME              13 (recurring_hazard)
+            154 LOAD_CONST              21 ('bool')
+            156 LOAD_NAME                3 (__annotations__)
+            158 LOAD_CONST              22 ('recurring_hazard')
+            160 STORE_SUBSCR
+
+117         162 LOAD_CONST               7 (None)
+            164 STORE_NAME              14 (road_attribute_source)
+            166 LOAD_CONST              14 ('str | None')
+            168 LOAD_NAME                3 (__annotations__)
+            170 LOAD_CONST              23 ('road_attribute_source')
+            172 STORE_SUBSCR
+
+118         174 LOAD_CONST               7 (None)
+            176 STORE_NAME              15 (road_attribute_match_distance_m)
+            178 LOAD_CONST               8 ('float | None')
+            180 LOAD_NAME                3 (__annotations__)
+            182 LOAD_CONST              24 ('road_attribute_match_distance_m')
+            184 STORE_SUBSCR
+
+119         186 LOAD_CONST               7 (None)
+            188 STORE_NAME              16 (overall_road_condition)
+            190 LOAD_CONST              14 ('str | None')
+            192 LOAD_NAME                3 (__annotations__)
+            194 LOAD_CONST              25 ('overall_road_condition')
+            196 STORE_SUBSCR
+
+120         198 LOAD_CONST               7 (None)
+            200 STORE_NAME              17 (friction_condition)
+            202 LOAD_CONST              14 ('str | None')
+            204 LOAD_NAME                3 (__annotations__)
+            206 LOAD_CONST              26 ('friction_condition')
+            208 STORE_SUBSCR
+
+121         210 LOAD_CONST               7 (None)
+            212 STORE_NAME              18 (winter_slipperiness)
+            214 LOAD_CONST              11 ('bool | None')
+            216 LOAD_NAME                3 (__annotations__)
+            218 LOAD_CONST              27 ('winter_slipperiness')
+            220 STORE_SUBSCR
+
+122         222 LOAD_CONST               7 (None)
+            224 STORE_NAME              19 (road_temperature_c)
+            226 LOAD_CONST               8 ('float | None')
+            228 LOAD_NAME                3 (__annotations__)
+            230 LOAD_CONST              28 ('road_temperature_c')
+            232 STORE_SUBSCR
+
+123         234 LOAD_CONST               7 (None)
+            236 STORE_NAME              20 (air_temperature_c)
+            238 LOAD_CONST               8 ('float | None')
+            240 LOAD_NAME                3 (__annotations__)
+            242 LOAD_CONST              29 ('air_temperature_c')
+            244 STORE_SUBSCR
+
+124         246 LOAD_CONST               7 (None)
+            248 STORE_NAME              21 (wind_speed_ms)
+            250 LOAD_CONST               8 ('float | None')
+            252 LOAD_NAME                3 (__annotations__)
+            254 LOAD_CONST              30 ('wind_speed_ms')
+            256 STORE_SUBSCR
+
+125         258 LOAD_CONST               7 (None)
+            260 STORE_NAME              22 (weather_source)
+            262 LOAD_CONST              14 ('str | None')
+            264 LOAD_NAME                3 (__annotations__)
+            266 LOAD_CONST              31 ('weather_source')
+            268 STORE_SUBSCR
+
+126         270 LOAD_CONST               7 (None)
+            272 STORE_NAME              23 (weather_match_distance_m)
+            274 LOAD_CONST               8 ('float | None')
+            276 LOAD_NAME                3 (__annotations__)
+            278 LOAD_CONST              32 ('weather_match_distance_m')
+            280 STORE_SUBSCR
+
+127         282 LOAD_CONST               7 (None)
+            284 STORE_NAME              24 (weather_forecast_time)
+            286 LOAD_CONST              14 ('str | None')
+            288 LOAD_NAME                3 (__annotations__)
+            290 LOAD_CONST              33 ('weather_forecast_time')
+            292 STORE_SUBSCR
+
+128         294 LOAD_CONST               7 (None)
+            296 STORE_NAME              25 (weather_reliability)
+            298 LOAD_CONST              14 ('str | None')
+            300 LOAD_NAME                3 (__annotations__)
+            302 LOAD_CONST              34 ('weather_reliability')
+            304 STORE_SUBSCR
+
+129         306 LOAD_CONST               7 (None)
+            308 STORE_NAME              26 (weather_section_id)
+            310 LOAD_CONST              14 ('str | None')
+            312 LOAD_NAME                3 (__annotations__)
+            314 LOAD_CONST              35 ('weather_section_id')
+            316 STORE_SUBSCR
+
+130         318 LOAD_CONST               7 (None)
+            320 STORE_NAME              27 (weather_forecast_type)
+            322 LOAD_CONST              14 ('str | None')
+            324 LOAD_NAME                3 (__annotations__)
+            326 LOAD_CONST              36 ('weather_forecast_type')
+            328 STORE_SUBSCR
+
+131         330 LOAD_CONST               7 (None)
+            332 STORE_NAME              28 (weather_time_delta_minutes)
+            334 LOAD_CONST               8 ('float | None')
+            336 LOAD_NAME                3 (__annotations__)
+            338 LOAD_CONST              37 ('weather_time_delta_minutes')
+            340 STORE_SUBSCR
+
+132         342 LOAD_CONST              20 (False)
+            344 STORE_NAME              29 (weather_usable_for_scoring)
+            346 LOAD_CONST              21 ('bool')
+            348 LOAD_NAME                3 (__annotations__)
+            350 LOAD_CONST              38 ('weather_usable_for_scoring')
+            352 STORE_SUBSCR
+
+133         354 LOAD_CONST               7 (None)
+            356 STORE_NAME              30 (weather_confidence)
+            358 LOAD_CONST              14 ('str | None')
+            360 LOAD_NAME                3 (__annotations__)
+            362 LOAD_CONST              39 ('weather_confidence')
+            364 STORE_SUBSCR
+
+134         366 LOAD_CONST               7 (None)
+            368 STORE_NAME              31 (road_lit)
+            370 LOAD_CONST              11 ('bool | None')
+            372 LOAD_NAME                3 (__annotations__)
+            374 LOAD_CONST              40 ('road_lit')
+            376 STORE_SUBSCR
+
+135         378 LOAD_CONST              20 (False)
+            380 STORE_NAME              32 (moose_risk)
+            382 LOAD_CONST              21 ('bool')
+            384 LOAD_NAME                3 (__annotations__)
+            386 LOAD_CONST              41 ('moose_risk')
+            388 STORE_SUBSCR
+
+136         390 LOAD_CONST               5 ('float')
+            392 LOAD_NAME                3 (__annotations__)
+            394 LOAD_CONST              42 ('risk_score')
+            396 STORE_SUBSCR
+
+137         398 LOAD_CONST              43 ('str')
+            400 LOAD_NAME                3 (__annotations__)
+            402 LOAD_CONST              44 ('risk_level')
+            404 STORE_SUBSCR
+
+138         406 LOAD_NAME               33 (Field)
+            408 LOAD_NAME               34 (list)
+            410 LOAD_CONST              45 (('default_factory',))
+            412 CALL_FUNCTION_KW         1
+            414 STORE_NAME              35 (reasons)
+            416 LOAD_CONST              46 ('list[str]')
+            418 LOAD_NAME                3 (__annotations__)
+            420 LOAD_CONST              47 ('reasons')
+            422 STORE_SUBSCR
+            424 LOAD_CONST               7 (None)
+            426 RETURN_VALUE
+
+Disassembly of <code object JourneyRiskSummary at 0x00000140FE60A080, file "E:\Projects\School_projects\Hazard_Situation_Analysis_and_Prediction\route_risk_backend\app\schemas.py", line 141>:
+141           0 LOAD_NAME                0 (__name__)
+              2 STORE_NAME               1 (__module__)
+              4 LOAD_CONST               0 ('JourneyRiskSummary')
+              6 STORE_NAME               2 (__qualname__)
+              8 SETUP_ANNOTATIONS
+
+142          10 LOAD_CONST               1 ('float')
+             12 LOAD_NAME                3 (__annotations__)
+             14 LOAD_CONST               2 ('overall_risk_score')
+             16 STORE_SUBSCR
+
+143          18 LOAD_CONST               3 ('str')
+             20 LOAD_NAME                3 (__annotations__)
+             22 LOAD_CONST               4 ('overall_risk_level')
+             24 STORE_SUBSCR
+
+144          26 LOAD_CONST               1 ('float')
+             28 LOAD_NAME                3 (__annotations__)
+             30 LOAD_CONST               5 ('highest_segment_score')
+             32 STORE_SUBSCR
+
+145          34 LOAD_CONST               6 ('int')
+             36 LOAD_NAME                3 (__annotations__)
+             38 LOAD_CONST               7 ('dark_segment_count')
+             40 STORE_SUBSCR
+
+146          42 LOAD_CONST               8 (0)
+             44 STORE_NAME               4 (twilight_segment_count)
+             46 LOAD_CONST               6 ('int')
+             48 LOAD_NAME                3 (__annotations__)
+             50 LOAD_CONST               9 ('twilight_segment_count')
+             52 STORE_SUBSCR
+
+147          54 LOAD_CONST               6 ('int')
+             56 LOAD_NAME                3 (__annotations__)
+             58 LOAD_CONST              10 ('poor_grip_segment_count')
+             60 STORE_SUBSCR
+
+148          62 LOAD_CONST               6 ('int')
+             64 LOAD_NAME                3 (__annotations__)
+             66 LOAD_CONST              11 ('recurring_hazard_segment_count')
+             68 STORE_SUBSCR
+
+149          70 LOAD_CONST               8 (0)
+             72 STORE_NAME               5 (poor_weather_segment_count)
+             74 LOAD_CONST               6 ('int')
+             76 LOAD_NAME                3 (__annotations__)
+             78 LOAD_CONST              12 ('poor_weather_segment_count')
+             80 STORE_SUBSCR
+
+150          82 LOAD_CONST               8 (0)
+             84 STORE_NAME               6 (slippery_segment_count)
+             86 LOAD_CONST               6 ('int')
+             88 LOAD_NAME                3 (__annotations__)
+             90 LOAD_CONST              13 ('slippery_segment_count')
+             92 STORE_SUBSCR
+
+151          94 LOAD_CONST               8 (0)
+             96 STORE_NAME               7 (weak_weather_match_count)
+             98 LOAD_CONST               6 ('int')
+            100 LOAD_NAME                3 (__annotations__)
+            102 LOAD_CONST              14 ('weak_weather_match_count')
+            104 STORE_SUBSCR
+
+152         106 LOAD_CONST               8 (0)
+            108 STORE_NAME               8 (usable_weather_segment_count)
+            110 LOAD_CONST               6 ('int')
+            112 LOAD_NAME                3 (__annotations__)
+            114 LOAD_CONST              15 ('usable_weather_segment_count')
+            116 STORE_SUBSCR
+
+153         118 LOAD_CONST              16 (0.0)
+            120 STORE_NAME               9 (darkness_total_km)
+            122 LOAD_CONST               1 ('float')
+            124 LOAD_NAME                3 (__annotations__)
+            126 LOAD_CONST              17 ('darkness_total_km')
+            128 STORE_SUBSCR
+
+154         130 LOAD_CONST              16 (0.0)
+            132 STORE_NAME              10 (darkness_total_minutes)
+            134 LOAD_CONST               1 ('float')
+            136 LOAD_NAME                3 (__annotations__)
+            138 LOAD_CONST              18 ('darkness_total_minutes')
+            140 STORE_SUBSCR
+
+155         142 LOAD_CONST              16 (0.0)
+            144 STORE_NAME              11 (daylight_total_km)
+            146 LOAD_CONST               1 ('float')
+            148 LOAD_NAME                3 (__annotations__)
+            150 LOAD_CONST              19 ('daylight_total_km')
+            152 STORE_SUBSCR
+
+156         154 LOAD_CONST              16 (0.0)
+            156 STORE_NAME              12 (daylight_total_minutes)
+            158 LOAD_CONST               1 ('float')
+            160 LOAD_NAME                3 (__annotations__)
+            162 LOAD_CONST              20 ('daylight_total_minutes')
+            164 STORE_SUBSCR
+
+157         166 LOAD_CONST              21 (None)
+            168 STORE_NAME              13 (darkness_start_time)
+            170 LOAD_CONST              22 ('str | None')
+            172 LOAD_NAME                3 (__annotations__)
+            174 LOAD_CONST              23 ('darkness_start_time')
+            176 STORE_SUBSCR
+
+158         178 LOAD_CONST              21 (None)
+            180 STORE_NAME              14 (darkness_end_time)
+            182 LOAD_CONST              22 ('str | None')
+            184 LOAD_NAME                3 (__annotations__)
+            186 LOAD_CONST              24 ('darkness_end_time')
+            188 STORE_SUBSCR
+
+159         190 LOAD_CONST              25 ('')
+            192 STORE_NAME              15 (darkness_start_road)
+            194 LOAD_CONST               3 ('str')
+            196 LOAD_NAME                3 (__annotations__)
+            198 LOAD_CONST              26 ('darkness_start_road')
+            200 STORE_SUBSCR
+
+160         202 LOAD_CONST              25 ('')
+            204 STORE_NAME              16 (darkness_end_road)
+            206 LOAD_CONST               3 ('str')
+            208 LOAD_NAME                3 (__annotations__)
+            210 LOAD_CONST              27 ('darkness_end_road')
+            212 STORE_SUBSCR
+
+161         214 LOAD_CONST              21 (None)
+            216 STORE_NAME              17 (daylight_start_time)
+            218 LOAD_CONST              22 ('str | None')
+            220 LOAD_NAME                3 (__annotations__)
+            222 LOAD_CONST              28 ('daylight_start_time')
+            224 STORE_SUBSCR
+
+162         226 LOAD_CONST              25 ('')
+            228 STORE_NAME              18 (daylight_start_road)
+            230 LOAD_CONST               3 ('str')
+            232 LOAD_NAME                3 (__annotations__)
+            234 LOAD_CONST              29 ('daylight_start_road')
+            236 STORE_SUBSCR
+
+163         238 LOAD_CONST              25 ('')
+            240 STORE_NAME              19 (highest_risk_road)
+            242 LOAD_CONST               3 ('str')
+            244 LOAD_NAME                3 (__annotations__)
+            246 LOAD_CONST              30 ('highest_risk_road')
+            248 STORE_SUBSCR
+
+164         250 LOAD_CONST               8 (0)
+            252 STORE_NAME              20 (lit_road_segment_count)
+            254 LOAD_CONST               6 ('int')
+            256 LOAD_NAME                3 (__annotations__)
+            258 LOAD_CONST              31 ('lit_road_segment_count')
+            260 STORE_SUBSCR
+
+165         262 LOAD_CONST               8 (0)
+            264 STORE_NAME              21 (moose_risk_segment_count)
+            266 LOAD_CONST               6 ('int')
+            268 LOAD_NAME                3 (__annotations__)
+            270 LOAD_CONST              32 ('moose_risk_segment_count')
+            272 STORE_SUBSCR
+            274 LOAD_CONST              21 (None)
+            276 RETURN_VALUE
+
+Disassembly of <code object TopRiskyPart at 0x00000140FE223E10, file "E:\Projects\School_projects\Hazard_Situation_Analysis_and_Prediction\route_risk_backend\app\schemas.py", line 168>:
+168           0 LOAD_NAME                0 (__name__)
+              2 STORE_NAME               1 (__module__)
+              4 LOAD_CONST               0 ('TopRiskyPart')
+              6 STORE_NAME               2 (__qualname__)
+              8 SETUP_ANNOTATIONS
+
+169          10 LOAD_CONST               1 ('int')
+             12 LOAD_NAME                3 (__annotations__)
+             14 LOAD_CONST               2 ('segment_id')
+             16 STORE_SUBSCR
+
+170          18 LOAD_CONST               3 ('float')
+             20 LOAD_NAME                3 (__annotations__)
+             22 LOAD_CONST               4 ('risk_score')
+             24 STORE_SUBSCR
+
+171          26 LOAD_CONST               5 ('str')
+             28 LOAD_NAME                3 (__annotations__)
+             30 LOAD_CONST               6 ('risk_level')
+             32 STORE_SUBSCR
+
+172          34 LOAD_CONST               7 ('list[str]')
+             36 LOAD_NAME                3 (__annotations__)
+             38 LOAD_CONST               8 ('reasons')
+             40 STORE_SUBSCR
+
+173          42 LOAD_CONST               9 (0.0)
+             44 STORE_NAME               4 (cumulative_distance_km)
+             46 LOAD_CONST               3 ('float')
+             48 LOAD_NAME                3 (__annotations__)
+             50 LOAD_CONST              10 ('cumulative_distance_km')
+             52 STORE_SUBSCR
+
+174          54 LOAD_CONST              11 (None)
+             56 STORE_NAME               5 (estimated_time)
+             58 LOAD_CONST              12 ('str | None')
+             60 LOAD_NAME                3 (__annotations__)
+             62 LOAD_CONST              13 ('estimated_time')
+             64 STORE_SUBSCR
+
+175          66 LOAD_CONST              14 ('')
+             68 STORE_NAME               6 (road_name)
+             70 LOAD_CONST               5 ('str')
+             72 LOAD_NAME                3 (__annotations__)
+             74 LOAD_CONST              15 ('road_name')
+             76 STORE_SUBSCR
+             78 LOAD_CONST              11 (None)
+             80 RETURN_VALUE
+
+Disassembly of <code object EvidenceForLlm at 0x00000140FE223EC0, file "E:\Projects\School_projects\Hazard_Situation_Analysis_and_Prediction\route_risk_backend\app\schemas.py", line 179>:
+179           0 LOAD_NAME                0 (__name__)
+              2 STORE_NAME               1 (__module__)
+              4 LOAD_CONST               0 ('EvidenceForLlm')
+              6 STORE_NAME               2 (__qualname__)
+              8 SETUP_ANNOTATIONS
+
+180          10 LOAD_CONST               1 ('str')
+             12 LOAD_NAME                3 (__annotations__)
+             14 LOAD_CONST               2 ('journey')
+             16 STORE_SUBSCR
+
+181          18 LOAD_CONST               1 ('str')
+             20 LOAD_NAME                3 (__annotations__)
+             22 LOAD_CONST               3 ('departure_time_local')
+             24 STORE_SUBSCR
+
+182          26 LOAD_CONST               4 ('int')
+             28 LOAD_NAME                3 (__annotations__)
+             30 LOAD_CONST               5 ('total_segments')
+             32 STORE_SUBSCR
+
+183          34 LOAD_CONST               6 ('float')
+             36 LOAD_NAME                3 (__annotations__)
+             38 LOAD_CONST               7 ('overall_risk_score')
+             40 STORE_SUBSCR
+
+184          42 LOAD_CONST               1 ('str')
+             44 LOAD_NAME                3 (__annotations__)
+             46 LOAD_CONST               8 ('overall_risk_level')
+             48 STORE_SUBSCR
+
+185          50 LOAD_CONST               9 (0)
+             52 STORE_NAME               4 (dark_segment_count)
+             54 LOAD_CONST               4 ('int')
+             56 LOAD_NAME                3 (__annotations__)
+             58 LOAD_CONST              10 ('dark_segment_count')
+             60 STORE_SUBSCR
+
+186          62 LOAD_CONST               9 (0)
+             64 STORE_NAME               5 (twilight_segment_count)
+             66 LOAD_CONST               4 ('int')
+             68 LOAD_NAME                3 (__annotations__)
+             70 LOAD_CONST              11 ('twilight_segment_count')
+             72 STORE_SUBSCR
+
+187          74 LOAD_CONST              12 (None)
+             76 STORE_NAME               6 (first_dark_timestamp)
+             78 LOAD_CONST              13 ('str | None')
+             80 LOAD_NAME                3 (__annotations__)
+             82 LOAD_CONST              14 ('first_dark_timestamp')
+             84 STORE_SUBSCR
+
+188          86 LOAD_CONST               9 (0)
+             88 STORE_NAME               7 (weak_weather_match_count)
+             90 LOAD_CONST               4 ('int')
+             92 LOAD_NAME                3 (__annotations__)
+             94 LOAD_CONST              15 ('weak_weather_match_count')
+             96 STORE_SUBSCR
+
+189          98 LOAD_CONST               9 (0)
+            100 STORE_NAME               8 (usable_weather_segment_count)
+            102 LOAD_CONST               4 ('int')
+            104 LOAD_NAME                3 (__annotations__)
+            106 LOAD_CONST              16 ('usable_weather_segment_count')
+            108 STORE_SUBSCR
+
+190         110 LOAD_CONST              12 (None)
+            112 STORE_NAME               9 (first_usable_slippery_weather_timestamp)
+            114 LOAD_CONST              13 ('str | None')
+            116 LOAD_NAME                3 (__annotations__)
+            118 LOAD_CONST              17 ('first_usable_slippery_weather_timestamp')
+            120 STORE_SUBSCR
+
+191         122 LOAD_CONST              18 (0.0)
+            124 STORE_NAME              10 (darkness_total_km)
+            126 LOAD_CONST               6 ('float')
+            128 LOAD_NAME                3 (__annotations__)
+            130 LOAD_CONST              19 ('darkness_total_km')
+            132 STORE_SUBSCR
+
+192         134 LOAD_CONST              18 (0.0)
+            136 STORE_NAME              11 (darkness_total_minutes)
+            138 LOAD_CONST               6 ('float')
+            140 LOAD_NAME                3 (__annotations__)
+            142 LOAD_CONST              20 ('darkness_total_minutes')
+            144 STORE_SUBSCR
+
+193         146 LOAD_CONST              18 (0.0)
+            148 STORE_NAME              12 (daylight_total_km)
+            150 LOAD_CONST               6 ('float')
+            152 LOAD_NAME                3 (__annotations__)
+            154 LOAD_CONST              21 ('daylight_total_km')
+            156 STORE_SUBSCR
+
+194         158 LOAD_CONST              18 (0.0)
+            160 STORE_NAME              13 (daylight_total_minutes)
+            162 LOAD_CONST               6 ('float')
+            164 LOAD_NAME                3 (__annotations__)
+            166 LOAD_CONST              22 ('daylight_total_minutes')
+            168 STORE_SUBSCR
+
+195         170 LOAD_NAME               14 (Field)
+            172 LOAD_NAME               15 (list)
+            174 LOAD_CONST              23 (('default_factory',))
+            176 CALL_FUNCTION_KW         1
+            178 STORE_NAME              16 (darkness_transitions)
+            180 LOAD_CONST              24 ('list[DarknessTransition]')
+            182 LOAD_NAME                3 (__annotations__)
+            184 LOAD_CONST              25 ('darkness_transitions')
+            186 STORE_SUBSCR
+
+196         188 LOAD_NAME               14 (Field)
+            190 LOAD_NAME               15 (list)
+            192 LOAD_CONST              23 (('default_factory',))
+            194 CALL_FUNCTION_KW         1
+            196 STORE_NAME              17 (surface_changes)
+            198 LOAD_CONST              26 ('list[SurfaceChange]')
+            200 LOAD_NAME                3 (__annotations__)
+            202 LOAD_CONST              27 ('surface_changes')
+            204 STORE_SUBSCR
+
+197         206 LOAD_NAME               14 (Field)
+            208 LOAD_NAME               15 (list)
+            210 LOAD_CONST              23 (('default_factory',))
+            212 CALL_FUNCTION_KW         1
+            214 STORE_NAME              18 (speed_zone_changes)
+            216 LOAD_CONST              28 ('list[SpeedZoneChange]')
+            218 LOAD_NAME                3 (__annotations__)
+            220 LOAD_CONST              29 ('speed_zone_changes')
+            222 STORE_SUBSCR
+
+198         224 LOAD_CONST               9 (0)
+            226 STORE_NAME              19 (lit_road_segment_count)
+            228 LOAD_CONST               4 ('int')
+            230 LOAD_NAME                3 (__annotations__)
+            232 LOAD_CONST              30 ('lit_road_segment_count')
+            234 STORE_SUBSCR
+
+199         236 LOAD_CONST               9 (0)
+            238 STORE_NAME              20 (moose_risk_segment_count)
+            240 LOAD_CONST               4 ('int')
+            242 LOAD_NAME                3 (__annotations__)
+            244 LOAD_CONST              31 ('moose_risk_segment_count')
+            246 STORE_SUBSCR
+
+200         248 LOAD_CONST              32 ('list[TopRiskyPart]')
+            250 LOAD_NAME                3 (__annotations__)
+            252 LOAD_CONST              33 ('top_risky_parts')
+            254 STORE_SUBSCR
+
+201         256 LOAD_CONST               1 ('str')
+            258 LOAD_NAME                3 (__annotations__)
+            260 LOAD_CONST              34 ('conditions_summary')
+            262 STORE_SUBSCR
+
+202         264 LOAD_NAME               14 (Field)
+            266 LOAD_NAME               15 (list)
+            268 LOAD_CONST              23 (('default_factory',))
+            270 CALL_FUNCTION_KW         1
+            272 STORE_NAME              21 (traffic_incidents)
+            274 LOAD_CONST              35 ('list[TrafficIncident]')
+            276 LOAD_NAME                3 (__annotations__)
+            278 LOAD_CONST              36 ('traffic_incidents')
+            280 STORE_SUBSCR
+            282 LOAD_CONST              12 (None)
+            284 RETURN_VALUE
+
+Disassembly of <code object JourneyPresentation at 0x00000140FE222760, file "E:\Projects\School_projects\Hazard_Situation_Analysis_and_Prediction\route_risk_backend\app\schemas.py", line 206>:
+206           0 LOAD_NAME                0 (__name__)
+              2 STORE_NAME               1 (__module__)
+              4 LOAD_CONST               0 ('JourneyPresentation')
+              6 STORE_NAME               2 (__qualname__)
+              8 SETUP_ANNOTATIONS
+
+207          10 LOAD_CONST               1 ('str')
+             12 LOAD_NAME                3 (__annotations__)
+             14 LOAD_CONST               2 ('departure_place')
+             16 STORE_SUBSCR
+
+208          18 LOAD_CONST               1 ('str')
+             20 LOAD_NAME                3 (__annotations__)
+             22 LOAD_CONST               3 ('destination_place')
+             24 STORE_SUBSCR
+
+209          26 LOAD_CONST               1 ('str')
+             28 LOAD_NAME                3 (__annotations__)
+             30 LOAD_CONST               4 ('departure_local_time')
+             32 STORE_SUBSCR
+
+210          34 LOAD_CONST               1 ('str')
+             36 LOAD_NAME                3 (__annotations__)
+             38 LOAD_CONST               5 ('arrival_local_time')
+             40 STORE_SUBSCR
+
+211          42 LOAD_CONST               1 ('str')
+             44 LOAD_NAME                3 (__annotations__)
+             46 LOAD_CONST               6 ('total_distance')
+             48 STORE_SUBSCR
+
+212          50 LOAD_CONST               1 ('str')
+             52 LOAD_NAME                3 (__annotations__)
+             54 LOAD_CONST               7 ('total_duration')
+             56 STORE_SUBSCR
+
+213          58 LOAD_CONST               8 ('int')
+             60 LOAD_NAME                3 (__annotations__)
+             62 LOAD_CONST               9 ('route_checkpoints')
+             64 STORE_SUBSCR
+
+214          66 LOAD_CONST               1 ('str')
+             68 LOAD_NAME                3 (__annotations__)
+             70 LOAD_CONST              10 ('checkpoint_interval')
+             72 STORE_SUBSCR
+
+215          74 LOAD_CONST               1 ('str')
+             76 LOAD_NAME                3 (__annotations__)
+             78 LOAD_CONST              11 ('overall_risk')
+             80 STORE_SUBSCR
+
+216          82 LOAD_CONST              12 ('float')
+             84 LOAD_NAME                3 (__annotations__)
+             86 LOAD_CONST              13 ('risk_score')
+             88 STORE_SUBSCR
+
+217          90 LOAD_NAME                4 (Field)
+             92 LOAD_NAME                5 (list)
+             94 LOAD_CONST              14 (('default_factory',))
+             96 CALL_FUNCTION_KW         1
+             98 STORE_NAME               6 (top_risk_reasons)
+            100 LOAD_CONST              15 ('list[str]')
+            102 LOAD_NAME                3 (__annotations__)
+            104 LOAD_CONST              16 ('top_risk_reasons')
+            106 STORE_SUBSCR
+
+218         108 LOAD_CONST              17 ('')
+            110 STORE_NAME               7 (extra_care_when)
+            112 LOAD_CONST               1 ('str')
+            114 LOAD_NAME                3 (__annotations__)
+            116 LOAD_CONST              18 ('extra_care_when')
+            118 STORE_SUBSCR
+
+219         120 LOAD_CONST              17 ('')
+            122 STORE_NAME               8 (weather_coverage_note)
+            124 LOAD_CONST               1 ('str')
+            126 LOAD_NAME                3 (__annotations__)
+            128 LOAD_CONST              19 ('weather_coverage_note')
+            130 STORE_SUBSCR
+
+220         132 LOAD_CONST              17 ('')
+            134 STORE_NAME               9 (trip_summary_line)
+            136 LOAD_CONST               1 ('str')
+            138 LOAD_NAME                3 (__annotations__)
+            140 LOAD_CONST              20 ('trip_summary_line')
+            142 STORE_SUBSCR
+
+221         144 LOAD_CONST              21 (True)
+            146 STORE_NAME              10 (has_daylight)
+            148 LOAD_CONST              22 ('bool')
+            150 LOAD_NAME                3 (__annotations__)
+            152 LOAD_CONST              23 ('has_daylight')
+            154 STORE_SUBSCR
+
+222         156 LOAD_CONST              24 (None)
+            158 STORE_NAME              11 (dark_from)
+            160 LOAD_CONST              25 ('str | None')
+            162 LOAD_NAME                3 (__annotations__)
+            164 LOAD_CONST              26 ('dark_from')
+            166 STORE_SUBSCR
+
+223         168 LOAD_CONST              24 (None)
+            170 STORE_NAME              12 (dark_to)
+            172 LOAD_CONST              25 ('str | None')
+            174 LOAD_NAME                3 (__annotations__)
+            176 LOAD_CONST              27 ('dark_to')
+            178 STORE_SUBSCR
+
+224         180 LOAD_CONST              24 (None)
+            182 STORE_NAME              13 (twilight_from)
+            184 LOAD_CONST              25 ('str | None')
+            186 LOAD_NAME                3 (__annotations__)
+            188 LOAD_CONST              28 ('twilight_from')
+            190 STORE_SUBSCR
+
+225         192 LOAD_CONST              17 ('')
+            194 STORE_NAME              14 (darkness_duration)
+            196 LOAD_CONST               1 ('str')
+            198 LOAD_NAME                3 (__annotations__)
+            200 LOAD_CONST              29 ('darkness_duration')
+            202 STORE_SUBSCR
+
+226         204 LOAD_CONST              17 ('')
+            206 STORE_NAME              15 (daylight_duration)
+            208 LOAD_CONST               1 ('str')
+            210 LOAD_NAME                3 (__annotations__)
+            212 LOAD_CONST              30 ('daylight_duration')
+            214 STORE_SUBSCR
+
+227         216 LOAD_CONST              17 ('')
+            218 STORE_NAME              16 (distance_in_dark)
+            220 LOAD_CONST               1 ('str')
+            222 LOAD_NAME                3 (__annotations__)
+            224 LOAD_CONST              31 ('distance_in_dark')
+            226 STORE_SUBSCR
+
+228         228 LOAD_NAME                4 (Field)
+            230 LOAD_NAME                5 (list)
+            232 LOAD_CONST              14 (('default_factory',))
+            234 CALL_FUNCTION_KW         1
+            236 STORE_NAME              17 (darkness_events)
+            238 LOAD_CONST              15 ('list[str]')
+            240 LOAD_NAME                3 (__annotations__)
+            242 LOAD_CONST              32 ('darkness_events')
+            244 STORE_SUBSCR
+
+229         246 LOAD_NAME                4 (Field)
+            248 LOAD_NAME                5 (list)
+            250 LOAD_CONST              14 (('default_factory',))
+            252 CALL_FUNCTION_KW         1
+            254 STORE_NAME              18 (surface_change_descriptions)
+            256 LOAD_CONST              15 ('list[str]')
+            258 LOAD_NAME                3 (__annotations__)
+            260 LOAD_CONST              33 ('surface_change_descriptions')
+            262 STORE_SUBSCR
+            264 LOAD_CONST              24 (None)
+            266 RETURN_VALUE
+
+Disassembly of <code object AiSummary at 0x00000140FE6221E0, file "E:\Projects\School_projects\Hazard_Situation_Analysis_and_Prediction\route_risk_backend\app\schemas.py", line 232>:
+232           0 LOAD_NAME                0 (__name__)
+              2 STORE_NAME               1 (__module__)
+              4 LOAD_CONST               0 ('AiSummary')
+              6 STORE_NAME               2 (__qualname__)
+              8 SETUP_ANNOTATIONS
+
+233          10 LOAD_CONST               1 ('str')
+             12 LOAD_NAME                3 (__annotations__)
+             14 LOAD_CONST               2 ('summary')
+             16 STORE_SUBSCR
+
+234          18 LOAD_NAME                4 (Field)
+             20 LOAD_NAME                5 (list)
+             22 LOAD_CONST               3 (('default_factory',))
+             24 CALL_FUNCTION_KW         1
+             26 STORE_NAME               6 (key_risks)
+             28 LOAD_CONST               4 ('list[str]')
+             30 LOAD_NAME                3 (__annotations__)
+             32 LOAD_CONST               5 ('key_risks')
+             34 STORE_SUBSCR
+
+235          36 LOAD_NAME                4 (Field)
+             38 LOAD_NAME                5 (list)
+             40 LOAD_CONST               3 (('default_factory',))
+             42 CALL_FUNCTION_KW         1
+             44 STORE_NAME               7 (advice)
+             46 LOAD_CONST               4 ('list[str]')
+             48 LOAD_NAME                3 (__annotations__)
+             50 LOAD_CONST               6 ('advice')
+             52 STORE_SUBSCR
+
+236          54 LOAD_NAME                4 (Field)
+             56 LOAD_NAME                5 (list)
+             58 LOAD_CONST               3 (('default_factory',))
+             60 CALL_FUNCTION_KW         1
+             62 STORE_NAME               8 (unknowns)
+             64 LOAD_CONST               4 ('list[str]')
+             66 LOAD_NAME                3 (__annotations__)
+             68 LOAD_CONST               7 ('unknowns')
+             70 STORE_SUBSCR
+
+237          72 LOAD_CONST               8 ('')
+             74 STORE_NAME               9 (confidence_note)
+             76 LOAD_CONST               1 ('str')
+             78 LOAD_NAME                3 (__annotations__)
+             80 LOAD_CONST               9 ('confidence_note')
+             82 STORE_SUBSCR
+             84 LOAD_CONST              10 (None)
+             86 RETURN_VALUE
+
+Disassembly of <code object JourneyAnalysisResponse at 0x00000140FE621F20, file "E:\Projects\School_projects\Hazard_Situation_Analysis_and_Prediction\route_risk_backend\app\schemas.py", line 240>:
+240           0 LOAD_NAME                0 (__name__)
+              2 STORE_NAME               1 (__module__)
+              4 LOAD_CONST               0 ('JourneyAnalysisResponse')
+              6 STORE_NAME               2 (__qualname__)
+              8 SETUP_ANNOTATIONS
+
+241          10 LOAD_CONST               1 ('str')
+             12 LOAD_NAME                3 (__annotations__)
+             14 LOAD_CONST               2 ('route_id')
+             16 STORE_SUBSCR
+
+242          18 LOAD_CONST               3 ('float')
+             20 LOAD_NAME                3 (__annotations__)
+             22 LOAD_CONST               4 ('overall_risk_score')
+             24 STORE_SUBSCR
+
+243          26 LOAD_CONST               5 ('RouteSummary')
+             28 LOAD_NAME                3 (__annotations__)
+             30 LOAD_CONST               6 ('route_summary')
+             32 STORE_SUBSCR
+
+244          34 LOAD_CONST               7 ('list[SampledPoint]')
+             36 LOAD_NAME                3 (__annotations__)
+             38 LOAD_CONST               8 ('sampled_points')
+             40 STORE_SUBSCR
+
+245          42 LOAD_CONST               9 ('list[SegmentRisk]')
+             44 LOAD_NAME                3 (__annotations__)
+             46 LOAD_CONST              10 ('segment_risks')
+             48 STORE_SUBSCR
+
+246          50 LOAD_CONST              11 ('JourneyRiskSummary')
+             52 LOAD_NAME                3 (__annotations__)
+             54 LOAD_CONST              12 ('journey_risk_summary')
+             56 STORE_SUBSCR
+
+247          58 LOAD_CONST              13 ('EvidenceForLlm')
+             60 LOAD_NAME                3 (__annotations__)
+             62 LOAD_CONST              14 ('evidence_for_llm')
+             64 STORE_SUBSCR
+
+248          66 LOAD_CONST              15 (None)
+             68 STORE_NAME               4 (journey_presentation)
+             70 LOAD_CONST              16 ('JourneyPresentation | None')
+             72 LOAD_NAME                3 (__annotations__)
+             74 LOAD_CONST              17 ('journey_presentation')
+             76 STORE_SUBSCR
+
+249          78 LOAD_CONST              18 ('list[TopRiskyPart]')
+             80 LOAD_NAME                3 (__annotations__)
+             82 LOAD_CONST              19 ('top_risky_parts')
+             84 STORE_SUBSCR
+
+250          86 LOAD_NAME                5 (Field)
+             88 LOAD_NAME                6 (list)
+             90 LOAD_CONST              20 (('default_factory',))
+             92 CALL_FUNCTION_KW         1
+             94 STORE_NAME               7 (traffic_incidents)
+             96 LOAD_CONST              21 ('list[TrafficIncident]')
+             98 LOAD_NAME                3 (__annotations__)
+            100 LOAD_CONST              22 ('traffic_incidents')
+            102 STORE_SUBSCR
+
+251         104 LOAD_CONST              15 (None)
+            106 STORE_NAME               8 (ai_summary)
+            108 LOAD_CONST              23 ('AiSummary | None')
+            110 LOAD_NAME                3 (__annotations__)
+            112 LOAD_CONST              24 ('ai_summary')
+            114 STORE_SUBSCR
+
+252         116 LOAD_CONST              15 (None)
+            118 STORE_NAME               9 (ai_summary_error)
+            120 LOAD_CONST              25 ('str | None')
+            122 LOAD_NAME                3 (__annotations__)
+            124 LOAD_CONST              26 ('ai_summary_error')
+            126 STORE_SUBSCR
+            128 LOAD_CONST              15 (None)
+            130 RETURN_VALUE

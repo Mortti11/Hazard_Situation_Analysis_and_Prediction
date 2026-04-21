@@ -1,0 +1,411 @@
+  3           0 LOAD_CONST               0 (0)
+              2 LOAD_CONST               1 (None)
+              4 IMPORT_NAME              0 (logging)
+              6 STORE_NAME               0 (logging)
+
+  4           8 LOAD_CONST               0 (0)
+             10 LOAD_CONST               1 (None)
+             12 IMPORT_NAME              1 (os)
+             14 STORE_NAME               1 (os)
+
+  5          16 LOAD_CONST               0 (0)
+             18 LOAD_CONST               2 (('Path',))
+             20 IMPORT_NAME              2 (pathlib)
+             22 IMPORT_FROM              3 (Path)
+             24 STORE_NAME               3 (Path)
+             26 POP_TOP
+
+  7          28 LOAD_CONST               0 (0)
+             30 LOAD_CONST               3 (('load_dotenv',))
+             32 IMPORT_NAME              4 (dotenv)
+             34 IMPORT_FROM              5 (load_dotenv)
+             36 STORE_NAME               5 (load_dotenv)
+             38 POP_TOP
+
+  8          40 LOAD_CONST               0 (0)
+             42 LOAD_CONST               4 (('FastAPI', 'HTTPException', 'Query'))
+             44 IMPORT_NAME              6 (fastapi)
+             46 IMPORT_FROM              7 (FastAPI)
+             48 STORE_NAME               7 (FastAPI)
+             50 IMPORT_FROM              8 (HTTPException)
+             52 STORE_NAME               8 (HTTPException)
+             54 IMPORT_FROM              9 (Query)
+             56 STORE_NAME               9 (Query)
+             58 POP_TOP
+
+  9          60 LOAD_CONST               0 (0)
+             62 LOAD_CONST               5 (('HTMLResponse',))
+             64 IMPORT_NAME             10 (fastapi.responses)
+             66 IMPORT_FROM             11 (HTMLResponse)
+             68 STORE_NAME              11 (HTMLResponse)
+             70 POP_TOP
+
+ 10          72 LOAD_CONST               0 (0)
+             74 LOAD_CONST               6 (('StaticFiles',))
+             76 IMPORT_NAME             12 (fastapi.staticfiles)
+             78 IMPORT_FROM             13 (StaticFiles)
+             80 STORE_NAME              13 (StaticFiles)
+             82 POP_TOP
+
+ 12          84 LOAD_CONST               7 (1)
+             86 LOAD_CONST               8 (('generate_ai_summary',))
+             88 IMPORT_NAME             14 (llm)
+             90 IMPORT_FROM             15 (generate_ai_summary)
+             92 STORE_NAME              15 (generate_ai_summary)
+             94 POP_TOP
+
+ 13          96 LOAD_CONST               7 (1)
+             98 LOAD_CONST               9 (('assess_journey', 'fetch_route_options'))
+            100 IMPORT_NAME             16 (pipeline)
+            102 IMPORT_FROM             17 (assess_journey)
+            104 STORE_NAME              17 (assess_journey)
+            106 IMPORT_FROM             18 (fetch_route_options)
+            108 STORE_NAME              18 (fetch_route_options)
+            110 POP_TOP
+
+ 14         112 LOAD_CONST               7 (1)
+            114 LOAD_CONST              10 (('JourneyAnalysisResponse', 'JourneyRequest', 'RouteOptionsResponse', 'RoutePreview'))
+            116 IMPORT_NAME             19 (schemas)
+            118 IMPORT_FROM             20 (JourneyAnalysisResponse)
+            120 STORE_NAME              20 (JourneyAnalysisResponse)
+            122 IMPORT_FROM             21 (JourneyRequest)
+            124 STORE_NAME              21 (JourneyRequest)
+            126 IMPORT_FROM             22 (RouteOptionsResponse)
+            128 STORE_NAME              22 (RouteOptionsResponse)
+            130 IMPORT_FROM             23 (RoutePreview)
+            132 STORE_NAME              23 (RoutePreview)
+            134 POP_TOP
+
+ 16         136 LOAD_NAME                3 (Path)
+            138 LOAD_NAME               24 (__file__)
+            140 CALL_FUNCTION            1
+            142 LOAD_METHOD             25 (resolve)
+            144 CALL_METHOD              0
+            146 LOAD_ATTR               26 (parent)
+            148 STORE_NAME              27 (_HERE)
+
+ 17         150 LOAD_NAME               27 (_HERE)
+            152 LOAD_CONST              11 ('static')
+            154 BINARY_TRUE_DIVIDE
+            156 STORE_NAME              28 (_STATIC_DIR)
+
+ 20         158 LOAD_NAME               27 (_HERE)
+            160 LOAD_ATTR               26 (parent)
+            162 LOAD_ATTR               26 (parent)
+            164 LOAD_CONST              12 ('.env')
+            166 BINARY_TRUE_DIVIDE
+            168 STORE_NAME              29 (_env_file)
+
+ 21         170 LOAD_NAME               29 (_env_file)
+            172 LOAD_METHOD             30 (exists)
+            174 CALL_METHOD              0
+            176 POP_JUMP_IF_FALSE      120 (to 240)
+
+ 22         178 LOAD_NAME                5 (load_dotenv)
+            180 LOAD_NAME               29 (_env_file)
+            182 CALL_FUNCTION            1
+            184 POP_TOP
+
+ 23         186 LOAD_CONST              13 ((('Open_ai_key', 'OPENAI_API_KEY'), ('openrouteservice', 'ORS_API_KEY')))
+            188 GET_ITER
+        >>  190 FOR_ITER                24 (to 240)
+            192 UNPACK_SEQUENCE          2
+            194 STORE_NAME              31 (old)
+            196 STORE_NAME              32 (new)
+
+ 24         198 LOAD_NAME                1 (os)
+            200 LOAD_ATTR               33 (environ)
+            202 LOAD_METHOD             34 (get)
+            204 LOAD_NAME               31 (old)
+            206 CALL_METHOD              1
+            208 POP_JUMP_IF_FALSE      119 (to 238)
+            210 LOAD_NAME                1 (os)
+            212 LOAD_ATTR               33 (environ)
+            214 LOAD_METHOD             34 (get)
+            216 LOAD_NAME               32 (new)
+            218 CALL_METHOD              1
+            220 POP_JUMP_IF_TRUE       119 (to 238)
+
+ 25         222 LOAD_NAME                1 (os)
+            224 LOAD_ATTR               33 (environ)
+            226 LOAD_NAME               31 (old)
+            228 BINARY_SUBSCR
+            230 LOAD_NAME                1 (os)
+            232 LOAD_ATTR               33 (environ)
+            234 LOAD_NAME               32 (new)
+            236 STORE_SUBSCR
+        >>  238 JUMP_ABSOLUTE           95 (to 190)
+
+ 27     >>  240 LOAD_NAME                0 (logging)
+            242 LOAD_METHOD             35 (getLogger)
+            244 LOAD_NAME               36 (__name__)
+            246 CALL_METHOD              1
+            248 STORE_NAME              37 (logger)
+
+ 28         250 LOAD_NAME                7 (FastAPI)
+            252 LOAD_CONST              14 ('Route Risk Backend')
+            254 LOAD_CONST              15 ('0.1.0')
+            256 LOAD_CONST              16 (('title', 'version'))
+            258 CALL_FUNCTION_KW         2
+            260 STORE_NAME              38 (app)
+
+ 30         262 LOAD_NAME               28 (_STATIC_DIR)
+            264 LOAD_METHOD             39 (is_dir)
+            266 CALL_METHOD              0
+            268 POP_JUMP_IF_FALSE      148 (to 296)
+
+ 31         270 LOAD_NAME               38 (app)
+            272 LOAD_ATTR               40 (mount)
+            274 LOAD_CONST              17 ('/static')
+            276 LOAD_NAME               13 (StaticFiles)
+            278 LOAD_NAME               41 (str)
+            280 LOAD_NAME               28 (_STATIC_DIR)
+            282 CALL_FUNCTION            1
+            284 LOAD_CONST              18 (('directory',))
+            286 CALL_FUNCTION_KW         1
+            288 LOAD_CONST              11 ('static')
+            290 LOAD_CONST              19 (('name',))
+            292 CALL_FUNCTION_KW         3
+            294 POP_TOP
+
+ 34     >>  296 LOAD_NAME               38 (app)
+            298 LOAD_ATTR               34 (get)
+            300 LOAD_CONST              20 ('/')
+            302 LOAD_NAME               11 (HTMLResponse)
+            304 LOAD_CONST              21 (('response_class',))
+            306 CALL_FUNCTION_KW         2
+
+ 35         308 LOAD_CONST              22 (<code object serve_ui at 0x00000140FE5EA3F0, file "E:\Projects\School_projects\Hazard_Situation_Analysis_and_Prediction\route_risk_backend\app\main.py", line 34>)
+            310 LOAD_CONST              23 ('serve_ui')
+            312 MAKE_FUNCTION            0
+            314 CALL_FUNCTION            1
+            316 STORE_NAME              42 (serve_ui)
+
+ 43         318 LOAD_NAME               38 (app)
+            320 LOAD_ATTR               34 (get)
+            322 LOAD_CONST              24 ('/api/v1/route-options')
+            324 LOAD_NAME               22 (RouteOptionsResponse)
+            326 LOAD_CONST              25 (('response_model',))
+            328 CALL_FUNCTION_KW         2
+
+ 44         330 LOAD_CONST              26 ('departure')
+            332 LOAD_NAME               41 (str)
+            334 LOAD_CONST              27 ('destination')
+            336 LOAD_NAME               41 (str)
+            338 BUILD_TUPLE              4
+            340 LOAD_CONST              28 (<code object route_options at 0x00000140FE608450, file "E:\Projects\School_projects\Hazard_Situation_Analysis_and_Prediction\route_risk_backend\app\main.py", line 43>)
+            342 LOAD_CONST              29 ('route_options')
+            344 MAKE_FUNCTION            4 (annotations)
+            346 CALL_FUNCTION            1
+            348 STORE_NAME              43 (route_options)
+
+ 52         350 LOAD_NAME               38 (app)
+            352 LOAD_ATTR               44 (post)
+            354 LOAD_CONST              30 ('/api/v1/route-analysis')
+            356 LOAD_NAME               20 (JourneyAnalysisResponse)
+            358 LOAD_CONST              25 (('response_model',))
+            360 CALL_FUNCTION_KW         2
+
+ 53         362 LOAD_NAME                9 (Query)
+            364 LOAD_CONST              31 (False)
+            366 LOAD_CONST              32 ('Include AI summary')
+            368 LOAD_CONST              33 (('description',))
+            370 CALL_FUNCTION_KW         2
+            372 BUILD_TUPLE              1
+            374 LOAD_CONST              34 ('request')
+            376 LOAD_NAME               21 (JourneyRequest)
+            378 LOAD_CONST              35 ('include_ai')
+            380 LOAD_NAME               45 (bool)
+            382 BUILD_TUPLE              4
+            384 LOAD_CONST              36 (<code object route_analysis at 0x00000140FE608920, file "E:\Projects\School_projects\Hazard_Situation_Analysis_and_Prediction\route_risk_backend\app\main.py", line 52>)
+            386 LOAD_CONST              37 ('route_analysis')
+            388 MAKE_FUNCTION            5 (defaults, annotations)
+            390 CALL_FUNCTION            1
+            392 STORE_NAME              46 (route_analysis)
+            394 LOAD_CONST               1 (None)
+            396 RETURN_VALUE
+
+Disassembly of <code object serve_ui at 0x00000140FE5EA3F0, file "E:\Projects\School_projects\Hazard_Situation_Analysis_and_Prediction\route_risk_backend\app\main.py", line 34>:
+ 37           0 LOAD_GLOBAL              0 (_STATIC_DIR)
+              2 LOAD_CONST               1 ('index.html')
+              4 BINARY_TRUE_DIVIDE
+              6 STORE_FAST               0 (index)
+
+ 38           8 LOAD_FAST                0 (index)
+             10 LOAD_METHOD              1 (exists)
+             12 CALL_METHOD              0
+             14 POP_JUMP_IF_TRUE        14 (to 28)
+
+ 39          16 LOAD_GLOBAL              2 (HTTPException)
+             18 LOAD_CONST               2 (500)
+             20 LOAD_CONST               3 ('UI page not found: static/index.html is missing.')
+             22 LOAD_CONST               4 (('status_code', 'detail'))
+             24 CALL_FUNCTION_KW         2
+             26 RAISE_VARARGS            1
+
+ 40     >>   28 LOAD_GLOBAL              3 (HTMLResponse)
+             30 LOAD_FAST                0 (index)
+             32 LOAD_ATTR                4 (read_text)
+             34 LOAD_CONST               5 ('utf-8')
+             36 LOAD_CONST               6 (('encoding',))
+             38 CALL_FUNCTION_KW         1
+             40 LOAD_CONST               7 (('content',))
+             42 CALL_FUNCTION_KW         1
+             44 RETURN_VALUE
+
+Disassembly of <code object route_options at 0x00000140FE608450, file "E:\Projects\School_projects\Hazard_Situation_Analysis_and_Prediction\route_risk_backend\app\main.py", line 43>:
+ 46           0 SETUP_FINALLY            7 (to 16)
+              2 LOAD_GLOBAL              0 (fetch_route_options)
+              4 LOAD_FAST                0 (departure)
+              6 LOAD_FAST                1 (destination)
+              8 CALL_FUNCTION            2
+             10 STORE_FAST               2 (previews)
+             12 POP_BLOCK
+             14 JUMP_FORWARD            21 (to 58)
+
+ 47     >>   16 DUP_TOP
+             18 LOAD_GLOBAL              1 (EnvironmentError)
+             20 JUMP_IF_NOT_EXC_MATCH    28 (to 56)
+             22 POP_TOP
+             24 STORE_FAST               3 (exc)
+             26 POP_TOP
+             28 SETUP_FINALLY            9 (to 48)
+
+ 48          30 LOAD_GLOBAL              2 (HTTPException)
+             32 LOAD_CONST               1 (503)
+             34 LOAD_GLOBAL              3 (str)
+             36 LOAD_FAST                3 (exc)
+             38 CALL_FUNCTION            1
+             40 LOAD_CONST               2 (('status_code', 'detail'))
+             42 CALL_FUNCTION_KW         2
+             44 LOAD_FAST                3 (exc)
+             46 RAISE_VARARGS            2
+        >>   48 LOAD_CONST               0 (None)
+             50 STORE_FAST               3 (exc)
+             52 DELETE_FAST              3 (exc)
+             54 RERAISE                  1
+
+ 47     >>   56 RERAISE                  0
+
+ 49     >>   58 LOAD_GLOBAL              4 (RouteOptionsResponse)
+             60 LOAD_FAST                0 (departure)
+             62 LOAD_FAST                1 (destination)
+             64 LOAD_CONST               3 (<code object <listcomp> at 0x00000140FE5EA6B0, file "E:\Projects\School_projects\Hazard_Situation_Analysis_and_Prediction\route_risk_backend\app\main.py", line 49>)
+             66 LOAD_CONST               4 ('route_options.<locals>.<listcomp>')
+             68 MAKE_FUNCTION            0
+             70 LOAD_FAST                2 (previews)
+             72 GET_ITER
+             74 CALL_FUNCTION            1
+             76 LOAD_CONST               5 (('departure', 'destination', 'routes'))
+             78 CALL_FUNCTION_KW         3
+             80 RETURN_VALUE
+
+Disassembly of <code object <listcomp> at 0x00000140FE5EA6B0, file "E:\Projects\School_projects\Hazard_Situation_Analysis_and_Prediction\route_risk_backend\app\main.py", line 49>:
+ 49           0 BUILD_LIST               0
+              2 LOAD_FAST                0 (.0)
+        >>    4 FOR_ITER                 9 (to 24)
+              6 STORE_FAST               1 (p)
+              8 LOAD_GLOBAL              0 (RoutePreview)
+             10 LOAD_CONST               0 (())
+             12 BUILD_MAP                0
+             14 LOAD_FAST                1 (p)
+             16 DICT_MERGE               1
+             18 CALL_FUNCTION_EX         1
+             20 LIST_APPEND              2
+             22 JUMP_ABSOLUTE            2 (to 4)
+        >>   24 RETURN_VALUE
+
+Disassembly of <code object route_analysis at 0x00000140FE608920, file "E:\Projects\School_projects\Hazard_Situation_Analysis_and_Prediction\route_risk_backend\app\main.py", line 52>:
+ 55           0 SETUP_FINALLY            6 (to 14)
+
+ 56           2 LOAD_GLOBAL              0 (assess_journey)
+              4 LOAD_FAST                0 (request)
+              6 CALL_FUNCTION            1
+              8 STORE_FAST               2 (result)
+             10 POP_BLOCK
+             12 JUMP_FORWARD            21 (to 56)
+
+ 57     >>   14 DUP_TOP
+             16 LOAD_GLOBAL              1 (EnvironmentError)
+             18 JUMP_IF_NOT_EXC_MATCH    27 (to 54)
+             20 POP_TOP
+             22 STORE_FAST               3 (exc)
+             24 POP_TOP
+             26 SETUP_FINALLY            9 (to 46)
+
+ 58          28 LOAD_GLOBAL              2 (HTTPException)
+             30 LOAD_CONST               1 (503)
+             32 LOAD_GLOBAL              3 (str)
+             34 LOAD_FAST                3 (exc)
+             36 CALL_FUNCTION            1
+             38 LOAD_CONST               2 (('status_code', 'detail'))
+             40 CALL_FUNCTION_KW         2
+             42 LOAD_FAST                3 (exc)
+             44 RAISE_VARARGS            2
+        >>   46 LOAD_CONST               0 (None)
+             48 STORE_FAST               3 (exc)
+             50 DELETE_FAST              3 (exc)
+             52 RERAISE                  1
+
+ 57     >>   54 RERAISE                  0
+
+ 60     >>   56 LOAD_FAST                1 (include_ai)
+             58 POP_JUMP_IF_FALSE       75 (to 150)
+
+ 61          60 SETUP_FINALLY           13 (to 88)
+
+ 62          62 LOAD_GLOBAL              4 (generate_ai_summary)
+
+ 63          64 LOAD_FAST                2 (result)
+             66 LOAD_ATTR                5 (route_summary)
+             68 LOAD_FAST                2 (result)
+             70 LOAD_ATTR                6 (journey_risk_summary)
+             72 LOAD_FAST                2 (result)
+             74 LOAD_ATTR                7 (evidence_for_llm)
+
+ 62          76 CALL_FUNCTION            3
+             78 LOAD_FAST                2 (result)
+             80 STORE_ATTR               8 (ai_summary)
+             82 POP_BLOCK
+
+ 69          84 LOAD_FAST                2 (result)
+             86 RETURN_VALUE
+
+ 64     >>   88 DUP_TOP
+             90 LOAD_GLOBAL              9 (Exception)
+             92 JUMP_IF_NOT_EXC_MATCH    74 (to 148)
+             94 POP_TOP
+             96 STORE_FAST               3 (exc)
+             98 POP_TOP
+            100 SETUP_FINALLY           19 (to 140)
+
+ 66         102 LOAD_GLOBAL             10 (logger)
+            104 LOAD_METHOD             11 (warning)
+            106 LOAD_CONST               3 ('AI summary failed: %s')
+            108 LOAD_FAST                3 (exc)
+            110 CALL_METHOD              2
+            112 POP_TOP
+
+ 67         114 LOAD_CONST               4 ('AI summary unavailable: ')
+            116 LOAD_FAST                3 (exc)
+            118 FORMAT_VALUE             0
+            120 BUILD_STRING             2
+            122 LOAD_FAST                2 (result)
+            124 STORE_ATTR              12 (ai_summary_error)
+            126 POP_BLOCK
+            128 POP_EXCEPT
+            130 LOAD_CONST               0 (None)
+            132 STORE_FAST               3 (exc)
+            134 DELETE_FAST              3 (exc)
+
+ 69         136 LOAD_FAST                2 (result)
+            138 RETURN_VALUE
+        >>  140 LOAD_CONST               0 (None)
+            142 STORE_FAST               3 (exc)
+            144 DELETE_FAST              3 (exc)
+            146 RERAISE                  1
+
+ 64     >>  148 RERAISE                  0
+
+ 69     >>  150 LOAD_FAST                2 (result)
+            152 RETURN_VALUE

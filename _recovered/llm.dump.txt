@@ -1,0 +1,104 @@
+# === llm.py recovered structure ===
+
+
+--- <module> (line 1, flags=0x40) ---
+args (0 pos + 0 kwonly): ()
+varnames: ()
+names (referenced): ('json', '_json', 'logging', 'os', 'presentation', 'fmt_datetime_label', 'fmt_time', 'schemas', 'AiSummary', 'openai', 'OpenAI', 'getLogger', '__name__', 'logger', '_fi_time', '_fi_datetime', '_SYSTEM_PROMPT', '_build_evidence_payload', 'generate_ai_summary')
+consts:
+  0
+  None
+  1
+  ('fmt_datetime_label', 'fmt_time')
+  ('AiSummary',)
+  ('OpenAI',)
+  '_fi_time'
+  '_fi_datetime'
+  'You summarise deterministic route-risk evidence for a driver.\n\nRules:\n- Use only the JSON evidence. Do not invent facts.\n- If a value is missing, say it is unknown.\n- Keep the risk realistic. Do not exaggerate.\n- Keep all numbers, times, distances, and conditions unchanged.\n- All times are already Europe/Helsinki local time.\n- Use road names when available. Do not show coordinates.\n- Mention weak or partial weather coverage in confidence_note.\n\nReturn valid JSON:\n{\n  "summary": "On...<truncated>
+  '_build_evidence_payload'
+  'generate_ai_summary'
+
+--- _fi_time (line 15, flags=0x43) ---
+args (1 pos + 0 kwonly): ('ts',)
+varnames: ('ts',)
+names (referenced): ('fmt_time',)
+consts:
+  None
+
+--- _fi_datetime (line 19, flags=0x43) ---
+args (1 pos + 0 kwonly): ('ts',)
+varnames: ('ts',)
+names (referenced): ('fmt_datetime_label',)
+consts:
+  None
+
+--- _build_evidence_payload (line 47, flags=0x43) ---
+args (3 pos + 0 kwonly): ('route', 'jr', 'ev')
+varnames: ('route', 'jr', 'ev', 'arrival_iso', 'payload')
+names (referenced): ('arrival_time', 'isoformat', 'departure', 'destination', 'total_distance_km', 'round', 'estimated_duration_minutes', '_fi_datetime', 'departure_time_local', 'overall_risk_score', 'overall_risk_level', 'total_segments', 'dark_segment_count', 'twilight_segment_count', '_fi_time', 'first_dark_timestamp', 'darkness_total_km', 'darkness_total_minutes', 'daylight_total_km', 'daylight_total_minutes', 'usable_weather_segment_count', 'weak_weather_match_count', 'first_usable_slippery_weather_timestamp', 'lit_road_segment_count', 'moose_risk_segment_count', 'poor_weather_segment_count', 'slippery_segment_count', 'poor_grip_segment_count', 'recurring_hazard_segment_count', 'darkness_transitions', 'surface_changes', 'speed_zone_changes', 'top_risky_parts', 'conditions_summary', '_json', 'dumps', 'str')
+consts:
+  None
+  60
+  1
+  ('from', 'to', 'distance_km', 'duration_hours', 'departure_time_local', 'arrival_time_local')
+  ('overall_score', 'overall_level', 'total_segments', 'dark_segments', 'twilight_segments', 'first_dark_time_local', 'darkness_total_km', 'darkness_total_minutes', 'daylight_total_km', 'daylight_total_minutes', 'usable_weather_segments', 'weak_weather_matches', 'first_slippery_time_local', 'lit_road_segments', 'moose_risk_segments')
+  ('poor_weather_segments', 'slippery_segments', 'poor_grip_segments', 'recurring_hazard_segments')
+  '_build_evidence_payload.<locals>.<listcomp>'
+  6
+  ('route', 'risk', 'journey_summary', 'darkness_transitions', 'surface_changes', 'speed_zone_changes', 'top_risky_parts', 'conditions_summary')
+  ('default',)
+
+--- _build_evidence_payload.<listcomp> (line 81, flags=0x53) ---
+args (1 pos + 0 kwonly): ('.0',)
+varnames: ('.0', 't')
+names (referenced): ('event', '_fi_time', 'timestamp', 'road_name', 'km')
+consts:
+  ('event', 'time_local', 'road', 'km')
+
+--- _build_evidence_payload.<listcomp> (line 85, flags=0x53) ---
+args (1 pos + 0 kwonly): ('.0',)
+varnames: ('.0', 'c')
+names (referenced): ('from_condition', 'to_condition', '_fi_time', 'timestamp', 'road_name', 'km')
+consts:
+  ('from', 'to', 'time_local', 'road', 'km')
+
+--- _build_evidence_payload.<listcomp> (line 90, flags=0x53) ---
+args (1 pos + 0 kwonly): ('.0',)
+varnames: ('.0', 's')
+names (referenced): ('from_speed', 'to_speed', '_fi_time', 'timestamp', 'road_name')
+consts:
+  ('from_speed', 'to_speed', 'time_local', 'road')
+
+--- _build_evidence_payload.<listcomp> (line 95, flags=0x53) ---
+args (1 pos + 0 kwonly): ('.0',)
+varnames: ('.0', 'p')
+names (referenced): ('road_name', '_fi_time', 'estimated_time', 'risk_score', 'risk_level', 'reasons')
+consts:
+  ('road', 'time_local', 'score', 'level', 'reasons')
+
+--- generate_ai_summary (line 103, flags=0x43) ---
+args (3 pos + 0 kwonly): ('route_summary', 'journey_risk', 'evidence')
+varnames: ('route_summary', 'journey_risk', 'evidence', 'api_key', 'response', 'data')
+names (referenced): ('os', 'environ', 'get', 'logger', 'info', 'OpenAI', 'chat', 'completions', 'create', '_SYSTEM_PROMPT', '_build_evidence_payload', '_json', 'loads', 'choices', 'message', 'content', 'AiSummary')
+consts:
+  None
+  'OPENAI_API_KEY'
+  ''
+  'OPENAI_API_KEY not set - skipping AI summary'
+  ('api_key',)
+  'gpt-4o-mini'
+  0.3
+  500
+  'type'
+  'json_object'
+  'system'
+  ('role', 'content')
+  'user'
+  ('model', 'temperature', 'max_tokens', 'response_format', 'messages')
+  0
+  'summary'
+  'key_risks'
+  'advice'
+  'unknowns'
+  'confidence_note'
+  ('summary', 'key_risks', 'advice', 'unknowns', 'confidence_note')

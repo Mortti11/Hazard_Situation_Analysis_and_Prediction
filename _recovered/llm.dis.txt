@@ -1,0 +1,473 @@
+  3           0 LOAD_CONST               0 (0)
+              2 LOAD_CONST               1 (None)
+              4 IMPORT_NAME              0 (json)
+              6 STORE_NAME               1 (_json)
+
+  4           8 LOAD_CONST               0 (0)
+             10 LOAD_CONST               1 (None)
+             12 IMPORT_NAME              2 (logging)
+             14 STORE_NAME               2 (logging)
+
+  5          16 LOAD_CONST               0 (0)
+             18 LOAD_CONST               1 (None)
+             20 IMPORT_NAME              3 (os)
+             22 STORE_NAME               3 (os)
+
+  7          24 LOAD_CONST               2 (1)
+             26 LOAD_CONST               3 (('fmt_datetime_label', 'fmt_time'))
+             28 IMPORT_NAME              4 (presentation)
+             30 IMPORT_FROM              5 (fmt_datetime_label)
+             32 STORE_NAME               5 (fmt_datetime_label)
+             34 IMPORT_FROM              6 (fmt_time)
+             36 STORE_NAME               6 (fmt_time)
+             38 POP_TOP
+
+  8          40 LOAD_CONST               2 (1)
+             42 LOAD_CONST               4 (('AiSummary',))
+             44 IMPORT_NAME              7 (schemas)
+             46 IMPORT_FROM              8 (AiSummary)
+             48 STORE_NAME               8 (AiSummary)
+             50 POP_TOP
+
+  9          52 LOAD_CONST               0 (0)
+             54 LOAD_CONST               5 (('OpenAI',))
+             56 IMPORT_NAME              9 (openai)
+             58 IMPORT_FROM             10 (OpenAI)
+             60 STORE_NAME              10 (OpenAI)
+             62 POP_TOP
+
+ 11          64 LOAD_NAME                2 (logging)
+             66 LOAD_METHOD             11 (getLogger)
+             68 LOAD_NAME               12 (__name__)
+             70 CALL_METHOD              1
+             72 STORE_NAME              13 (logger)
+
+ 15          74 LOAD_CONST               6 (<code object _fi_time at 0x00000140FE608A80, file "E:\Projects\School_projects\Hazard_Situation_Analysis_and_Prediction\route_risk_backend\app\llm.py", line 15>)
+             76 LOAD_CONST               7 ('_fi_time')
+             78 MAKE_FUNCTION            0
+             80 STORE_NAME              14 (_fi_time)
+
+ 19          82 LOAD_CONST               8 (<code object _fi_datetime at 0x00000140FE608450, file "E:\Projects\School_projects\Hazard_Situation_Analysis_and_Prediction\route_risk_backend\app\llm.py", line 19>)
+             84 LOAD_CONST               9 ('_fi_datetime')
+             86 MAKE_FUNCTION            0
+             88 STORE_NAME              15 (_fi_datetime)
+
+ 23          90 LOAD_CONST              10 ('You summarise deterministic route-risk evidence for a driver.\n\nRules:\n- Use only the JSON evidence. Do not invent facts.\n- If a value is missing, say it is unknown.\n- Keep the risk realistic. Do not exaggerate.\n- Keep all numbers, times, distances, and conditions unchanged.\n- All times are already Europe/Helsinki local time.\n- Use road names when available. Do not show coordinates.\n- Mention weak or partial weather coverage in confidence_note.\n\nReturn valid JSON:\n{\n  "summary": "One short paragraph under 100 words.",\n  "key_risks": ["risk 1", "risk 2"],\n  "advice": ["advice 1", "advice 2"],\n  "unknowns": ["unknown 1"],\n  "confidence_note": "Short note about data quality."\n}\nUse at most 5 items per list.\n')
+             92 STORE_NAME              16 (_SYSTEM_PROMPT)
+
+ 47          94 LOAD_CONST              11 (<code object _build_evidence_payload at 0x00000140FE609B00, file "E:\Projects\School_projects\Hazard_Situation_Analysis_and_Prediction\route_risk_backend\app\llm.py", line 47>)
+             96 LOAD_CONST              12 ('_build_evidence_payload')
+             98 MAKE_FUNCTION            0
+            100 STORE_NAME              17 (_build_evidence_payload)
+
+103         102 LOAD_CONST              13 (<code object generate_ai_summary at 0x00000140FE60A080, file "E:\Projects\School_projects\Hazard_Situation_Analysis_and_Prediction\route_risk_backend\app\llm.py", line 103>)
+            104 LOAD_CONST              14 ('generate_ai_summary')
+            106 MAKE_FUNCTION            0
+            108 STORE_NAME              18 (generate_ai_summary)
+            110 LOAD_CONST               1 (None)
+            112 RETURN_VALUE
+
+Disassembly of <code object _fi_time at 0x00000140FE608A80, file "E:\Projects\School_projects\Hazard_Situation_Analysis_and_Prediction\route_risk_backend\app\llm.py", line 15>:
+ 16           0 LOAD_FAST                0 (ts)
+              2 POP_JUMP_IF_FALSE        8 (to 16)
+              4 LOAD_GLOBAL              0 (fmt_time)
+              6 LOAD_FAST                0 (ts)
+              8 CALL_FUNCTION            1
+             10 JUMP_IF_TRUE_OR_POP      7 (to 14)
+             12 LOAD_CONST               0 (None)
+        >>   14 RETURN_VALUE
+        >>   16 LOAD_CONST               0 (None)
+             18 RETURN_VALUE
+
+Disassembly of <code object _fi_datetime at 0x00000140FE608450, file "E:\Projects\School_projects\Hazard_Situation_Analysis_and_Prediction\route_risk_backend\app\llm.py", line 19>:
+ 20           0 LOAD_FAST                0 (ts)
+              2 POP_JUMP_IF_FALSE        8 (to 16)
+              4 LOAD_GLOBAL              0 (fmt_datetime_label)
+              6 LOAD_FAST                0 (ts)
+              8 CALL_FUNCTION            1
+             10 JUMP_IF_TRUE_OR_POP      7 (to 14)
+             12 LOAD_CONST               0 (None)
+        >>   14 RETURN_VALUE
+        >>   16 LOAD_CONST               0 (None)
+             18 RETURN_VALUE
+
+Disassembly of <code object _build_evidence_payload at 0x00000140FE609B00, file "E:\Projects\School_projects\Hazard_Situation_Analysis_and_Prediction\route_risk_backend\app\llm.py", line 47>:
+ 49           0 LOAD_FAST                0 (route)
+              2 LOAD_ATTR                0 (arrival_time)
+              4 POP_JUMP_IF_FALSE        8 (to 16)
+              6 LOAD_FAST                0 (route)
+              8 LOAD_ATTR                0 (arrival_time)
+             10 LOAD_METHOD              1 (isoformat)
+             12 CALL_METHOD              0
+             14 JUMP_FORWARD             1 (to 18)
+        >>   16 LOAD_CONST               0 (None)
+        >>   18 STORE_FAST               3 (arrival_iso)
+
+ 51          20 LOAD_FAST                0 (route)
+             22 LOAD_ATTR                2 (departure)
+
+ 52          24 LOAD_FAST                0 (route)
+             26 LOAD_ATTR                3 (destination)
+
+ 53          28 LOAD_FAST                0 (route)
+             30 LOAD_ATTR                4 (total_distance_km)
+
+ 54          32 LOAD_GLOBAL              5 (round)
+             34 LOAD_FAST                0 (route)
+             36 LOAD_ATTR                6 (estimated_duration_minutes)
+             38 LOAD_CONST               1 (60)
+             40 BINARY_TRUE_DIVIDE
+             42 LOAD_CONST               2 (1)
+             44 CALL_FUNCTION            2
+
+ 55          46 LOAD_GLOBAL              7 (_fi_datetime)
+             48 LOAD_FAST                2 (ev)
+             50 LOAD_ATTR                8 (departure_time_local)
+             52 CALL_FUNCTION            1
+
+ 56          54 LOAD_GLOBAL              7 (_fi_datetime)
+             56 LOAD_FAST                3 (arrival_iso)
+             58 CALL_FUNCTION            1
+
+ 50          60 LOAD_CONST               3 (('from', 'to', 'distance_km', 'duration_hours', 'departure_time_local', 'arrival_time_local'))
+             62 BUILD_CONST_KEY_MAP      6
+
+ 59          64 LOAD_FAST                2 (ev)
+             66 LOAD_ATTR                9 (overall_risk_score)
+
+ 60          68 LOAD_FAST                2 (ev)
+             70 LOAD_ATTR               10 (overall_risk_level)
+
+ 61          72 LOAD_FAST                2 (ev)
+             74 LOAD_ATTR               11 (total_segments)
+
+ 62          76 LOAD_FAST                2 (ev)
+             78 LOAD_ATTR               12 (dark_segment_count)
+
+ 63          80 LOAD_FAST                2 (ev)
+             82 LOAD_ATTR               13 (twilight_segment_count)
+
+ 64          84 LOAD_GLOBAL             14 (_fi_time)
+             86 LOAD_FAST                2 (ev)
+             88 LOAD_ATTR               15 (first_dark_timestamp)
+             90 CALL_FUNCTION            1
+
+ 65          92 LOAD_FAST                2 (ev)
+             94 LOAD_ATTR               16 (darkness_total_km)
+
+ 66          96 LOAD_FAST                2 (ev)
+             98 LOAD_ATTR               17 (darkness_total_minutes)
+
+ 67         100 LOAD_FAST                2 (ev)
+            102 LOAD_ATTR               18 (daylight_total_km)
+
+ 68         104 LOAD_FAST                2 (ev)
+            106 LOAD_ATTR               19 (daylight_total_minutes)
+
+ 69         108 LOAD_FAST                2 (ev)
+            110 LOAD_ATTR               20 (usable_weather_segment_count)
+
+ 70         112 LOAD_FAST                2 (ev)
+            114 LOAD_ATTR               21 (weak_weather_match_count)
+
+ 71         116 LOAD_GLOBAL             14 (_fi_time)
+            118 LOAD_FAST                2 (ev)
+            120 LOAD_ATTR               22 (first_usable_slippery_weather_timestamp)
+            122 CALL_FUNCTION            1
+
+ 72         124 LOAD_FAST                2 (ev)
+            126 LOAD_ATTR               23 (lit_road_segment_count)
+
+ 73         128 LOAD_FAST                2 (ev)
+            130 LOAD_ATTR               24 (moose_risk_segment_count)
+
+ 58         132 LOAD_CONST               4 (('overall_score', 'overall_level', 'total_segments', 'dark_segments', 'twilight_segments', 'first_dark_time_local', 'darkness_total_km', 'darkness_total_minutes', 'daylight_total_km', 'daylight_total_minutes', 'usable_weather_segments', 'weak_weather_matches', 'first_slippery_time_local', 'lit_road_segments', 'moose_risk_segments'))
+            134 BUILD_CONST_KEY_MAP     15
+
+ 76         136 LOAD_FAST                1 (jr)
+            138 LOAD_ATTR               25 (poor_weather_segment_count)
+
+ 77         140 LOAD_FAST                1 (jr)
+            142 LOAD_ATTR               26 (slippery_segment_count)
+
+ 78         144 LOAD_FAST                1 (jr)
+            146 LOAD_ATTR               27 (poor_grip_segment_count)
+
+ 79         148 LOAD_FAST                1 (jr)
+            150 LOAD_ATTR               28 (recurring_hazard_segment_count)
+
+ 75         152 LOAD_CONST               5 (('poor_weather_segments', 'slippery_segments', 'poor_grip_segments', 'recurring_hazard_segments'))
+            154 BUILD_CONST_KEY_MAP      4
+
+ 81         156 LOAD_CONST               6 (<code object <listcomp> at 0x00000140FE609210, file "E:\Projects\School_projects\Hazard_Situation_Analysis_and_Prediction\route_risk_backend\app\llm.py", line 81>)
+            158 LOAD_CONST               7 ('_build_evidence_payload.<locals>.<listcomp>')
+            160 MAKE_FUNCTION            0
+
+ 83         162 LOAD_FAST                2 (ev)
+            164 LOAD_ATTR               29 (darkness_transitions)
+            166 LOAD_CONST               0 (None)
+            168 LOAD_CONST               8 (6)
+            170 BUILD_SLICE              2
+            172 BINARY_SUBSCR
+
+ 81         174 GET_ITER
+            176 CALL_FUNCTION            1
+
+ 85         178 LOAD_CONST               9 (<code object <listcomp> at 0x00000140FE609370, file "E:\Projects\School_projects\Hazard_Situation_Analysis_and_Prediction\route_risk_backend\app\llm.py", line 85>)
+            180 LOAD_CONST               7 ('_build_evidence_payload.<locals>.<listcomp>')
+            182 MAKE_FUNCTION            0
+
+ 88         184 LOAD_FAST                2 (ev)
+            186 LOAD_ATTR               30 (surface_changes)
+            188 LOAD_CONST               0 (None)
+            190 LOAD_CONST               8 (6)
+            192 BUILD_SLICE              2
+            194 BINARY_SUBSCR
+
+ 85         196 GET_ITER
+            198 CALL_FUNCTION            1
+
+ 90         200 LOAD_CONST              10 (<code object <listcomp> at 0x00000140FE609580, file "E:\Projects\School_projects\Hazard_Situation_Analysis_and_Prediction\route_risk_backend\app\llm.py", line 90>)
+            202 LOAD_CONST               7 ('_build_evidence_payload.<locals>.<listcomp>')
+            204 MAKE_FUNCTION            0
+
+ 93         206 LOAD_FAST                2 (ev)
+            208 LOAD_ATTR               31 (speed_zone_changes)
+            210 LOAD_CONST               0 (None)
+            212 LOAD_CONST               8 (6)
+            214 BUILD_SLICE              2
+            216 BINARY_SUBSCR
+
+ 90         218 GET_ITER
+            220 CALL_FUNCTION            1
+
+ 95         222 LOAD_CONST              11 (<code object <listcomp> at 0x00000140FE609790, file "E:\Projects\School_projects\Hazard_Situation_Analysis_and_Prediction\route_risk_backend\app\llm.py", line 95>)
+            224 LOAD_CONST               7 ('_build_evidence_payload.<locals>.<listcomp>')
+            226 MAKE_FUNCTION            0
+
+ 98         228 LOAD_FAST                2 (ev)
+            230 LOAD_ATTR               32 (top_risky_parts)
+
+ 95         232 GET_ITER
+            234 CALL_FUNCTION            1
+
+ 99         236 LOAD_FAST                2 (ev)
+            238 LOAD_ATTR               33 (conditions_summary)
+
+ 50         240 LOAD_CONST              12 (('route', 'risk', 'journey_summary', 'darkness_transitions', 'surface_changes', 'speed_zone_changes', 'top_risky_parts', 'conditions_summary'))
+            242 BUILD_CONST_KEY_MAP      8
+            244 STORE_FAST               4 (payload)
+
+100         246 LOAD_GLOBAL             34 (_json)
+            248 LOAD_ATTR               35 (dumps)
+            250 LOAD_FAST                4 (payload)
+            252 LOAD_GLOBAL             36 (str)
+            254 LOAD_CONST              13 (('default',))
+            256 CALL_FUNCTION_KW         2
+            258 RETURN_VALUE
+
+Disassembly of <code object <listcomp> at 0x00000140FE609210, file "E:\Projects\School_projects\Hazard_Situation_Analysis_and_Prediction\route_risk_backend\app\llm.py", line 81>:
+ 81           0 BUILD_LIST               0
+              2 LOAD_FAST                0 (.0)
+        >>    4 FOR_ITER                15 (to 36)
+
+ 83           6 STORE_FAST               1 (t)
+
+ 82           8 LOAD_FAST                1 (t)
+             10 LOAD_ATTR                0 (event)
+             12 LOAD_GLOBAL              1 (_fi_time)
+             14 LOAD_FAST                1 (t)
+             16 LOAD_ATTR                2 (timestamp)
+             18 CALL_FUNCTION            1
+             20 LOAD_FAST                1 (t)
+             22 LOAD_ATTR                3 (road_name)
+             24 LOAD_FAST                1 (t)
+             26 LOAD_ATTR                4 (km)
+             28 LOAD_CONST               0 (('event', 'time_local', 'road', 'km'))
+             30 BUILD_CONST_KEY_MAP      4
+
+ 81          32 LIST_APPEND              2
+             34 JUMP_ABSOLUTE            2 (to 4)
+        >>   36 RETURN_VALUE
+
+Disassembly of <code object <listcomp> at 0x00000140FE609370, file "E:\Projects\School_projects\Hazard_Situation_Analysis_and_Prediction\route_risk_backend\app\llm.py", line 85>:
+ 85           0 BUILD_LIST               0
+              2 LOAD_FAST                0 (.0)
+        >>    4 FOR_ITER                17 (to 40)
+
+ 88           6 STORE_FAST               1 (c)
+
+ 86           8 LOAD_FAST                1 (c)
+             10 LOAD_ATTR                0 (from_condition)
+             12 LOAD_FAST                1 (c)
+             14 LOAD_ATTR                1 (to_condition)
+
+ 87          16 LOAD_GLOBAL              2 (_fi_time)
+             18 LOAD_FAST                1 (c)
+             20 LOAD_ATTR                3 (timestamp)
+             22 CALL_FUNCTION            1
+             24 LOAD_FAST                1 (c)
+             26 LOAD_ATTR                4 (road_name)
+             28 LOAD_FAST                1 (c)
+             30 LOAD_ATTR                5 (km)
+
+ 86          32 LOAD_CONST               0 (('from', 'to', 'time_local', 'road', 'km'))
+             34 BUILD_CONST_KEY_MAP      5
+
+ 85          36 LIST_APPEND              2
+             38 JUMP_ABSOLUTE            2 (to 4)
+        >>   40 RETURN_VALUE
+
+Disassembly of <code object <listcomp> at 0x00000140FE609580, file "E:\Projects\School_projects\Hazard_Situation_Analysis_and_Prediction\route_risk_backend\app\llm.py", line 90>:
+ 90           0 BUILD_LIST               0
+              2 LOAD_FAST                0 (.0)
+        >>    4 FOR_ITER                15 (to 36)
+
+ 93           6 STORE_FAST               1 (s)
+
+ 91           8 LOAD_FAST                1 (s)
+             10 LOAD_ATTR                0 (from_speed)
+             12 LOAD_FAST                1 (s)
+             14 LOAD_ATTR                1 (to_speed)
+
+ 92          16 LOAD_GLOBAL              2 (_fi_time)
+             18 LOAD_FAST                1 (s)
+             20 LOAD_ATTR                3 (timestamp)
+             22 CALL_FUNCTION            1
+             24 LOAD_FAST                1 (s)
+             26 LOAD_ATTR                4 (road_name)
+
+ 91          28 LOAD_CONST               0 (('from_speed', 'to_speed', 'time_local', 'road'))
+             30 BUILD_CONST_KEY_MAP      4
+
+ 90          32 LIST_APPEND              2
+             34 JUMP_ABSOLUTE            2 (to 4)
+        >>   36 RETURN_VALUE
+
+Disassembly of <code object <listcomp> at 0x00000140FE609790, file "E:\Projects\School_projects\Hazard_Situation_Analysis_and_Prediction\route_risk_backend\app\llm.py", line 95>:
+ 95           0 BUILD_LIST               0
+              2 LOAD_FAST                0 (.0)
+        >>    4 FOR_ITER                17 (to 40)
+
+ 98           6 STORE_FAST               1 (p)
+
+ 96           8 LOAD_FAST                1 (p)
+             10 LOAD_ATTR                0 (road_name)
+             12 LOAD_GLOBAL              1 (_fi_time)
+             14 LOAD_FAST                1 (p)
+             16 LOAD_ATTR                2 (estimated_time)
+             18 CALL_FUNCTION            1
+
+ 97          20 LOAD_FAST                1 (p)
+             22 LOAD_ATTR                3 (risk_score)
+             24 LOAD_FAST                1 (p)
+             26 LOAD_ATTR                4 (risk_level)
+             28 LOAD_FAST                1 (p)
+             30 LOAD_ATTR                5 (reasons)
+
+ 96          32 LOAD_CONST               0 (('road', 'time_local', 'score', 'level', 'reasons'))
+             34 BUILD_CONST_KEY_MAP      5
+
+ 95          36 LIST_APPEND              2
+             38 JUMP_ABSOLUTE            2 (to 4)
+        >>   40 RETURN_VALUE
+
+Disassembly of <code object generate_ai_summary at 0x00000140FE60A080, file "E:\Projects\School_projects\Hazard_Situation_Analysis_and_Prediction\route_risk_backend\app\llm.py", line 103>:
+104           0 LOAD_GLOBAL              0 (os)
+              2 LOAD_ATTR                1 (environ)
+              4 LOAD_METHOD              2 (get)
+              6 LOAD_CONST               1 ('OPENAI_API_KEY')
+              8 LOAD_CONST               2 ('')
+             10 CALL_METHOD              2
+             12 STORE_FAST               3 (api_key)
+
+105          14 LOAD_FAST                3 (api_key)
+             16 POP_JUMP_IF_TRUE        16 (to 32)
+
+106          18 LOAD_GLOBAL              3 (logger)
+             20 LOAD_METHOD              4 (info)
+             22 LOAD_CONST               3 ('OPENAI_API_KEY not set - skipping AI summary')
+             24 CALL_METHOD              1
+             26 POP_TOP
+
+107          28 LOAD_CONST               0 (None)
+             30 RETURN_VALUE
+
+112     >>   32 LOAD_GLOBAL              5 (OpenAI)
+             34 LOAD_FAST                3 (api_key)
+             36 LOAD_CONST               4 (('api_key',))
+             38 CALL_FUNCTION_KW         1
+             40 LOAD_ATTR                6 (chat)
+             42 LOAD_ATTR                7 (completions)
+             44 LOAD_ATTR                8 (create)
+
+113          46 LOAD_CONST               5 ('gpt-4o-mini')
+             48 LOAD_CONST               6 (0.3)
+             50 LOAD_CONST               7 (500)
+
+114          52 LOAD_CONST               8 ('type')
+             54 LOAD_CONST               9 ('json_object')
+             56 BUILD_MAP                1
+
+115          58 LOAD_CONST              10 ('system')
+             60 LOAD_GLOBAL              9 (_SYSTEM_PROMPT)
+             62 LOAD_CONST              11 (('role', 'content'))
+             64 BUILD_CONST_KEY_MAP      2
+
+116          66 LOAD_CONST              12 ('user')
+             68 LOAD_GLOBAL             10 (_build_evidence_payload)
+             70 LOAD_FAST                0 (route_summary)
+             72 LOAD_FAST                1 (journey_risk)
+             74 LOAD_FAST                2 (evidence)
+             76 CALL_FUNCTION            3
+             78 LOAD_CONST              11 (('role', 'content'))
+             80 BUILD_CONST_KEY_MAP      2
+
+115          82 BUILD_LIST               2
+
+112          84 LOAD_CONST              13 (('model', 'temperature', 'max_tokens', 'response_format', 'messages'))
+             86 CALL_FUNCTION_KW         5
+             88 STORE_FAST               4 (response)
+
+118          90 LOAD_GLOBAL             11 (_json)
+             92 LOAD_METHOD             12 (loads)
+             94 LOAD_FAST                4 (response)
+             96 LOAD_ATTR               13 (choices)
+             98 LOAD_CONST              14 (0)
+            100 BINARY_SUBSCR
+            102 LOAD_ATTR               14 (message)
+            104 LOAD_ATTR               15 (content)
+            106 CALL_METHOD              1
+            108 STORE_FAST               5 (data)
+
+119         110 LOAD_GLOBAL             16 (AiSummary)
+            112 LOAD_FAST                5 (data)
+            114 LOAD_METHOD              2 (get)
+            116 LOAD_CONST              15 ('summary')
+            118 LOAD_CONST               2 ('')
+            120 CALL_METHOD              2
+            122 LOAD_FAST                5 (data)
+            124 LOAD_METHOD              2 (get)
+            126 LOAD_CONST              16 ('key_risks')
+            128 BUILD_LIST               0
+            130 CALL_METHOD              2
+            132 LOAD_FAST                5 (data)
+            134 LOAD_METHOD              2 (get)
+            136 LOAD_CONST              17 ('advice')
+            138 BUILD_LIST               0
+            140 CALL_METHOD              2
+
+120         142 LOAD_FAST                5 (data)
+            144 LOAD_METHOD              2 (get)
+            146 LOAD_CONST              18 ('unknowns')
+            148 BUILD_LIST               0
+            150 CALL_METHOD              2
+            152 LOAD_FAST                5 (data)
+            154 LOAD_METHOD              2 (get)
+            156 LOAD_CONST              19 ('confidence_note')
+            158 LOAD_CONST               2 ('')
+            160 CALL_METHOD              2
+
+119         162 LOAD_CONST              20 (('summary', 'key_risks', 'advice', 'unknowns', 'confidence_note'))
+            164 CALL_FUNCTION_KW         5
+            166 RETURN_VALUE

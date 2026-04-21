@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Journey Risk Analysis — Map View</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<link rel="stylesheet" href="/static/css/styles.css" />
+</head>
+<body>
+<div class="app-layout">
+
+  <!-- MAP PANEL -->
+  <div class="map-panel">
+    <div id="map"></div>
+    <div class="map-pick-bar">
+      <button class="pick-btn" id="pick-dep-btn">
+        <span class="dot" style="background:#27ae60"></span> Set Departure
+      </button>
+      <button class="pick-btn" id="pick-dest-btn">
+        <span class="dot" style="background:#e74c3c"></span> Set Destination
+      </button>
+      <span class="pick-hint" id="pick-hint">Click buttons then click map, or type addresses in sidebar</span>
+    </div>
+  </div>
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <h1>Journey Risk Analysis</h1>
+
+    <div class="form-card">
+      <label for="departure">Departure</label>
+      <div class="input-row">
+        <input type="text" id="departure" placeholder="e.g. Oulu — or click map" />
+        <button class="clear-btn" id="clear-dep" title="Clear departure">&times;</button>
+      </div>
+
+      <label for="destination">Destination</label>
+      <div class="input-row">
+        <input type="text" id="destination" placeholder="e.g. Tampere — or click map" />
+        <button class="clear-btn" id="clear-dest" title="Clear destination">&times;</button>
+      </div>
+
+      <div class="row-3">
+        <div>
+          <label for="departure_date">Date (pp.kk.vvvv)</label>
+          <input type="text" id="departure_date" placeholder="31.03.2026" inputmode="numeric" autocomplete="off" />
+        </div>
+        <div>
+          <label for="departure_time_input">Time (tt:mm)</label>
+          <input type="text" id="departure_time_input" placeholder="14:00" inputmode="numeric" autocomplete="off" maxlength="5" />
+        </div>
+        <div>
+          <label for="sampling">Sampling (min)</label>
+          <input type="text" id="sampling" value="5" style="width:100%" />
+        </div>
+      </div>
+      <!-- hidden field consumed by form.js -->
+      <input type="hidden" id="departure_time" />
+
+      <div class="checkbox-row">
+        <input type="checkbox" id="include_ai" checked />
+        <label for="include_ai">Include AI summary</label>
+      </div>
+
+      <div class="btn-row">
+        <button id="show-routes-btn" class="btn-secondary">Show Route Options</button>
+        <button id="submit-btn">Analyse Journey</button>
+      </div>
+    </div>
+
+    <div id="route-options-bar" class="route-options-bar" style="display:none"></div>
+
+    <div id="loading" class="loading" style="display:none">Analysing your journey &hellip; this may take 30-60 s</div>
+    <div id="error" style="display:none"></div>
+    <div id="results"></div>
+
+    <div class="data-credits">
+      <strong>Data sources:</strong>
+      Route: OpenRouteService (driving-hgv profile) &bull;
+      Road attributes: Digiroad WFS (V&auml;yl&auml;virasto, CC BY 4.0) &bull;
+      Weather: Digitraffic (Fintraffic, CC BY 4.0) &bull;
+      Winter maintenance: Digitraffic Maintenance Tracking (Harja/V&auml;yl&auml;virasto, CC BY 4.0) &bull;
+      Darkness: Astral solar model &bull;
+      HGV stopping distance: physics formula <em>d = (t<sub>r</sub>+t<sub>lag</sub>)v + v&sup2;/(2&micro;g)</em> (t<sub>r</sub>=1.0 s, t<sub>lag</sub>=0.5 s air-brake; &micro; values per surface from SWOV / Finnish road-friction studies) &bull;
+      Wildlife: LUKE (Natural Resources Institute Finland) &bull;
+      Map tiles: &copy; <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> contributors
+    </div>
+  </div>
+</div>
+
+<!-- JS: Leaflet lib first, then app modules in dependency order -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="/static/js/helpers.js"></script>
+<script src="/static/js/map.js"></script>
+<script src="/static/js/overlays.js"></script>
+<script src="/static/js/results.js"></script>
+<script src="/static/js/form.js"></script>
+</body>
+</html>
