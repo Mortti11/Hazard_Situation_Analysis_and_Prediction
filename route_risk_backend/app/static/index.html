@@ -75,17 +75,20 @@
     <div id="error" style="display:none"></div>
     <div id="results"></div>
 
-    <div class="data-credits">
-      <strong>Data sources:</strong>
-      Route: OpenRouteService (driving-hgv profile) &bull;
-      Road attributes: Digiroad WFS (V&auml;yl&auml;virasto, CC BY 4.0) &bull;
-      Weather: Digitraffic (Fintraffic, CC BY 4.0) &bull;
-      Winter maintenance: Digitraffic Maintenance Tracking (Harja/V&auml;yl&auml;virasto, CC BY 4.0) &bull;
-      Darkness: Astral solar model &bull;
-      HGV stopping distance: physics formula <em>d = (t<sub>r</sub>+t<sub>lag</sub>)v + v&sup2;/(2&micro;g)</em> (t<sub>r</sub>=1.0 s, t<sub>lag</sub>=0.5 s air-brake; &micro; values per surface from SWOV / Finnish road-friction studies) &bull;
-      Wildlife: LUKE (Natural Resources Institute Finland) &bull;
-      Map tiles: &copy; <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> contributors
-    </div>
+    <details class="data-credits">
+      <summary>Data sources &amp; methods</summary>
+      <ul>
+        <li><b>Routing:</b> <a href="https://openrouteservice.org/" target="_blank">OpenRouteService</a> &mdash; <code>driving-hgv</code> profile (heavy goods vehicle, weight/height-restricted)</li>
+        <li><b>Road attributes:</b> <a href="https://vayla.fi/en/transport-network/data/digiroad" target="_blank">Digiroad WFS</a> &mdash; speed limits, road width, lighting (V&auml;yl&auml;virasto, CC BY 4.0)</li>
+        <li><b>Road weather:</b> <a href="https://www.digitraffic.fi/en/road-traffic/weather/" target="_blank">Digitraffic Weather</a> &mdash; surface, friction, road/air temp, wind (Fintraffic, CC BY 4.0)</li>
+        <li><b>Winter maintenance:</b> <a href="https://www.digitraffic.fi/en/road-traffic/maintenance/" target="_blank">Digitraffic Maintenance Tracking</a> &mdash; ploughing, salting, sanding, ice removal, last 24 h (Harja/V&auml;yl&auml;virasto, CC BY 4.0)</li>
+        <li><b>Traffic incidents:</b> <a href="https://www.digitraffic.fi/en/road-traffic/" target="_blank">Digitraffic Traffic Messages</a> (Fintraffic, CC BY 4.0)</li>
+        <li><b>Darkness / twilight:</b> <a href="https://astral.readthedocs.io/" target="_blank">Astral</a> solar elevation model (Europe/Helsinki TZ)</li>
+        <li><b>Wildlife (moose) risk:</b> <a href="https://www.luke.fi/en" target="_blank">LUKE</a> seasonal collision statistics</li>
+        <li><b>HGV stopping distance:</b> physics &mdash; <em>d = (t<sub>r</sub>+t<sub>lag</sub>)v + v&sup2;/(2&micro;g)</em>, t<sub>r</sub>=1.0&nbsp;s, t<sub>lag</sub>=0.5&nbsp;s air-brake; &micro; per surface from SWOV / Finnish road-friction studies</li>
+        <li><b>Map tiles:</b> &copy; <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> contributors</li>
+      </ul>
+    </details>
   </div>
 </div>
 

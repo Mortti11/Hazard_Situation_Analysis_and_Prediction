@@ -157,7 +157,8 @@ function renderResults(data) {
 
   // ── Speed Limit Changes ──
   if (ev.speed_zone_changes && ev.speed_zone_changes.length) {
-    html += '<div class="result-card card-speed"><h2>&#x26A1; Speed Limit Changes</h2>';
+    html += '<div class="result-card card-speed"><details><summary><h2 style="display:inline">&#x26A1; Speed Limit Changes (' +
+            ev.speed_zone_changes.length + ')</h2></summary><div style="margin-top:.5rem">';
     for (var szi2 = 0; szi2 < ev.speed_zone_changes.length; szi2++) {
       var sz2   = ev.speed_zone_changes[szi2];
       var isUp  = sz2.to_speed > sz2.from_speed;
@@ -166,7 +167,7 @@ function renderResults(data) {
               sz2.to_speed + ' km/h at ' + fmtTime(sz2.timestamp) +
               (sz2.road_name ? ' near ' + esc(sz2.road_name) : '') + '</div>';
     }
-    html += '</div>';
+    html += '</div></details></div>';
   }
 
   // ── Traffic Incidents (Fintraffic) ──

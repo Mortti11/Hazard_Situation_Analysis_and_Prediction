@@ -146,7 +146,18 @@ button#submit-btn:disabled{background:#b2bec3;cursor:not-allowed}
 .seg-reasons{margin-top:5px;color:#636e72;font-size:.78rem}
 .seg-reasons div{padding:1px 0}
 
-.data-credits{margin-top:1.2rem;padding:.7rem .8rem;background:#fff;border-radius:6px;font-size:.7rem;color:#8395a7;line-height:1.5;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+.data-credits{margin-top:1.2rem;padding:.7rem .9rem;background:#fff;border-radius:6px;font-size:.72rem;color:#576574;line-height:1.55;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+.data-credits summary{cursor:pointer;font-weight:600;color:#2d3436;padding:.15rem 0;list-style:none}
+.data-credits summary::-webkit-details-marker{display:none}
+.data-credits summary::before{content:'\25B6';display:inline-block;margin-right:.4rem;font-size:.6rem;transition:transform .15s}
+.data-credits[open] summary::before{transform:rotate(90deg)}
+.data-credits ul{margin:.5rem 0 0;padding-left:1.1rem}
+.data-credits li{margin:.18rem 0}
+.data-credits li b{color:#2d3436;font-weight:600}
+.card-speed details summary{cursor:pointer;list-style:none}
+.card-speed details summary::-webkit-details-marker{display:none}
+.card-speed details summary::before{content:'\25B6';display:inline-block;margin-right:.4rem;font-size:.65rem;color:#636e72;transition:transform .15s}
+.card-speed details[open] summary::before{transform:rotate(90deg)}
 
 /* ── Responsive ──────────────────────────────────────────────────── */
 @media(max-width:900px){
