@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>HSAP — Exploratory Data Analysis</title>
+  <link rel="stylesheet" href="hsap-style.css"/>
+  <style>
+    /* ── EDA-specific styles ─────────────────────────────────── */
+
+    .eda-page {
+      position: relative; z-index: 10;
+      max-width: 1100px; margin: 0 auto; padding: 3rem 2rem 5rem;
+    }
+
+    .eda-hero {
+      margin-bottom: 3rem;
+    }
+    .eda-hero .hero-eyebrow { margin-bottom: .8rem; }
+    .eda-hero h1 { font-size: clamp(1.8rem, 2.8vw, 2.6rem); margin-bottom: .8rem; }
+    .eda-hero p  { font-family: var(--hf); font-size: .84rem; color: var(--text-soft); line-height: 1.8; max-width: 600px; }
+
+    /* ── SECTION DIVIDER ── */
+    .eda-section {
+      margin-bottom: 3.5rem;
+    }
+    .eda-section-title {
+      font-family: var(--hf); font-weight: 600; font-size: 1rem;
+      color: var(--text); margin-bottom: 1.2rem;
+      padding-bottom: .7rem; border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; gap: .7rem;
+    }
+    .eda-section-title .eda-num {
+      font-family: var(--mf); font-size: .6rem; color: var(--accent);
+      background: rgba(212,90,32,.12); border: 1px solid rgba(212,90,32,.25);
+      border-radius: 4px; padding: .15rem .45rem; letter-spacing: .1em;
+    }
+
+    /* ── TEXT BOX ── */
+    /*
+      HOW TO ADD A TEXT BOX:
+      Copy the block below and paste it inside any .eda-section.
+      Replace the content inside <p> tags with your own text.
+
+      <div class="eda-textbox">
+        <div class="eda-textbox-label">Your label here</div>
+        <p>Your paragraph text goes here. You can have multiple
+        <p> tags inside the same box.</p>
+        <p>Second paragraph...</p>
+      </div>
+    */
+
+    .eda-textbox {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 12px; padding: 1.4rem 1.6rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,.2);
+      margin-bottom: 1.2rem;
+    }
+
+    .eda-textbox-label {
+      font-family: var(--mf); font-size: .58rem; letter-spacing: .16em;
+      text-transform: uppercase; color: var(--accent);
+      margin-bottom: .8rem;
+    }
+    .eda-textbox p {
+      font-family: var(--hf); font-size: .84rem; line-height: 1.85;
+      color: var(--text-soft); margin-bottom: .75rem;
+    }
+    .eda-textbox p:last-child { margin-bottom: 0; }
+    .eda-textbox strong { color: var(--text); font-weight: 600; }
+    .eda-textbox code {
+      font-family: var(--mf); font-size: .78rem;
+      background: var(--faint); border: 1px solid var(--border);
+      border-radius: 4px; padding: .1rem .4rem; color: var(--teal);
+    }
+
+    /* ── GRAPH / IMAGE SLOT ── */
+    /*
+      HOW TO ADD A GRAPH:
+      Copy the block below and paste it inside any .eda-section.
+      Replace src="YOUR_GRAPH.png" with the path to your image.
+      Replace the caption text.
+
+      <figure class="eda-figure">
+        <img src="YOUR_GRAPH.png" alt="Description of graph"/>
+        <figcaption>Figure N — Your caption text here</figcaption>
+      </figure>
+
+      For a 2-column layout (side by side), wrap two figures in:
+      <div class="eda-figure-row">
+        <figure class="eda-figure"> ... </figure>
+        <figure class="eda-figure"> ... </figure>
+      </div>
+    */
+    .eda-figure {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 12px; overflow: hidden;
+      box-shadow: 0 2px 12px rgba(0,0,0,.25);
+      margin-bottom: 1.2rem;
+    }
+    .eda-figure img {
+      width: 100%; display: block;
+      border-bottom: 1px solid var(--border);
+    }
+    .eda-figure figcaption {
+      font-family: var(--hf); font-size: .7rem; color: var(--muted);
+      padding: .7rem 1rem; line-height: 1.5;
+    }
+    .eda-figure figcaption strong { color: var(--text-soft); }
+
+    .eda-figure-row {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 1.2rem; margin-bottom: 1.2rem;
+    }
+    .eda-figure-row .eda-figure { margin-bottom: 0; }
+
+    /* ── IMAGE PLACEHOLDER (shown when no src set) ── */
+    .eda-figure-placeholder {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 12px; padding: 3rem 2rem;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center; gap: .8rem;
+      margin-bottom: 1.2rem; box-shadow: 0 2px 8px rgba(0,0,0,.2);
+      position: relative; overflow: hidden;
+    }
+    .eda-figure-placeholder::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse at 50% 50%, rgba(42,143,133,.04), transparent 70%);
+    }
+    .eda-figure-placeholder .ph-icon  { font-size: 2rem; opacity: .2; }
+    .eda-figure-placeholder .ph-label {
+      font-family: var(--hf); font-size: .72rem; font-weight: 500;
+      color: var(--muted); opacity: .55;
+    }
+    .eda-figure-placeholder .ph-hint  {
+      font-family: var(--mf); font-size: .58rem; color: var(--teal);
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 6px; padding: .4rem .8rem; text-align: center; line-height: 1.8;
+    }
+
+    /* ── STAT ROW (inline highlight numbers) ── */
+    /*
+      HOW TO ADD A STAT ROW:
+      <div class="eda-stats">
+        <div class="eda-stat">
+          <div class="eda-stat-val">42</div>
+          <div class="eda-stat-label">Your label</div>
+        </div>
+        ... repeat for each stat ...
+      </div>
+    */
+    .eda-stats {
+      display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 1.2rem;
+    }
+    .eda-stat {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 10px; padding: 1rem 1.4rem; flex: 1; min-width: 100px;
+      box-shadow: 0 1px 4px rgba(0,0,0,.2);
+    }
+    .eda-stat-val {
+      font-family: var(--hf); font-weight: 700; font-size: 1.6rem;
+      color: var(--text); line-height: 1; margin-bottom: .3rem;
+    }
+    .eda-stat-label {
+      font-family: var(--hf); font-size: .65rem; color: var(--muted);
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 700px) {
+      .eda-figure-row { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── WEATHER FX LAYERS ── -->
+<div id="sky-layer"></div>
+<div id="grid-layer"></div>
+<canvas id="rain-canvas"></canvas>
+<canvas id="snow-canvas"></canvas>
+<div id="fog-layer"></div>
+
+<!-- ── WEATHER WIDGET ── -->
+<div id="weather-widget">
+  <div class="w-icon" id="w-icon">&#9203;</div>
+  <div class="w-info">
+    <div class="w-loc">Rovaniemi, FI</div>
+    <div class="w-temp" id="w-temp">&#8212;&#176;C</div>
+    <div class="w-desc" id="w-desc">Loading&#8230;</div>
+    <div class="w-extras">
+      <span id="w-wind">&#8212; km/h</span>
+      <span id="w-humid">&#8212; %RH</span>
+      <span id="w-precip">&#8212; mm</span>
+    </div>
+  </div>
+</div>
+
+<!-- ── HEADER ── -->
+<header>
+  <div class="logo">
+    <div class="logo-badge">&#9888; HSAP</div>
+    Hazard Analysis Platform
+  </div>
+  <nav>
+    <a href="hsap-dashboard.html"style="color:var(--teal)">&#8592; Dashboard</a>
+    <a href="hsap-dashboard.html#map">Map</a>
+    <a href="hsap-dashboard.html#incidents">Incidents</a>
+    <a href="hsap-dashboard.html#analysis">Analysis</a>
+    <a href="hsap-eda.html">EDA</a>
+    <a href="hsap-summary.html" style="color:var(--accent)">Methodology</a>
+    <a href="static/index.html" style="color:var(--teal)">ML Travel Analysis ↗</a>
+  </nav>
+  <div class="sys-status">
+    <div class="pulse"></div>
+    System Live
+  </div>
+</header>
+
+
+<!-- ══════════════════════════════════════════════════════════════════
+     EDA PAGE CONTENT
+     ══════════════════════════════════════════════════════════════════
+
+  HOW TO USE THIS PAGE:
+  ─────────────────────
+  This page is structured into numbered sections.
+  Inside each section you can freely mix:
+
+    • Text boxes   → .eda-textbox
+    • Graph images → .eda-figure  /  .eda-figure-row (2 side-by-side)
+    • Stat rows    → .eda-stats
+    • Placeholders → .eda-figure-placeholder  (remove once you add real images)
+
+  To add a new section, copy the .eda-section block and give it a new number.
+  All instructions are in the CSS comments above.
+
+════════════════════════════════════════════════════════════════════ -->
+
+<div class="eda-page">
+
+  <!-- PAGE TITLE -->
+  <div class="eda-hero">
+    <div class="hero-eyebrow">HSAP &middot; Exploratory Data Analysis</div>
+    <h1>Data <mark>Exploration</mark><br>&amp; Findings</h1>
+    <p>
+      Analysis of hazard event data collected from the truck fleet.
+      Each section combines written observations with supporting visualisations
+      exported from the analysis notebook.
+    </p>
+  </div>
+
+
+  <!-- ══════════════════════════════════════════════════════════════
+       SECTION 1 — paste your first block of analysis here
+       ══════════════════════════════════════════════════════════════ -->
+  <div class="eda-section">
+    <div class="eda-section-title">
+      <span class="eda-num">01</span>
+      Dataset Overview
+      <!-- ↑ Change this title to match your section -->
+    </div>
+
+    <!-- TEXT BOX — replace with your own observations -->
+    <div class="eda-textbox">
+      <div class="eda-textbox-label">Analysis</div>
+      <!-- PASTE YOUR TEXT BELOW -->
+      <p><strong>SCOPE OF THE PROJECT</strong><br>
+        The project started with a task to analyze data from a company called "Trionas". The data is from a truck with a dedicated button that the driver is instructed to press when a hazardous event happens.<br>
+        The data used is a collection of hazard events collected over a specific period. Approximately 890 events were collected over a 3-month period.<br>
+        The instructions given on what to do with said data were to perform exploratory data analysis and generate insights about the patterns and trends in the hazard events.<br>
+        This was possible due to having also sensor data from the truck including 3 movement sensors and its GPS-location. Additionally we also had road surface data to make insights easier.</p>
+      <!-- END OF TEXT -->
+    </div>
+
+    <div class="eda-textbox">
+      <div class="eda-textbox-label">STATS REGARDING THE ANALYSIS</div>
+      <!-- PASTE YOUR TEXT BELOW -->
+      <p><strong>Listed key numbers from the analysis below:</strong><br></p>
+      <!-- END OF TEXT -->
+    </div>
+
+    <!-- STAT ROW — replace values and labels with your real numbers -->
+    <div class="eda-stats">
+      <div class="eda-stat">
+        <div class="eda-stat-val" style="color:var(--red)">18</div>
+        <!-- ↑ paste your number -->
+        <div class="eda-stat-label">Dangerous situations</div>
+      </div>
+      <div class="eda-stat">
+        <div class="eda-stat-val" style="color:var(--amber)">890</div>
+        <div class="eda-stat-label">Total signals from the button</div>
+      </div>
+      <div class="eda-stat">
+        <div class="eda-stat-val" style="color:var(--teal)">11</div>
+        <div class="eda-stat-label">Hazardous situations in the dark</div>
+      </div>
+      <div class="eda-stat">
+        <div class="eda-stat-val" style="color:var(--green)">7</div>
+        <div class="eda-stat-label">Incidents on the same day</div>
+      </div>
+    </div>
+
+    <div class="eda-textbox">
+      <div class="eda-textbox-label">ANALYSIS</div>
+      <p><strong>EMERGING ISSUES DURING THE PROJECT</strong><BR>
+      During the project a few issues came up that made the analysis more difficult. The main issue was that the data had so many rows of a button being pressed with some gaps being below 2 seconds.<br>
+      This made it difficult to analyze the data as it was not clear if these were multiple events or if they were just one event with multiple signals.<br>
+      We believe this was caused by latency issues in the BLE broadcast interval configurations.<br><br>
+
+      Also a problem, where we cannot know what happened a while before or after the button was pressed, makes it harder to go deeper into every event. This way having more data about the bofres and afters of an event would make clearer analysis easier on every event.
+      </p>
+    </div>
+
+    <!--<figure class="eda-figure">
+      <img src="Random graph.png">
+    </figure></div>-->
+
+  </div><!-- /section 1 -->
+
+
+  <!-- ══════════════════════════════════════════════════════════════
+       SECTION 2 — paste your second block of analysis here
+       ══════════════════════════════════════════════════════════════ -->
+  <div class="eda-section">
+    <div class="eda-section-title">
+      <span class="eda-num">02</span>
+      Severity Distribution
+      <!-- ↑ Change title -->
+    </div>
+
+    <div class="eda-textbox">
+      <div class="eda-textbox-label">Observations</div>
+      <p>Replace this with your findings about severity distribution.</p>
+    </div>
+
+    <!-- TWO GRAPHS SIDE BY SIDE -->
+    <div class="eda-figure-row">
+      <div class="eda-figure-placeholder">
+        <div class="ph-icon">&#128200;</div>
+        <div class="ph-label">Left graph — Section 2</div>
+        <div class="ph-hint">
+          &lt;figure class="eda-figure"&gt;<br>
+          &nbsp;&nbsp;&lt;img src="graph_left.png"/&gt;<br>
+          &lt;/figure&gt;
+        </div>
+      </div>
+      <div class="eda-figure-placeholder">
+        <div class="ph-icon">&#128200;</div>
+        <div class="ph-label">Right graph — Section 2</div>
+        <div class="ph-hint">
+          &lt;figure class="eda-figure"&gt;<br>
+          &nbsp;&nbsp;&lt;img src="graph_right.png"/&gt;<br>
+          &lt;/figure&gt;
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /section 2 -->
+
+
+  <!-- ══════════════════════════════════════════════════════════════
+       SECTION 3 — paste your third block of analysis here
+       ══════════════════════════════════════════════════════════════ -->
+  <div class="eda-section">
+    <div class="eda-section-title">
+      <span class="eda-num">03</span>
+      Road Surface Analysis
+      <!-- ↑ Change title -->
+    </div>
+
+    <div class="eda-textbox">
+      <div class="eda-textbox-label">Observations</div>
+      <p>Replace this with your findings about road surface conditions.</p>
+    </div>
+
+    <div class="eda-figure-placeholder">
+      <div class="ph-icon">&#128200;</div>
+      <div class="ph-label">Graph slot — Section 3</div>
+      <div class="ph-hint">
+        Replace with &lt;figure class="eda-figure"&gt;&lt;img src="..."&gt;&lt;/figure&gt;
+      </div>
+    </div>
+
+  </div><!-- /section 3 -->
+
+
+  <!-- ══════════════════════════════════════════════════════════════
+       SECTION 4 — movement anomaly analysis
+       ══════════════════════════════════════════════════════════════ -->
+  <div class="eda-section">
+    <div class="eda-section-title">
+      <span class="eda-num">04</span>
+      Movement Anomaly Patterns
+    </div>
+
+    <div class="eda-textbox">
+      <div class="eda-textbox-label">Observations</div>
+      <p>Replace this with your movement anomaly findings.</p>
+    </div>
+
+    <div class="eda-figure-placeholder">
+      <div class="ph-icon">&#128200;</div>
+      <div class="ph-label">Graph slot — Section 4</div>
+      <div class="ph-hint">
+        Replace with &lt;figure class="eda-figure"&gt;&lt;img src="..."&gt;&lt;/figure&gt;
+      </div>
+    </div>
+
+  </div><!-- /section 4 -->
+
+
+  <!-- ══════════════════════════════════════════════════════════════
+       ADD MORE SECTIONS by copying the block below
+       ══════════════════════════════════════════════════════════════
+
+  <div class="eda-section">
+    <div class="eda-section-title">
+      <span class="eda-num">05</span>
+      Your Section Title
+    </div>
+
+    <div class="eda-textbox">
+      <div class="eda-textbox-label">Observations</div>
+      <p>Your text here.</p>
+    </div>
+
+    <figure class="eda-figure">
+      <img src="your_graph.png" alt="Graph description"/>
+      <figcaption>Figure 5 — Your caption</figcaption>
+    </figure>
+  </div>
+
+  ══════════════════════════════════════════════════════════════════ -->
+
+</div><!-- /eda-page -->
+
+<footer>
+  <span>HSAP &middot; Exploratory Data Analysis &middot; Rovaniemi Fleet</span>
+  <span id="footer-clock"></span>
+</footer>
+
+
+<!-- ════════════════════════════════════════════════════════════════
+     WEATHER ENGINE — Open-Meteo · Rovaniemi · No API key needed
+     ════════════════════════════════════════════════════════════════ -->
+<script>
+var WMO = {
+  0:  ['Clear sky',          '☀️'],  1:  ['Mainly clear',       '🌤️'],
+  2:  ['Partly cloudy',      '⛅'],  3:  ['Overcast',           '☁️'],
+  45: ['Fog',                '🌫️'], 48: ['Icy fog',            '🌫️'],
+  51: ['Light drizzle',      '🌦️'], 53: ['Moderate drizzle',   '🌦️'],
+  55: ['Dense drizzle',      '🌧️'], 61: ['Slight rain',        '🌧️'],
+  63: ['Moderate rain',      '🌧️'], 65: ['Heavy rain',         '🌧️'],
+  71: ['Slight snow',        '🌨️'], 73: ['Moderate snow',      '❄️'],
+  75: ['Heavy snow',         '❄️'],  77: ['Snow grains',        '🌨️'],
+  80: ['Slight showers',     '🌦️'], 81: ['Moderate showers',   '🌧️'],
+  82: ['Violent showers',    '⛈️'], 85: ['Snow showers',       '🌨️'],
+  86: ['Heavy snow showers', '❄️'],  95: ['Thunderstorm',       '⛈️'],
+  96: ['Thunder + hail',     '⛈️'], 99: ['Thunder + hail',     '⛈️'],
+};
+
+function wmoClass(code) {
+  if ([45,48].includes(code))                       return 'wx-fog';
+  if ([51,53,55,61,63,65,80,81,82].includes(code)) return 'wx-rain';
+  if ([71,73,75,77,85,86].includes(code))           return 'wx-snow';
+  if ([95,96,99].includes(code))                    return 'wx-thunder';
+  if (code === 3)                                   return 'wx-cloudy';
+  return 'wx-clear';
+}
+
+async function fetchWeather() {
+  var LAT = 66.5039, LON = 25.7294;
+  var url = 'https://api.open-meteo.com/v1/forecast'
+    + '?latitude=' + LAT + '&longitude=' + LON
+    + '&current=temperature_2m,relative_humidity_2m,wind_speed_10m,precipitation,weather_code'
+    + '&wind_speed_unit=kmh&timezone=Europe%2FHelsinki';
+  try {
+    var res  = await fetch(url);
+    var data = await res.json();
+    var c    = data.current;
+    var code = c.weather_code != null ? c.weather_code : 0;
+    var info = WMO[code] || ['Unknown', '🌡️'];
+
+    document.getElementById('w-icon').textContent   = info[1];
+    document.getElementById('w-temp').textContent   = (c.temperature_2m != null ? c.temperature_2m.toFixed(1) : '—') + '°C';
+    document.getElementById('w-desc').textContent   = info[0];
+    document.getElementById('w-wind').textContent   = (c.wind_speed_10m != null ? c.wind_speed_10m.toFixed(0) : '—') + ' km/h';
+    document.getElementById('w-humid').textContent  = (c.relative_humidity_2m != null ? c.relative_humidity_2m : '—') + '%';
+    document.getElementById('w-precip').textContent = (c.precipitation != null ? c.precipitation.toFixed(1) : '0.0') + ' mm';
+
+    var cls = wmoClass(code);
+    document.body.classList.add(cls);
+    if (cls === 'wx-rain' || cls === 'wx-thunder') startRain(cls === 'wx-thunder' ? 'heavy' : 'normal');
+    if (cls === 'wx-snow') startSnow();
+    if (c.temperature_2m != null && c.temperature_2m < -10) {
+      document.getElementById('sky-layer').style.background =
+        'radial-gradient(ellipse at 30% 0%, rgba(30,55,95,.55) 0%, transparent 60%),' +
+        'linear-gradient(180deg,#080b11 0%,#0e1217 100%)';
+    }
+  } catch(e) {
+    document.getElementById('w-desc').textContent = 'Weather unavailable';
+  }
+}
+
+/* shared scroll-pause flag */
+var _scrolling = false, _scrollTimer;
+window.addEventListener('scroll', function() {
+  _scrolling = true;
+  clearTimeout(_scrollTimer);
+  _scrollTimer = setTimeout(function(){ _scrolling = false; }, 150);
+}, { passive: true });
+
+function startRain(intensity) {
+  var canvas = document.getElementById('rain-canvas');
+  var ctx    = canvas.getContext('2d');
+  var COUNT  = intensity === 'heavy' ? 280 : intensity === 'normal' ? 160 : 70;
+  var ANGLE  = 12;
+  var drops  = [];
+
+  function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+  resize();
+  window.addEventListener('resize', resize, { passive: true });
+
+  for (var i = 0; i < COUNT; i++) {
+    drops.push({
+      x:     Math.random() * window.innerWidth,
+      y:     Math.random() * window.innerHeight,
+      len:   Math.random() * 18  + 8,
+      /* speed in px/second — divide by 60 gives old per-frame value at 60Hz */
+      speed: (Math.random() * 8  + 6) * 60,
+      op:    Math.random() * 0.35 + 0.1,
+      w:     Math.random() * 0.8  + 0.3
+    });
+  }
+
+  var rad = ANGLE * Math.PI / 180, dx = Math.sin(rad), dy = Math.cos(rad);
+  var lastTs = 0;
+
+  (function frame(ts) {
+    if (document.hidden) { requestAnimationFrame(frame); return; }
+
+    /* delta in seconds since last frame — clamp to 100ms to avoid huge jumps
+       when tab was hidden or browser stalled */
+    var delta = Math.min((ts - lastTs) / 1000, 0.1);
+    lastTs = ts;
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    drops.forEach(function(d) {
+      ctx.beginPath(); ctx.moveTo(d.x, d.y);
+      ctx.lineTo(d.x + dx * d.len, d.y + dy * d.len);
+      ctx.strokeStyle = 'rgba(160,200,230,' + d.op + ')';
+      ctx.lineWidth   = d.w; ctx.stroke();
+
+      /* move by speed * seconds elapsed — same distance on 60Hz and 144Hz */
+      d.x += dx * d.speed * delta;
+      d.y += dy * d.speed * delta;
+
+      if (d.y > canvas.height + 20 || d.x > canvas.width + 20) {
+        d.x = Math.random() * canvas.width - 50; d.y = -20;
+      }
+    });
+    requestAnimationFrame(frame);
+  })(0);
+}
+
+function startSnow() {
+  var canvas = document.getElementById('snow-canvas');
+  var ctx    = canvas.getContext('2d');
+  var flakes = [];
+
+  function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+  resize();
+  window.addEventListener('resize', resize, { passive: true });
+
+  for (var i = 0; i < 140; i++) {
+    flakes.push({
+      x:     Math.random() * window.innerWidth,
+      y:     Math.random() * window.innerHeight,
+      r:     Math.random() * 2.5  + 0.8,
+      /* px/second */
+      speed: (Math.random() * 1.2 + 0.4) * 60,
+      drift: (Math.random() - 0.5) * 0.5 * 60,
+      op:    Math.random() * 0.6  + 0.2
+    });
+  }
+
+  var lastTs = 0;
+
+  (function frame(ts) {
+    if (document.hidden) { requestAnimationFrame(frame); return; }
+
+    var delta = Math.min((ts - lastTs) / 1000, 0.1);
+    lastTs = ts;
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    flakes.forEach(function(f) {
+      ctx.beginPath(); ctx.arc(f.x, f.y, f.r, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(220,235,255,' + f.op + ')'; ctx.fill();
+
+      f.y += f.speed * delta;
+      f.x += f.drift * delta;
+
+      if (f.y >  canvas.height + 10) { f.y = -10; f.x = Math.random() * canvas.width; }
+      if (f.x >  canvas.width  + 10)   f.x = -10;
+      if (f.x < -10)                    f.x =  canvas.width + 10;
+    });
+    requestAnimationFrame(frame);
+  })(0);
+}
+
+fetchWeather();
+</script>
+
+</body>
+</html>

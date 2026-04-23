@@ -195,18 +195,12 @@ function endPick() {
 }
 
 function clearDeparture() {
-  var inp = document.getElementById('departure');
-  inp.value = '';
-  delete inp.dataset.lat;
-  delete inp.dataset.lng;
+  document.getElementById('departure').value = '';
   if (pickDepMarker) { map.removeLayer(pickDepMarker); pickDepMarker = null; }
 }
 
 function clearDestination() {
-  var inp = document.getElementById('destination');
-  inp.value = '';
-  delete inp.dataset.lat;
-  delete inp.dataset.lng;
+  document.getElementById('destination').value = '';
   if (pickDestMarker) { map.removeLayer(pickDestMarker); pickDestMarker = null; }
 }
 
@@ -217,21 +211,12 @@ map.on('click', function (e) {
   if (type === 'departure') {
     if (pickDepMarker) map.removeLayer(pickDepMarker);
     pickDepMarker = L.marker([lat, lng], {icon: ICONS.departure, draggable: true}).addTo(map);
-    pickDepMarker.on('dragend', function () {
-      var ll = pickDepMarker.getLatLng();
-      _setPickedCoords('departure', ll.lat, ll.lng);
-      reverseGeocode(ll, 'departure');
-    });
+    pickDepMarker.on('dragend', function () { reverseGeocode(pickDepMarker.getLatLng(), 'departure'); });
   } else {
     if (pickDestMarker) map.removeLayer(pickDestMarker);
     pickDestMarker = L.marker([lat, lng], {icon: ICONS.destination, draggable: true}).addTo(map);
-    pickDestMarker.on('dragend', function () {
-      var ll = pickDestMarker.getLatLng();
-      _setPickedCoords('destination', ll.lat, ll.lng);
-      reverseGeocode(ll, 'destination');
-    });
+    pickDestMarker.on('dragend', function () { reverseGeocode(pickDestMarker.getLatLng(), 'destination'); });
   }
-  _setPickedCoords(type, lat, lng);
   reverseGeocode({lat: lat, lng: lng}, type);
   endPick();
 
@@ -243,43 +228,14 @@ map.on('click', function (e) {
 
 document.addEventListener('keydown', function (e) { if (e.key === 'Escape') endPick(); });
 
-// Store exact picked coords on the input. submitAnalysis()/showRouteOptions()
-// send these instead of the friendly label, so the backend routes from the
-// exact pin -- no Pelias round-trip and no marker/route mismatch.
-function _setPickedCoords(field, lat, lng) {
-  var inp = document.getElementById(field);
-  inp.dataset.lat = lat.toFixed(6);
-  inp.dataset.lng = lng.toFixed(6);
-}
-
-// If the user types over the input or clears it, drop any stored coords so the
-// next submit goes through normal geocoding.
-['departure', 'destination'].forEach(function (id) {
-  var inp = document.getElementById(id);
-  inp.addEventListener('input', function () {
-    delete inp.dataset.lat;
-    delete inp.dataset.lng;
-  });
-});
-
-function resolvedLocation(field) {
-  var inp = document.getElementById(field);
-  if (inp.dataset.lat && inp.dataset.lng) {
-    return inp.dataset.lat + ',' + inp.dataset.lng;
-  }
-  return inp.value.trim();
-}
-
 async function reverseGeocode(ll, field) {
   var inp = document.getElementById(field);
-  // Immediate feedback that does NOT look like coordinates: if the user
-  // submits before Nominatim returns, form.js below filters coord-shaped
-  // labels out, so the LLM never receives the lat/lng string.
-  inp.value = 'Locating\u2026';
+  inp.value = ll.lat.toFixed(4) + ', ' + ll.lng.toFixed(4);  // immediate feedback
   try {
     var r = await fetch(
       'https://nominatim.openstreetmap.org/reverse?lat=' + ll.lat +
-      '&lon=' + ll.lng + '&format=json&zoom=10&addressdetails=1&accept-language=en'
+      '&lon=' + ll.lng + '&format=json&zoom=10&addressdetails=1&accept-language=en',
+      {headers: {'User-Agent': 'HazardAnalysis/1.0 (school-project)'}}
     );
     var d = await r.json();
     if (d.address) {
@@ -287,16 +243,8 @@ async function reverseGeocode(ll, field) {
       var city = a.city || a.town || a.village || a.municipality || '';
       var road = a.road || '';
       inp.value = city ? (road ? road + ', ' + city : city) : (d.display_name || '').split(',').slice(0, 3).join(',');
-    } else {
-      inp.value = '';
     }
-  } catch (err) {
-    console.warn('Reverse geocode failed:', err);
-    inp.value = '';
-  }
-  // Re-arm coords because the 'input' listener above wipes them when value
-  // is changed programmatically by some browsers; safe to re-set here.
-  _setPickedCoords(field, ll.lat, ll.lng);
+  } catch (err) { console.warn('Reverse geocode failed:', err); }
 }
 
 // ═════════════════════════════════════════════════════════════════════

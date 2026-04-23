@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-glyphicons.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.2.0/css/all.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/python-visualization/folium/folium/templates/leaflet.awesome.rotate.min.css"/>
+    
+            <meta name="viewport" content="width=device-width,
+                initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+            <style>
+                #map_1a9a2af6b5579fffd929db9a46c5e18e {
+                    position: relative;
+                    width: 100.0%;
+                    height: 100.0%;
+                    left: 0.0%;
+                    top: 0.0%;
+                }
+                .leaflet-container { font-size: 1rem; }
+            </style>
+
+            <style>html, body {
+                width: 100%;
+                height: 100%;
+                margin: 0;
+                padding: 0;
+            }
+            </style>
+
+            <style>#map {
+                position:absolute;
+                top:0;
+                bottom:0;
+                right:0;
+                left:0;
+                }
+            </style>
+
+            <script>
+                L_NO_TOUCH = false;
+                L_DISABLE_3D = false;
+            </script>
+
+            <style>
+                /* Dashboard-aligned filter panel */
+                #filter-box {
+                    position: fixed; top: 12px; right: 12px; z-index: 99999;
+                    background: rgba(28, 34, 41, 0.94);
+                    color: #e6edf3;
+                    padding: 14px 14px 12px;
+                    border: 1px solid #2a3340;
+                    border-radius: 10px;
+                    box-shadow: 0 8px 24px rgba(0,0,0,.45);
+                    min-width: 220px;
+                    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+                    font-size: 13px;
+                    backdrop-filter: blur(6px);
+                    -webkit-backdrop-filter: blur(6px);
+                }
+                #filter-box b { color: #2a8f85; letter-spacing: .06em; font-size: 11px; text-transform: uppercase; }
+                #filter-box label b { color: #8a98a8; font-weight: 600; }
+                #filter-box select {
+                    width: 100%; margin-top: 6px; margin-bottom: 10px; padding: 6px 8px;
+                    background: #171c22; color: #e6edf3;
+                    border: 1px solid #2a3340; border-radius: 6px;
+                    outline: none; cursor: pointer;
+                    appearance: none; -webkit-appearance: none;
+                    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'><path fill='%238a98a8' d='M0 0l5 6 5-6z'/></svg>");
+                    background-repeat: no-repeat; background-position: right 8px center;
+                    padding-right: 24px;
+                }
+                #filter-box select:focus { border-color: #2a8f85; }
+
+                /* Crisp truck pins (replace emoji SVG icons) */
+                .hsap-pin {
+                    width: 34px; height: 34px; border-radius: 50%;
+                    display: flex; align-items: center; justify-content: center;
+                    box-shadow: 0 2px 6px rgba(0,0,0,.45), 0 0 0 2px rgba(255,255,255,.9);
+                    transition: transform .15s ease, box-shadow .15s ease;
+                    cursor: pointer;
+                }
+                .hsap-pin:hover {
+                    transform: scale(1.18);
+                    box-shadow: 0 4px 10px rgba(0,0,0,.55), 0 0 0 2px #fff;
+                }
+                .hsap-pin svg { width: 20px; height: 20px; display: block; }
+                .hsap-pin.high    { background: #c44040; }
+                .hsap-pin.medium  { background: #c49a2a; }
+                .hsap-pin.low     { background: #3a9e6e; }
+                .hsap-pin.weather { background: #2a8f85; }
+
+                /* Subtle tile harmonisation with the dark dashboard chrome */
+                .leaflet-tile-pane { filter: saturate(.9) contrast(.97); }
+
+                /* Cleaner popups/tooltips on dark surroundings */
+                .leaflet-popup-content-wrapper, .leaflet-tooltip {
+                    border-radius: 8px;
+                }
+            </style>
+
+        
+</head>
+<body>
+    
+    
+<div id="filter-box">
+    <b>EVENT FILTER</b><br><br>
+
+    <label><b>PICK A DATE:</b></label><br>
+    <select id="dateSelect">
+        <option value="ALL">All Dates</option>
+    </select>
+
+    <label><b>PICK A TIME:</b></label><br>
+    <select id="timeSelect">
+        <option value="ALL">All Times</option>
+    </select>
+</div>
+    
+<script>
+var markerData = [{"date": "2025-11-10", "time": "01:50", "lat": 60.493152, "lon": 22.288016, "tooltip": "<b>Press 1</b><br><b>Time:</b> 2025-11-10T01:50:40<br><b>Day/Night:</b> \ud83c\udf19 Night<br><b>Street:</b> Telekatu<br><b>Town:</b> Turku<br><b>Highest acceleration:</b> 44.8 m/s\u00b2<br><b>Speed:</b> 0.0 km/h (\ud83d\udfe2 Low)<br><b>Grip:</b> 0.688 (\ud83d\udfe1 Moderate)<br><b>Surface:</b> \ud83c\udf27\ufe0f wet", "popup": "<b>Press 1</b><br><b>Time:</b> 2025-11-10T01:50:40<br><b>Day/Night:</b> \ud83c\udf19 Night<br><b>Street:</b> Telekatu<br><b>Town:</b> Turku<br><b>Highest acceleration:</b> 44.8 m/s\u00b2<br><b>Speed:</b> 0.0 km/h (\ud83d\udfe2 Low)<br><b>Grip:</b> 0.688 (\ud83d\udfe1 Moderate)<br><b>Surface:</b> \ud83c\udf27\ufe0f wet", "icon_url": "data:image/svg+xml;base64,CjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB3aWR0aD0iNjQwIiBoZWlnaHQ9IjY0MCIgdmlld0JveD0iMCAwIDY0MCA2NDAiPgogIDx0ZXh0IHg9IjMyMCIgeT0iNDIwIiBmb250LXNpemU9IjM0MCIgdGV4dC1hbmNob3I9Im1pZGRsZSI+8J+amjwvdGV4dD4KPC9zdmc+Cg==", "icon_size": [100, 100], "icon_anchor": [50, 50], "press": 1}, {"date": "2025-11-10", "time": "04:06", "lat": 60.383189, "lon": 23.100664, "tooltip": "<b>Press 2</b><br><b>Time:</b> 2025-11-10T04:06:25<br><b>Day/Night:</b> \ud83c\udf19 Night<br><b>Street:</b> Meriniitynkatu<br><b>Town:</b> Salon suuralue<br><b>Highest acceleration:</b> 2083.0 m/s\u00b2<br><b>Speed:</b> 37.8 km/h (\ud83d\udfe2 Low)<br><b>Grip:</b> 0.623 (\ud83d\udfe1 Moderate)<br><b>Surface:</b> \ud83c\udf27\ufe0f wet", "popup": "<b>Press 2</b><br><b>Time:</b> 2025-11-10T04:06:25<br><b>Day/Night:</b> \ud83c\udf19 Night<br><b>Street:</b> Meriniitynkatu<br><b>Town:</b> Salon suuralue<br><b>Highest acceleration:</b> 2083.0 m/s\u00b2<br><b>Speed:</b> 37.8 km/h (\ud83d\udfe2 Low)<br><b>Grip:</b> 0.623 (\ud83d\udfe1 Moderate)<br><b>Surface:</b> \ud83c\udf27\ufe0f wet", "icon_url": "data:image/svg+xml;base64,CjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB3aWR0aD0iNjQwIiBoZWlnaHQ9IjY0MCIgdmlld0JveD0iMCAwIDY0MCA2NDAiPgogIDx0ZXh0IHg9IjMyMCIgeT0iNDIwIiBmb250LXNpemU9IjM0MCIgdGV4dC1hbmNob3I9Im1pZGRsZSI+8J+amjwvdGV4dD4KPC9zdmc+Cg==", "icon_size": [100, 100], "icon_anchor": [50, 50], "press": 2}, {"date": "2025-11-10", "time": "04:28", "lat": 60.204471, "lon": 23.113718, "tooltip": "<b>Press 3</b><br><b>Time:</b> 2025-11-10T04:28:52<br><b>Day/Night:</b> \ud83c\udf19 Night<br><b>Street:</b> Haarlantie<br><b>Town:</b> Salo<br><b>Highest acceleration:</b> 634.6 m/s\u00b2<br><b>Speed:</b> 13.8 km/h (\ud83d\udfe2 Low)<br><b>Grip:</b> 0.746 (\ud83d\udfe2 Safe)<br><b>Surface:</b> \ud83c\udf27\ufe0f wet", "popup": "<b>Press 3</b><br><b>Time:</b> 2025-11-10T04:28:52<br><b>Day/Night:</b> \ud83c\udf19 Night<br><b>Street:</b> Haarlantie<br><b>Town:</b> Salo<br><b>Highest acceleration:</b> 634.6 m/s\u00b2<br><b>Speed:</b> 13.8 km/h (\ud83d\udfe2 Low)<br><b>Grip:</b> 0.746 (\ud83d\udfe2 Safe)<br><b>Surface:</b> \ud83c\udf27\ufe0f wet", "icon_url": "data:image/svg+xml;base64,CjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB3aWR0aD0iNjQwIiBoZWlnaHQ9IjY0MCIgdmlld0JveD0iMCAwIDY0MCA2NDAiPgogIDx0ZXh0IHg9IjMyMCIgeT0iNDIwIiBmb250LXNpemU9IjM0MCIgdGV4dC1hbmNob3I9Im1pZGRsZSI+8J+amjwvdGV4dD4KPC9zdmc+Cg==", "icon_size": [100, 100], "icon_anchor": [50, 50], "press": 3}, {"date": "2025-11-10", "time": "05:40", "lat": 60.009589, "lon": 23.543561, "tooltip": "<b>Press 4</b><br><b>Time:</b> 2025-11-10T05:40:50<br><b>Day/Night:</b> \ud83c\udf19 Night<br><b>Street:</b> Eker\u00f6v\u00e4gen<br><b>Town:</b> Raasepori<br><b>Highest acceleration:</b> 225.3 m/s\u00b2<br><b>Speed:</b> 12.5 km/h (\ud83d\udfe2 Low)<br><b>Grip:</b> 0.677 (\ud83d\udfe1 Moderate)<br><b>Surface:</b> \ud83c\udf27\ufe0f wet", "popup": "<b>Press 4</b><br><b>Time:</b> 2025-11-10T05:40:50<br><b>Day/Night:</b> \ud83c\udf19 Night<br><b>Street:</b> Eker\u00f6v\u00e4gen<br><b>Town:</b> Raasepori<br><b>Highest acceleration:</b> 225.3 m/s\u00b2<br><b>Speed:</b> 12.5 km/h (\ud83d\udfe2 Low)<br><b>Grip:</b> 0.677 (\ud83d\udfe1 Moderate)<br><b>Surface:</b> \ud83c\udf27\ufe0f wet", "icon_url": "data:image/svg+xml;base64,CjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB3aWR0aD0iNjQwIiBoZWlnaHQ9IjY0MCIgdmlld0JveD0iMCAwIDY0MCA2NDAiPgogIDx0ZXh0IHg9IjMyMCIgeT0iNDIwIiBmb250LXNpemU9IjM0MCIgdGV4dC1hbmNob3I9Im1pZGRsZSI+8J+amjwvdGV4dD4KPC9zdmc+Cg==", "icon_size": [100, 100], "icon_anchor": [50, 50], "press": 4}, {"date": "2025-11-10", "time": "09:54", "lat": 59.819316, "lon": 22.95807, "tooltip": "<b>Press 5</b><br><b>Time:</b> 2025-11-10T09:54:27<br><b>Day/Night:</b> \u2600\ufe0f Day<br><b>Street:</b> Town Centre<br><b>Town:</b> Hanko<br><b>Highest acceleration:</b> 100.2 m/s\u00b2<br><b>Speed:</b> 0.4 km/h (\ud83d\udfe2 Low)<br><b>Grip:</b> 0.82 (\ud83d\udfe2 Safe)<br><b>Surface:</b> \u2600\ufe0f dry", "popup": "<b>Press 5</b><br><b>Time:</b> 2025-11-10T09:54:27<br><b>Day/Night:</b> \u2600\ufe0f Day<br><b>Street:</b> Town Centre<br><b>Town:</b> Hanko<br><b>Highest acceleration:</b> 100.2 m/s\u00b2<br><b>Speed:</b> 0.4 km/h (\ud83d\udfe2 Low)<br><b>Grip:</b> 0.82 (\ud83d\udfe2 Safe)<br><b>Surface:</b> \u2600\ufe0f dry", "icon_url": "data:image/svg+xml;base64,CjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB3aWR0aD0iNjQwIiBoZWlnaHQ9IjY0MCIgdmlld0JveD0iMCAwIDY0MCA2NDAiPgogIDx0ZXh0IHg9IjMyMCIgeT0iNDIwIiBmb250LXNpemU9IjM0MCIgdGV4dC1hbmNob3I9Im1pZGRsZSI+8J+amjwvdGV4dD4KPC9zdmc+Cg==", "icon_size": [100, 100], "icon_anchor": [50, 50], "press": 5}, {"date": "2025-11-10", "time": "18:05", "lat": 60.386477, "lon": 23.159415, "tooltip": "<b>Press 6</b><br><b>Time:</b> 2025-11-10T18:05:23<br><b>Day/Night:</b> \ud83c\udf19 Night<br><b>Street:</b> Otsonkatu<br><b>Town:</b> Salon suuralue<br><b>Highest acceleration:</b> 108.8 m/s\u00b2<br><b>Speed:</b> 20.2 km/h (\ud83d\udfe2 Low)<br><b>Grip:</b> 0.82 (\ud83d\udfe2 Safe)<br><b>Surface:</b> \u2600\ufe0f dry", "popup": "<b>Press 6</b><br><b>Time:</b> 2025-11-10T18:05:23<br><b>Day/Night:</b> \ud83c\udf19 Night<br><b>Street:</b> Otsonkatu<br><b>Town:</b> Salon suuralue<br><b>Highest acceleration:</b> 108.8 m/s\u00b2<br><b>Speed:</b> 20.2 km/h (\ud83d\udfe2 Low)<br><b>Grip:</b> 0.82 (\ud83d\udfe2 Safe)<br><b>Surface:</b> \u2600\ufe0f dry", "icon_url": "data:image/svg+xml;base64,CjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB3aWR0aD0iNjQwIiBoZWlnaHQ9IjY0MCIgdmlld0JveD0iMCAwIDY0MCA2NDAiPgogIDx0ZXh0IHg9IjMyMCIgeT0iNDIwIiBmb250LXNpemU9IjM0MCIgdGV4dC1hbmNob3I9Im1pZGRsZSI+8J+amjwvdGV4dD4KPC9zdmc+Cg==", "icon_size": [100, 100], "icon_anchor": [50, 50], "press": 6}, {"date": "2025-11-27", "time": "00:06", "lat": 60.234862, "lon": 23.588156, "tooltip": "<b>Press 7</b><br><b>Time:</b> 2025-11-27T00:06:20<br><b>Day/Night:</b> \ud83c\udf19 Night<br><b>Street:</b> Kiskontie<br><b>Town:</b> Salo<br><b>Highest acceleration:</b> 352.7 m/s\u00b2<br><b>Speed:</b> 2.2 km/h (\ud83d\udfe2 Low)<br><b>Grip:</b> 0.464 (\ud83d\udfe1 Moderate)<br><b>Surface:</b> \u3030\ufe0f slippery", "popup": "<b>Press 7</b><br><b>Time:</b> 2025-11-27T00:06:20<br><b>Day/Night:</b> \ud83c\udf19 Night<br><b>Street:</b> Kiskontie<br><b>Town:</b> Salo<br><b>Highest acceleration:</b> 352.7 m/s\u00b2<br><b>Speed:</b> 2.2 km/h (\ud83d\udfe2 Low)<br><b>Grip:</b> 0.464 (\ud83d\udfe1 Moderate)<br><b>Surface:</b> \u3030\ufe0f slippery", "icon_url": "data:image/svg+xml;base64,CjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB3aWR0aD0iNjQwIiBoZWlnaHQ9IjY0MCIgdmlld0JveD0iMCAwIDY0MCA2NDAiPgogIDx0ZXh0IHg9IjMyMCIgeT0iNDIwIiBmb250LXNpemU9IjM0MCIgdGV4dC1hbmNob3I9Im1pZGRsZSI+8J+amjwvdGV4dD4KPC9zdmc+Cg==", "icon_size": [100, 100], "icon_anchor": [50, 50], "press": 7}, {"date": "2025-11-27", "time": "13:06", "lat": 60.482399, "lon": 22.165015, "tooltip": "<b>Press 8</b><br><b>Time:</b> 2025-11-27T13:06:14<br><b>Day/Night:</b> \u2600\ufe0f Day<br><b>Street:</b> Nesteentie<br><b>Town:</b> Raisio<br><b>Highest acceleration:</b> 337.5 m/s\u00b2<br><b>Speed:</b> 0.9 km/h (\ud83d\udfe2 Low)<br><b>Grip:</b> 0.82 (\ud83d\udfe2 Safe)<br><b>Surface:</b> \u2600\ufe0f dry", "popup": "<b>Press 8</b><br><b>Time:</b> 2025-11-27T13:06:14<br><b>Day/Night:</b> \u2600\ufe0f Day<br><b>Street:</b> Nesteentie<br><b>Town:</b> Raisio<br><b>Highest acceleration:</b> 337.5 m/s\u00b2<br><b>Speed:</b> 0.9 km/h (\ud83d\udfe2 Low)<br><b>Grip:</b> 0.82 (\ud83d\udfe2 Safe)<br><b>Surface:</b> \u2600\ufe0f dry", "icon_url": "data:image/svg+xml;base64,CjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB3aWR0aD0iNjQwIiBoZWlnaHQ9IjY0MCIgdmlld0JveD0iMCAwIDY0MCA2NDAiPgogIDx0ZXh0IHg9IjMyMCIgeT0iNDIwIiBmb250LXNpemU9IjM0MCIgdGV4dC1hbmNob3I9Im1pZGRsZSI+8J+amjwvdGV4dD4KPC9zdmc+Cg==", "icon_size": [100, 100], "icon_anchor": [50, 50], "press": 8}, {"date": "2025-11-27", "time": "14:04", "lat": 60.434343, "lon": 22.977084, "tooltip": "<b>Press 9</b><br><b>Time:</b> 2025-11-27T14:04:46<br><b>Day/Night:</b> \u2600\ufe0f Day<br><b>Street:</b> Turku\u2013Helsinki moottoritie<br><b>Town:</b> Salo<br><b>Highest acceleration:</b> 209.2 m/s\u00b2<br><b>Speed:</b> 93.0 km/h (\ud83d\udd25\ud83d\ude97High)<br><b>Grip:</b> 0.81 (\ud83d\udfe2 Safe)<br><b>Surface:</b> \ud83d\udca6 moist", "popup": "<b>Press 9</b><br><b>Time:</b> 2025-11-27T14:04:46<br><b>Day/Night:</b> \u2600\ufe0f Day<br><b>Street:</b> Turku\u2013Helsinki moottoritie<br><b>Town:</b> Salo<br><b>Highest acceleration:</b> 209.2 m/s\u00b2<br><b>Speed:</b> 93.0 km/h (\ud83d\udd25\ud83d\ude97High)<br><b>Grip:</b> 0.81 (\ud83d\udfe2 Safe)<br><b>Surface:</b> \ud83d\udca6 moist", "icon_url": "data:image/svg+xml;base64,CjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB3aWR0aD0iNjQwIiBoZWlnaHQ9IjY0MCIgdmlld0JveD0iMCAwIDY0MCA2NDAiPgogIDx0ZXh0IHg9IjMyMCIgeT0iNDIwIiBmb250LXNpemU9IjM0MCIgdGV4dC1hbmNob3I9Im1pZGRsZSI+8J+amjwvdGV4dD4KPC9zdmc+Cg==", "icon_size": [100, 100], "icon_anchor": [50, 50], "press": 9}, {"date": "2025-11-27", "time": "14:57", "lat": 60.246788, "lon": 23.510027, "tooltip": "<b>Press 10</b><br><b>Time:</b> 2025-11-27T14:57:57<br><b>Day/Night:</b> \u2600\ufe0f Day<br><b>Street:</b> Kiskontie<br><b>Town:</b> Salo<br><b>Highest acceleration:</b> 109.9 m/s\u00b2<br><b>Speed:</b> 79.1 km/h (\ud83d\udd25\ud83d\ude97High)<br><b>Grip:</b> 0.323 (\ud83d\udd25Slippery)<br><b>Surface:</b> \ud83c\udf0a streaming water", "popup": "<b>Press 10</b><br><b>Time:</b> 2025-11-27T14:57:57<br><b>Day/Night:</b> \u2600\ufe0f Day<br><b>Street:</b> Kiskontie<br><b>Town:</b> Salo<br><b>Highest acceleration:</b> 109.9 m/s\u00b2<br><b>Speed:</b> 79.1 km/h (\ud83d\udd25\ud83d\ude97High)<br><b>Grip:</b> 0.323 (\ud83d\udd25Slippery)<br><b>Surface:</b> \ud83c\udf0a streaming water", "icon_url": "data:image/svg+xml;base64,CjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB3aWR0aD0iNjQwIiBoZWlnaHQ9IjY0MCIgdmlld0JveD0iMCAwIDY0MCA2NDAiPgogIDx0ZXh0IHg9IjMyMCIgeT0iNDIwIiBmb250LXNpemU9IjM0MCIgdGV4dC1hbmNob3I9Im1pZGRsZSI+8J+amjwvdGV4dD4KPC9zdmc+Cg==", "icon_size": [100, 100], "icon_anchor": [50, 50], "press": 10}, {"date": "2025-11-27", "time": "15:12", "lat": 60.18142, "lon": 23.761897, "tooltip": "<b>Press 11</b><br><b>Time:</b> 2025-11-27T15:12:15<br><b>Day/Night:</b> \u2600\ufe0f Day<br><b>Street:</b> Mustiontie<br><b>Town:</b> Tammisaari<br><b>Highest acceleration:</b> 67.3 m/s\u00b2<br><b>Speed:</b> 64.6 km/h (\ud83d\udfe1 Moderate)<br><b>Grip:</b> 0.256 (\ud83d\udd25Slippery)<br><b>Surface:</b> \ud83c\udf0a streaming water", "popup": "<b>Press 11</b><br><b>Time:</b> 2025-11-27T15:12:15<br><b>Day/Night:</b> \u2600\ufe0f Day<br><b>Street:</b> Mustiontie<br><b>Town:</b> Tammisaari<br><b>Highest acceleration:</b> 67.3 m/s\u00b2<br><b>Speed:</b> 64.6 km/h (\ud83d\udfe1 Moderate)<br><b>Grip:</b> 0.256 (\ud83d\udd25Slippery)<br><b>Surface:</b> \ud83c\udf0a streaming water", "icon_url": "data:image/svg+xml;base64,CjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB3aWR0aD0iNjQwIiBoZWlnaHQ9IjY0MCIgdmlld0JveD0iMCAwIDY0MCA2NDAiPgogIDx0ZXh0IHg9IjMyMCIgeT0iNDIwIiBmb250LXNpemU9IjM0MCIgdGV4dC1hbmNob3I9Im1pZGRsZSI+8J+amjwvdGV4dD4KPC9zdmc+Cg==", "icon_size": [100, 100], "icon_anchor": [50, 50], "press": 11}, {"date": "2026-01-09", "time": "01:16", "lat": 60.463376, "lon": 22.109561, "tooltip": "<b>Press 12</b><br><b>Time:</b> 2026-01-09T01:16:43<br><b>Day/Night:</b> \ud83c\udf19 Night<br><b>Street:</b> Nesteentie<br><b>Town:</b> Raisio<br><b>Highest acceleration:</b> 247.3 m/s\u00b2<br><b>Speed:</b> 12.8 km/h (\ud83d\udfe2 Low)<br><b>Grip:</b> 0.102 (\ud83d\udd25Slippery)<br><b>Surface:</b> \u3030\ufe0f slippery", "popup": "<b>Press 12</b><br><b>Time:</b> 2026-01-09T01:16:43<br><b>Day/Night:</b> \ud83c\udf19 Night<br><b>Street:</b> Nesteentie<br><b>Town:</b> Raisio<br><b>Highest acceleration:</b> 247.3 m/s\u00b2<br><b>Speed:</b> 12.8 km/h (\ud83d\udfe2 Low)<br><b>Grip:</b> 0.102 (\ud83d\udd25Slippery)<br><b>Surface:</b> \u3030\ufe0f slippery", "icon_url": "data:image/svg+xml;base64,CjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB3aWR0aD0iNjQwIiBoZWlnaHQ9IjY0MCIgdmlld0JveD0iMCAwIDY0MCA2NDAiPgogIDx0ZXh0IHg9IjMyMCIgeT0iNDIwIiBmb250LXNpemU9IjM0MCIgdGV4dC1hbmNob3I9Im1pZGRsZSI+8J+amjwvdGV4dD4KPC9zdmc+Cg==", "icon_size": [100, 100], "icon_anchor": [50, 50], "press": 12}, {"date": "2026-01-09", "time": "03:21", "lat": 60.421144, "lon": 22.728092, "tooltip": "<b>Press 13</b><br><b>Time:</b> 2026-01-09T03:21:16<br><b>Day/Night:</b> \ud83c\udf19 Night<br><b>Street:</b> Valtatie<br><b>Town:</b> Paimio<br><b>Highest acceleration:</b> 134.8 m/s\u00b2<br><b>Speed:</b> 18.0 km/h (\ud83d\udfe2 Low)<br><b>Grip:</b> 0.106 (\ud83d\udd25Slippery)<br><b>Surface:</b> \u3030\ufe0f slippery", "popup": "<b>Press 13</b><br><b>Time:</b> 2026-01-09T03:21:16<br><b>Day/Night:</b> \ud83c\udf19 Night<br><b>Street:</b> Valtatie<br><b>Town:</b> Paimio<br><b>Highest acceleration:</b> 134.8 m/s\u00b2<br><b>Speed:</b> 18.0 km/h (\ud83d\udfe2 Low)<br><b>Grip:</b> 0.106 (\ud83d\udd25Slippery)<br><b>Surface:</b> \u3030\ufe0f slippery", "icon_url": "data:image/svg+xml;base64,CjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB3aWR0aD0iNjQwIiBoZWlnaHQ9IjY0MCIgdmlld0JveD0iMCAwIDY0MCA2NDAiPgogIDx0ZXh0IHg9IjMyMCIgeT0iNDIwIiBmb250LXNpemU9IjM0MCIgdGV4dC1hbmNob3I9Im1pZGRsZSI+8J+amjwvdGV4dD4KPC9zdmc+Cg==", "icon_size": [100, 100], "icon_anchor": [50, 50], "press": 13}, {"date": "2026-01-09", "time": "03:41", "lat": 60.391843, "lon": 23.082998, "tooltip": "<b>Press 14</b><br><b>Time:</b> 2026-01-09T03:41:48<br><b>Day/Night:</b> \ud83c\udf19 Night<br><b>Street:</b> Meriniityntie<br><b>Town:</b> Salo<br><b>Highest acceleration:</b> 48.2 m/s\u00b2<br><b>Speed:</b> 51.4 km/h (\ud83d\udfe1 Moderate)<br><b>Grip:</b> 0.127 (\ud83d\udd25Slippery)<br><b>Surface:</b> \u3030\ufe0f slippery", "popup": "<b>Press 14</b><br><b>Time:</b> 2026-01-09T03:41:48<br><b>Day/Night:</b> \ud83c\udf19 Night<br><b>Street:</b> Meriniityntie<br><b>Town:</b> Salo<br><b>Highest acceleration:</b> 48.2 m/s\u00b2<br><b>Speed:</b> 51.4 km/h (\ud83d\udfe1 Moderate)<br><b>Grip:</b> 0.127 (\ud83d\udd25Slippery)<br><b>Surface:</b> \u3030\ufe0f slippery", "icon_url": "data:image/svg+xml;base64,CjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB3aWR0aD0iNjQwIiBoZWlnaHQ9IjY0MCIgdmlld0JveD0iMCAwIDY0MCA2NDAiPgogIDx0ZXh0IHg9IjMyMCIgeT0iNDIwIiBmb250LXNpemU9IjM0MCIgdGV4dC1hbmNob3I9Im1pZGRsZSI+8J+amjwvdGV4dD4KPC9zdmc+Cg==", "icon_size": [100, 100], "icon_anchor": [50, 50], "press": 14}, {"date": "2026-01-09", "time": "03:44", "lat": 60.38424, "lon": 23.100431, "tooltip": "<b>Press 15</b><br><b>Time:</b> 2026-01-09T03:44:06<br><b>Day/Night:</b> \ud83c\udf19 Night<br><b>Street:</b> Joensuunkatu<br><b>Town:</b> Salon suuralue<br><b>Highest acceleration:</b> 108.6 m/s\u00b2<br><b>Speed:</b> 91.4 km/h (\ud83d\udd25\ud83d\ude97High)<br><b>Grip:</b> 0.127 (\ud83d\udd25Slippery)<br><b>Surface:</b> \u3030\ufe0f slippery", "popup": "<b>Press 15</b><br><b>Time:</b> 2026-01-09T03:44:06<br><b>Day/Night:</b> \ud83c\udf19 Night<br><b>Street:</b> Joensuunkatu<br><b>Town:</b> Salon suuralue<br><b>Highest acceleration:</b> 108.6 m/s\u00b2<br><b>Speed:</b> 91.4 km/h (\ud83d\udd25\ud83d\ude97High)<br><b>Grip:</b> 0.127 (\ud83d\udd25Slippery)<br><b>Surface:</b> \u3030\ufe0f slippery", "icon_url": "data:image/svg+xml;base64,CjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB3aWR0aD0iNjQwIiBoZWlnaHQ9IjY0MCIgdmlld0JveD0iMCAwIDY0MCA2NDAiPgogIDx0ZXh0IHg9IjMyMCIgeT0iNDIwIiBmb250LXNpemU9IjM0MCIgdGV4dC1hbmNob3I9Im1pZGRsZSI+8J+amjwvdGV4dD4KPC9zdmc+Cg==", "icon_size": [100, 100], "icon_anchor": [50, 50], "press": 15}, {"date": "2026-01-09", "time": "16:27", "lat": 60.404377, "lon": 22.820764, "tooltip": "<b>Press 16</b><br><b>Time:</b> 2026-01-09T16:27:47<br><b>Day/Night:</b> \u2600\ufe0f Day<br><b>Street:</b> Valtatie<br><b>Town:</b> Halikko<br><b>Highest acceleration:</b> 152.2 m/s\u00b2<br><b>Speed:</b> 77.0 km/h (\ud83d\udd25\ud83d\ude97High)<br><b>Grip:</b> 0.16 (\ud83d\udd25Slippery)<br><b>Surface:</b> \u3030\ufe0f slippery", "popup": "<b>Press 16</b><br><b>Time:</b> 2026-01-09T16:27:47<br><b>Day/Night:</b> \u2600\ufe0f Day<br><b>Street:</b> Valtatie<br><b>Town:</b> Halikko<br><b>Highest acceleration:</b> 152.2 m/s\u00b2<br><b>Speed:</b> 77.0 km/h (\ud83d\udd25\ud83d\ude97High)<br><b>Grip:</b> 0.16 (\ud83d\udd25Slippery)<br><b>Surface:</b> \u3030\ufe0f slippery", "icon_url": "data:image/svg+xml;base64,CjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB3aWR0aD0iNjQwIiBoZWlnaHQ9IjY0MCIgdmlld0JveD0iMCAwIDY0MCA2NDAiPgogIDx0ZXh0IHg9IjMyMCIgeT0iNDIwIiBmb250LXNpemU9IjM0MCIgdGV4dC1hbmNob3I9Im1pZGRsZSI+8J+amjwvdGV4dD4KPC9zdmc+Cg==", "icon_size": [100, 100], "icon_anchor": [50, 50], "press": 16}, {"date": "2026-01-09", "time": "16:32", "lat": 60.421258, "lon": 22.728743, "tooltip": "<b>Press 17</b><br><b>Time:</b> 2026-01-09T16:32:15<br><b>Day/Night:</b> \u2600\ufe0f Day<br><b>Street:</b> Valtatie<br><b>Town:</b> Paimio<br><b>Highest acceleration:</b> 152.2 m/s\u00b2<br><b>Speed:</b> 40.1 km/h (\ud83d\udfe1 Moderate)<br><b>Grip:</b> 0.1 (\ud83d\udd25Slippery)<br><b>Surface:</b> \u3030\ufe0f slippery", "popup": "<b>Press 17</b><br><b>Time:</b> 2026-01-09T16:32:15<br><b>Day/Night:</b> \u2600\ufe0f Day<br><b>Street:</b> Valtatie<br><b>Town:</b> Paimio<br><b>Highest acceleration:</b> 152.2 m/s\u00b2<br><b>Speed:</b> 40.1 km/h (\ud83d\udfe1 Moderate)<br><b>Grip:</b> 0.1 (\ud83d\udd25Slippery)<br><b>Surface:</b> \u3030\ufe0f slippery", "icon_url": "data:image/svg+xml;base64,CjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB3aWR0aD0iNjQwIiBoZWlnaHQ9IjY0MCIgdmlld0JveD0iMCAwIDY0MCA2NDAiPgogIDx0ZXh0IHg9IjMyMCIgeT0iNDIwIiBmb250LXNpemU9IjM0MCIgdGV4dC1hbmNob3I9Im1pZGRsZSI+8J+amjwvdGV4dD4KPC9zdmc+Cg==", "icon_size": [100, 100], "icon_anchor": [50, 50], "press": 17}, {"date": "2026-01-09", "time": "22:29", "lat": 60.323705, "lon": 22.939734, "tooltip": "<b>Press 18</b><br><b>Time:</b> 2026-01-09T22:29:17<br><b>Day/Night:</b> \ud83c\udf19 Night<br><b>Street:</b> J\u00e4rvenkyl\u00e4ntie<br><b>Town:</b> Salo<br><b>Highest acceleration:</b> 52.9 m/s\u00b2<br><b>Speed:</b> 13.1 km/h (\ud83d\udfe2 Low)<br><b>Grip:</b> 0.107 (\ud83d\udd25Slippery)<br><b>Surface:</b> \u3030\ufe0f slippery", "popup": "<b>Press 18</b><br><b>Time:</b> 2026-01-09T22:29:17<br><b>Day/Night:</b> \ud83c\udf19 Night<br><b>Street:</b> J\u00e4rvenkyl\u00e4ntie<br><b>Town:</b> Salo<br><b>Highest acceleration:</b> 52.9 m/s\u00b2<br><b>Speed:</b> 13.1 km/h (\ud83d\udfe2 Low)<br><b>Grip:</b> 0.107 (\ud83d\udd25Slippery)<br><b>Surface:</b> \u3030\ufe0f slippery", "icon_url": "data:image/svg+xml;base64,CjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB3aWR0aD0iNjQwIiBoZWlnaHQ9IjY0MCIgdmlld0JveD0iMCAwIDY0MCA2NDAiPgogIDx0ZXh0IHg9IjMyMCIgeT0iNDIwIiBmb250LXNpemU9IjM0MCIgdGV4dC1hbmNob3I9Im1pZGRsZSI+8J+amjwvdGV4dD4KPC9zdmc+Cg==", "icon_size": [100, 100], "icon_anchor": [50, 50], "press": 18}];
+
+function initFilterMap() {
+    var mapObj = window["map_1a9a2af6b5579fffd929db9a46c5e18e"];
+    if (!mapObj) {
+        setTimeout(initFilterMap, 200);
+        return;
+    }
+
+    var dateSelect = document.getElementById("dateSelect");
+    var timeSelect = document.getElementById("timeSelect");
+
+    if (!dateSelect || !timeSelect) {
+        setTimeout(initFilterMap, 200);
+        return;
+    }
+
+    if (window.markerLayerInitialized) {
+        return;
+    }
+    window.markerLayerInitialized = true;
+
+    var markerLayer = L.layerGroup().addTo(mapObj);
+    var leafletMarkers = [];
+
+    // Truck silhouette reused from static/js/map.js
+    var TRUCK_SVG = '<svg viewBox="0 0 24 24"><path fill="#fff" d="M20 8h-3V4H3c-1.1 0-2 .9-2 2v11h2c0 1.66 1.34 3 3 3s3-1.34 3-3h6c0 1.66 1.34 3 3 3s3-1.34 3-3h2v-5l-3-4zM6 18.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm13.5-9l1.96 2.5H17V9.5h2.5zm-1.5 9c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>';
+
+    // Severity inferred from the existing tooltip text (grip/surface markers).
+    // Mapping matches the legend in hsap-dashboard.html (#c44040 / #c49a2a / #3a9e6e / #2a8f85).
+    function severityOf(text) {
+        if (!text) return 'weather';
+        if (text.indexOf('Slippery') !== -1) return 'high';
+        if (text.indexOf('Moderate') !== -1) return 'medium';
+        if (text.indexOf('Safe') !== -1)     return 'low';
+        return 'weather';
+    }
+
+    markerData.forEach(function(item) {
+        var sev = severityOf(item.tooltip);
+        var icon = L.divIcon({
+            className: '',
+            html: '<div class="hsap-pin ' + sev + '">' + TRUCK_SVG + '</div>',
+            iconSize:   [34, 34],
+            iconAnchor: [17, 17],
+            popupAnchor:[0, -16]
+        });
+
+        var marker = L.marker([item.lat, item.lon], {icon: icon})
+            .bindPopup(item.popup)
+            .bindTooltip(item.tooltip, {sticky: true});
+
+        marker.customDate = item.date;
+        marker.customTime = item.time;
+        leafletMarkers.push(marker);
+    });
+
+    var uniqueDates = [...new Set(markerData.map(x => x.date))].sort();
+    uniqueDates.forEach(function(d) {
+        var opt = document.createElement("option");
+        opt.value = d;
+        opt.textContent = d;
+        dateSelect.appendChild(opt);
+    });
+
+    function populateTimeDropdown(selectedDate) {
+        timeSelect.innerHTML = '<option value="ALL">All Times</option>';
+
+        var filtered = markerData.filter(function(x) {
+            return selectedDate === "ALL" || x.date === selectedDate;
+        });
+
+        var uniqueTimes = [...new Set(filtered.map(x => x.time))].sort();
+        uniqueTimes.forEach(function(t) {
+            var opt = document.createElement("option");
+            opt.value = t;
+            opt.textContent = t;
+            timeSelect.appendChild(opt);
+        });
+    }
+
+    function updateMarkers() {
+        var selectedDate = dateSelect.value;
+        var selectedTime = timeSelect.value;
+
+        markerLayer.clearLayers();
+
+        var matchingMarkers = [];
+        leafletMarkers.forEach(function(marker) {
+            var dateMatch = (selectedDate === "ALL" || marker.customDate === selectedDate);
+            var timeMatch = (selectedTime === "ALL" || marker.customTime === selectedTime);
+
+            if (dateMatch && timeMatch) {
+                markerLayer.addLayer(marker);
+                matchingMarkers.push(marker);
+            }
+        });
+
+        if (matchingMarkers.length > 0) {
+            var group = L.featureGroup(matchingMarkers);
+            mapObj.fitBounds(group.getBounds().pad(0.2));
+        }
+    }
+
+    populateTimeDropdown("ALL");
+    updateMarkers();
+
+    dateSelect.addEventListener("change", function() {
+        populateTimeDropdown(this.value);
+        timeSelect.value = "ALL";
+        updateMarkers();
+    });
+
+    timeSelect.addEventListener("change", function() {
+        updateMarkers();
+    });
+}
+
+setTimeout(initFilterMap, 300);
+</script>
+    
+            <div class="folium-map" id="map_1a9a2af6b5579fffd929db9a46c5e18e" ></div>
+        
+</body>
+<script>
+    
+    
+            var map_1a9a2af6b5579fffd929db9a46c5e18e = L.map(
+                "map_1a9a2af6b5579fffd929db9a46c5e18e",
+                {
+                    center: [60.35, 22.95],
+                    crs: L.CRS.EPSG3857,
+                    ...{
+  "zoom": 8,
+  "zoomControl": true,
+  "preferCanvas": false,
+}
+
+                }
+            );
+
+            
+
+        
+    
+            var tile_layer_9bc8c57bbc563d08ae7126278ac690e2 = L.tileLayer(
+                "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+                {
+  "minZoom": 0,
+  "maxZoom": 19,
+  "maxNativeZoom": 19,
+  "noWrap": false,
+  "attribution": "\u0026copy; \u003ca href=\"https://www.openstreetmap.org/copyright\"\u003eOpenStreetMap\u003c/a\u003e contributors",
+  "subdomains": "abc",
+  "detectRetina": false,
+  "tms": false,
+  "opacity": 1,
+}
+
+            );
+        
+    
+            tile_layer_9bc8c57bbc563d08ae7126278ac690e2.addTo(map_1a9a2af6b5579fffd929db9a46c5e18e);
+        
+</script>
+</html>

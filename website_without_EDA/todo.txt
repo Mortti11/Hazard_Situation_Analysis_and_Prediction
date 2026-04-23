@@ -1,0 +1,6 @@
+1. combine road surface data, and motion anomaly data together to get one cleaned CSV
+2. Fill all the placeholders on the website
+3. Write an analysis
+4. Fix legend on subash' folium map
+5. Fix Medium + low rate to something else or delete fully!
+6. Make a pop up notification to the middle if something happens and a new event gets added!

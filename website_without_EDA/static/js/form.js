@@ -14,8 +14,8 @@ function showError(msg) {
 
 // ── Route preview & choice ──────────────────────────────────────────
 async function showRouteOptions() {
-  var dep  = resolvedLocation('departure');
-  var dest = resolvedLocation('destination');
+  var dep  = document.getElementById('departure').value.trim();
+  var dest = document.getElementById('destination').value.trim();
   if (!dep || !dest) { showError('Please set both departure and destination first.'); return; }
 
   var routeBar = document.getElementById('route-options-bar');
@@ -60,7 +60,7 @@ async function showRouteOptions() {
     var html = '';
     for (var j = 0; j < routes.length; j++) {
       var r = routes[j];
-      var label = 'Route ' + (j + 1) + ' — ' + r.distance_km + ' km, ' + fmtHours(r.duration_minutes * 60);
+      var label = 'Route ' + (j + 1) + ' — ' + r.distance_km + ' km, ' + Math.round(r.duration_minutes) + ' min';
       var cls = j === selectedRouteIndex ? 'route-opt selected' : 'route-opt';
       html += '<button class="' + cls + '" data-idx="' + j + '" style="border-left-color:' + previewColors[j % previewColors.length] + '">' + label + '</button>';
     }
@@ -99,8 +99,8 @@ function selectRoute(idx, routes) {
 
 // ── Submit full analysis ────────────────────────────────────────────
 async function submitAnalysis() {
-  var dep  = resolvedLocation('departure');
-  var dest = resolvedLocation('destination');
+  var dep  = document.getElementById('departure').value.trim();
+  var dest = document.getElementById('destination').value.trim();
   var dt   = document.getElementById('departure_time').value;
 
   if (!dep || !dest) { showError('Please select both departure and destination on the map (or type addresses).'); return; }
@@ -120,30 +120,12 @@ async function submitAnalysis() {
     var sampling = parseInt(document.getElementById('sampling').value) || 5;
     var includeAi = document.getElementById('include_ai').checked;
     var url = '/api/v1/route-analysis' + (includeAi ? '?include_ai=true' : '');
-    // dep/dest carry "lat,lng" when picked on the map. Send the visible text
-    // as a separate label so the result card and the LLM see real place names
-    // instead of raw coordinates (which the model otherwise hallucinates into
-    // wrong city names). Reject coord-shaped or in-progress labels so the
-    // backend falls back to the routing string instead of getting a number
-    // it would then reverse-geocode into a wrong city.
-    function _cleanLabel(v) {
-      if (!v) return null;
-      v = v.trim();
-      if (!v || v === 'Locating\u2026') return null;
-      // "60.17, 24.94" / "60.17,24.94" — pure coords, useless as a label.
-      if (/^-?\d+(\.\d+)?\s*,\s*-?\d+(\.\d+)?$/.test(v)) return null;
-      return v;
-    }
-    var depLabel  = _cleanLabel(document.getElementById('departure').value);
-    var destLabel = _cleanLabel(document.getElementById('destination').value);
     var res = await fetch(url, {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
       body: JSON.stringify({
         departure: dep,
         destination: dest,
-        departure_label: depLabel,
-        destination_label: destLabel,
         departure_time: dt + ':00',
         sampling_minutes: sampling,
         route_index: selectedRouteIndex,

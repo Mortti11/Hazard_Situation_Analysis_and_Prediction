@@ -1,0 +1,19 @@
+press,datetime,light,lat,lon,street,city,highest_acceleration,speed_at_press_kmh,grip,surface_condition_name,Traffic Amount
+1,2025-11-10 01:50:40+02:00,Night,60.493152,22.288016,Telekatu,Turku,44.8,0.0,0.688,Wet,Low
+2,2025-11-10 04:06:25+02:00,Night,60.383189,23.100664,Meriniitynkatu,Salon suuralue,2083.0,"37,8",0.623,Wet,Low
+3,2025-11-10 04:28:52+02:00,Night,60.204471,23.113718,Haarlantie,Salo,634.6,"13,8",0.746,Wet,Low
+4,2025-11-10 05:40:50+02:00,Night,60.009589,23.543561,Ekerövägen,Raasepori,225.3,"12,5",0.677,Wet,Low
+5,2025-11-10 09:54:27+02:00,Day,59.819316,22.95807,Town Centre,Hanko,100.2,"0,4",0.82,Dry,High
+6,2025-11-10 18:05:23+02:00,Night,60.386477,23.159415,Otsonkatu,Salon suuralue,108.8,"20,2",0.82,Dry,High
+7,2025-11-27 00:06:20+02:00,Night,60.234862,23.588156,Kiskontie,Salo,352.7,"2,2",0.464,Slippery,Low
+8,2025-11-27 13:06:14+02:00,Day,60.482399,22.165015,Nesteentie,Raisio,337.5,"0,9",0.82,Dry,Medium
+9,2025-11-27 14:04:46+02:00,Day,60.434343,22.977084,Turku–Helsinki moottoritie,Salo,209.2,93,0.81,Moist,Medium
+10,2025-11-27 14:57:57+02:00,Day,60.246788,23.510027,Kiskontie,Salo,109.9,"79,1",0.323,Streaming water,Medium
+11,2025-11-27 15:12:15+02:00,Day,60.18142,23.761897,Mustiontie,Tammisaari,67.3,"64,6",0.256,Streaming water,High
+12,2026-01-09 01:16:43+02:00,Night,60.463376,22.109561,Nesteentie,Raisio,247.3,"12,8",0.102,Slippery,Low
+13,2026-01-09 03:21:16+02:00,Night,60.421144,22.728092,Valtatie,Paimio,134.8,18,0.106,Slippery,Low
+14,2026-01-09 03:41:48+02:00,Night,60.391843,23.082998,Meriniityntie,Salo,48.2,"51,4",0.127,Slippery,Low
+15,2026-01-09 03:44:06+02:00,Night,60.38424,23.100431,Joensuunkatu,Salon suuralue,108.6,"91,4",0.127,Slippery,Low
+16,2026-01-09 16:27:47+02:00,Dusk,60.404377,22.820764,Valtatie,Halikko,152.2,77,0.16,Slippery,High
+17,2026-01-09 16:32:15+02:00,Dusk,60.421258,22.728743,Valtatie,Paimio,152.2,"40,1",0.1,Slippery,High
+18,2026-01-09 22:29:17+02:00,Night,60.323705,22.939734,Järvenkyläntie,Salo,52.9,"13,1",0.107,Slippery,Low

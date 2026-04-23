@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>HSAP — Methodology</title>
+  <link rel="stylesheet" href="hsap-style.css"/>
+  <style>
+    /* ── Summary page (scoped, .sum-* namespace) ─────────────── */
+    .sum-page {
+      position: relative; z-index: 10;
+      max-width: 1100px; margin: 0 auto; padding: 3rem 2rem 5rem;
+    }
+
+    .sum-hero { margin-bottom: 2.6rem; display: flex; flex-wrap: wrap;
+                gap: 1.4rem; align-items: flex-end; justify-content: space-between; }
+    .sum-hero-text { max-width: 640px; }
+    .sum-hero h1 { font-size: clamp(1.8rem, 2.8vw, 2.6rem); margin: .8rem 0; color: var(--text); }
+    .sum-hero h1 mark { background: transparent; color: var(--accent); }
+    .sum-hero p { font-family: var(--hf); font-size: .84rem; color: var(--text-soft);
+                  line-height: 1.8; }
+
+    .sum-actions { display: flex; gap: .6rem; }
+    .sum-btn {
+      font-family: var(--mf); font-size: .7rem; letter-spacing: .12em;
+      text-transform: uppercase; text-decoration: none;
+      color: var(--text); background: var(--card);
+      border: 1px solid var(--border); border-radius: 8px;
+      padding: .65rem 1rem; transition: border-color .15s, color .15s, background .15s;
+      display: inline-flex; align-items: center; gap: .5rem;
+    }
+    .sum-btn:hover { border-color: var(--teal); color: var(--teal); background: var(--card-hover); }
+
+    .sum-toc {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: .6rem; margin-bottom: 2.4rem;
+    }
+    .sum-toc a {
+      font-family: var(--mf); font-size: .68rem; letter-spacing: .1em;
+      text-transform: uppercase; text-decoration: none; color: var(--text-soft);
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 8px; padding: .7rem .85rem;
+      display: flex; align-items: center; gap: .55rem;
+      transition: color .15s, border-color .15s, transform .15s;
+    }
+    .sum-toc a:hover { color: var(--text); border-color: var(--border2); transform: translateY(-1px); }
+    .sum-toc a.is-active {
+      color: var(--text); border-color: var(--accent);
+      background: linear-gradient(180deg, rgba(212,90,32,.08), var(--surface));
+      box-shadow: inset 0 -2px 0 var(--accent);
+    }
+    .sum-toc a.is-active span { color: var(--accent); }
+    .sum-toc a span { color: var(--accent); font-size: .6rem; }
+
+    .sum-meta {
+      display: inline-flex; align-items: center; gap: .55rem;
+      font-family: var(--mf); font-size: .62rem; letter-spacing: .14em;
+      text-transform: uppercase; color: var(--text-soft);
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 999px; padding: .45rem .85rem;
+    }
+    .sum-meta b { color: var(--accent); font-weight: 600; }
+    .sum-meta::before {
+      content: ""; width: 6px; height: 6px; border-radius: 50%;
+      background: var(--accent); box-shadow: 0 0 8px var(--accent);
+    }
+
+    .sum-section { margin-bottom: 2.6rem; scroll-margin-top: 90px; }
+    .sum-section-title {
+      font-family: var(--hf); font-weight: 600; font-size: 1rem;
+      color: var(--text); margin-bottom: 1.1rem;
+      padding-bottom: .65rem; border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; gap: .7rem;
+    }
+    .sum-section-title .sum-num {
+      font-family: var(--mf); font-size: .6rem; color: var(--accent);
+      background: rgba(212,90,32,.12); border: 1px solid rgba(212,90,32,.25);
+      border-radius: 4px; padding: .15rem .45rem; letter-spacing: .1em;
+    }
+
+    .sum-card {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 12px; padding: 1.4rem 1.6rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,.2);
+      margin-bottom: 1rem;
+    }
+    .sum-card-label {
+      font-family: var(--mf); font-size: .58rem; letter-spacing: .16em;
+      text-transform: uppercase; color: var(--accent);
+      margin-bottom: .8rem;
+    }
+    .sum-card-label.is-teal { color: var(--teal); border-color: rgba(42,143,133,.25); }
+    .sum-card p, .sum-card li {
+      font-family: var(--hf); font-size: .84rem; line-height: 1.85;
+      color: var(--text-soft);
+    }
+    .sum-card p { margin-bottom: .75rem; }
+    .sum-card p:last-child, .sum-card ul:last-child, .sum-card ol:last-child { margin-bottom: 0; }
+    .sum-card ul { list-style: none; padding: 0; margin: .2rem 0 .6rem; }
+    .sum-card ul li {
+      position: relative; padding: .15rem 0 .15rem 1.1rem;
+    }
+    .sum-card ul li::before {
+      content: ""; position: absolute; left: 0; top: .85rem;
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--teal); opacity: .8;
+    }
+    .sum-card strong { color: var(--text); font-weight: 600; }
+
+    .sum-divider {
+      border: 0; height: 1px; margin: 2.6rem 0;
+      background: linear-gradient(90deg, transparent, var(--border), transparent);
+    }
+
+    .sum-foot {
+      margin-top: 3rem; padding-top: 1.2rem;
+      border-top: 1px solid var(--border);
+      font-family: var(--mf); font-size: .65rem; color: var(--muted);
+      display: flex; justify-content: space-between; flex-wrap: wrap; gap: .6rem;
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── HEADER (matches dashboard / eda) ── -->
+<header>
+  <div class="logo">
+    <div class="logo-badge">&#9888; HSAP</div>
+    Hazard Analysis Platform
+  </div>
+  <nav>
+    <a href="hsap-dashboard.html" style="color:var(--teal)">&#8592; Dashboard</a>
+    <a href="hsap-dashboard.html#map">Map</a>
+    <a href="hsap-dashboard.html#incidents">Incidents</a>
+    <a href="hsap-dashboard.html#analysis">Analysis</a>
+    <a href="hsap-summary.html" style="color:var(--accent)">Methodology</a>
+    <a href="static/index.html" style="color:var(--teal)">ML Travel Analysis ↗</a>
+  </nav>
+  <div class="sys-status">
+    <div class="pulse"></div>
+    System Live
+  </div>
+</header>
+
+<div class="sum-page">
+
+  <!-- HERO -->
+  <div class="sum-hero">
+    <div class="sum-hero-text">
+      <div class="hero-eyebrow" style="font-family:var(--mf);font-size:.62rem;letter-spacing:.18em;text-transform:uppercase;color:var(--text-soft);">
+        HSAP &middot; Analysis Process
+      </div>
+      <h1>How We <mark>Analyzed</mark> It</h1>
+      <p>
+        A walk-through of how the Hazard Situation Analysis &amp; Prediction project was built &mdash;
+        scope, key findings, sensor work, mapping, and the small language model used
+        to turn raw event data into safety insight.
+      </p>
+      <div class="sum-meta" style="margin-top:1rem;"><b>5</b>&nbsp;stages &middot; end-to-end pipeline</div>
+    </div>
+    <div class="sum-actions">
+      <a class="sum-btn" href="hsap-dashboard.html">&larr; Back to Dashboard</a>
+    </div>
+  </div>
+
+  <!-- TABLE OF CONTENTS -->
+  <nav class="sum-toc" aria-label="Section index">
+    <a href="#sec-scope"><span>01</span> Project Scope</a>
+    <a href="#sec-button"><span>02</span> Hazard Button Analysis</a>
+    <a href="#sec-surface"><span>03</span> Road Surface &amp; Merging</a>
+    <a href="#sec-map"><span>04</span> Interactive Hazard Map</a>
+    <a href="#sec-chatbot"><span>05</span> Hazard Analysis Chatbot</a>
+  </nav>
+
+  <!-- ══ SECTION 01 — Project Scope ══ -->
+  <section class="sum-section" id="sec-scope">
+    <div class="sum-section-title">
+      <span class="sum-num">01</span>
+      Project Scope
+    </div>
+    <div class="sum-card">
+      <div class="sum-card-label">Overview</div>
+      <p>This project began with a real-world challenge provided by Trionas: to analyze the data
+        collected from a truck equipped with a special button. Drivers were instructed to press this
+        button whenever they experienced a potentially dangerous situation on the road.</p>
+      <p>The dataset came from one truck operating in Southwest Finland, mainly on routes between
+        Turku, Salo, and Helsinki. Data was collected during three driving days: November 10,
+        November 27, and January 9.</p>
+      <p>Over a three-month period, around 890 hazard events were recorded. The main objective was
+        to explore this data, identify meaningful patterns, and uncover trends that could help improve
+        road safety and driving conditions.</p>
+      <p>To support the analysis, the dataset also included valuable additional information such as:</p>
+      <ul>
+        <li>Three motion sensors &ndash; measuring acceleration, temperature, and humidity</li>
+        <li>MD30 road surface sensor &ndash; measuring grip, ice, water, snow, and surface temperature</li>
+        <li>GPS tracking &ndash; providing exact event locations</li>
+      </ul>
+      <p>By combining these data sources, we were able to better understand when, where, and why
+        hazardous events happen.</p>
+    </div>
+  </section>
+
+  <hr class="sum-divider"/>
+
+  <!-- ══ SECTION 02 — Hazard Button Analysis Results ══ -->
+  <section class="sum-section" id="sec-button">
+    <div class="sum-section-title">
+      <span class="sum-num">02</span>
+      Hazard Button Analysis Results
+    </div>
+
+    <div class="sum-card">
+      <div class="sum-card-label">Key Findings</div>
+      <ul>
+        <li>Original dataset contained 890 recorded button signals</li>
+        <li>Many records were duplicate Bluetooth transmissions after a single press</li>
+        <li>Records were grouped into separate event sessions using a 5-second time gap rule</li>
+        <li>If more than 5 seconds passed between two signals, it was counted as a new button press event</li>
+        <li>Final cleaned dataset identified 25 real hazard button presses</li>
+        <li>These events represent actual situations where the driver reported danger or discomfort</li>
+      </ul>
+    </div>
+
+    <div class="sum-card">
+      <div class="sum-card-label is-teal">Outcome</div>
+      <p>The cleaned hazard button data provided a reliable event timeline for the project. These
+        confirmed hazard events were later combined with motion sensors, road condition data, GPS
+        locations, and machine learning models to better understand risky driving situations.</p>
+    </div>
+
+    <div class="sum-card">
+      <div class="sum-card-label">Motion Sensor Analysis</div>
+      <ul>
+        <li>Three motion sensors were installed in different truck locations</li>
+        <li>Sensor orientation and signal strength helped estimate mounting positions inside the vehicle</li>
+        <li>One sensor was likely inside the cabin, while others were mounted closer to the truck body</li>
+        <li>Strong vibration patterns were detected in one sensor, indicating areas with higher vehicle movement</li>
+        <li>Bluetooth signal variation was identified as normal due to the metal truck cabin environment</li>
+        <li>Incorrect temperature readings were detected and corrected during data cleaning</li>
+      </ul>
+    </div>
+  </section>
+
+  <hr class="sum-divider"/>
+
+  <!-- ══ SECTION 03 — Road Surface Analysis & Data Merging ══ -->
+  <section class="sum-section" id="sec-surface">
+    <div class="sum-section-title">
+      <span class="sum-num">03</span>
+      Road Surface Analysis
+    </div>
+
+    <div class="sum-card">
+      <div class="sum-card-label">Key Findings</div>
+      <ul>
+        <li>November 10: Dry roads with high grip and safe conditions</li>
+        <li>November 27: Conditions changed from dry to wet, with grip dropping significantly during the trip</li>
+        <li>January 9: Icy and slippery roads with very low grip levels</li>
+      </ul>
+    </div>
+
+    <div class="sum-card">
+      <div class="sum-card-label">Data Merging &amp; Event Matching</div>
+      <ul>
+        <li>The original hazard button data was cleaned and combined with motion sensor and road surface data</li>
+        <li>Sensor values were matched using a 60-second time window around each button press</li>
+        <li>Some events had identical sensor readings because the Bluetooth button continued sending signals for up to 60 seconds after one press</li>
+        <li>These duplicate events were merged into single hazard events for better accuracy</li>
+        <li>Missing values were completed using the closest available sensor data</li>
+      </ul>
+    </div>
+
+    <div class="sum-card">
+      <div class="sum-card-label is-teal">Outcome</div>
+      <p>After final processing, the dataset contained 18 confirmed hazard events linked with vehicle
+        movement and road conditions, ready for visualization and machine learning analysis.</p>
+    </div>
+  </section>
+
+  <hr class="sum-divider"/>
+
+  <!-- ══ SECTION 04 — Interactive Hazard Map ══ -->
+  <section class="sum-section" id="sec-map">
+    <div class="sum-section-title">
+      <span class="sum-num">04</span>
+      Interactive Hazard Map
+    </div>
+
+    <div class="sum-card">
+      <div class="sum-card-label">Key Features</div>
+      <ul>
+        <li>Built using Folium to create an interactive web-based map</li>
+        <li>Visualized all confirmed hazard events using GPS location data</li>
+        <li>Combined location data with speed, road grip, and day/night conditions</li>
+        <li>Included clickable markers with detailed event information</li>
+        <li>Added date and time filters for easier data exploration</li>
+      </ul>
+    </div>
+
+    <div class="sum-card">
+      <div class="sum-card-label is-teal">Outcome</div>
+      <p>The map provides a clear visual overview of where hazard events happened and under what
+        conditions.</p>
+    </div>
+  </section>
+
+  <hr class="sum-divider"/>
+
+  <!-- ══ SECTION 05 — Hazard Analysis Chatbot ══ -->
+  <section class="sum-section" id="sec-chatbot">
+    <div class="sum-section-title">
+      <span class="sum-num">05</span>
+      Hazard Analysis Chatbot (Small Language Model)
+    </div>
+
+    <div class="sum-card">
+      <div class="sum-card-label">Highlights</div>
+      <ul>
+        <li>Real hazard event data was used as input, including speed, acceleration, friction, and road conditions</li>
+        <li>Powered by SmolLM2-1.7B to analyze each event</li>
+        <li>Generated clear explanations of possible dangerous situations</li>
+        <li>Considered factors such as speed, movement, weather, and darkness</li>
+        <li>Built with Gradio as an interactive chatbot interface</li>
+      </ul>
+    </div>
+
+    <div class="sum-card">
+      <div class="sum-card-label is-teal">Outcome</div>
+      <p>The chatbot transforms sensor data into easy-to-understand safety insights for users.</p>
+    </div>
+  </section>
+
+  <div class="sum-foot">
+    <span>HSAP &middot; Methodology</span>
+    <span>5 stages &middot; analysis to deployment</span>
+  </div>
+
+</div>
+
+<script>
+  // Lightweight scroll-spy: highlight the TOC chip whose section is in view.
+  (function () {
+    var links = document.querySelectorAll('.sum-toc a');
+    var map = {};
+    links.forEach(function (a) { map[a.getAttribute('href').slice(1)] = a; });
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        var a = map[e.target.id];
+        if (!a) return;
+        if (e.isIntersecting) {
+          links.forEach(function (l) { l.classList.remove('is-active'); });
+          a.classList.add('is-active');
+        }
+      });
+    }, { rootMargin: '-40% 0px -55% 0px', threshold: 0 });
+    document.querySelectorAll('.sum-section').forEach(function (s) { io.observe(s); });
+  })();
+</script>
+
+</body>
+</html>

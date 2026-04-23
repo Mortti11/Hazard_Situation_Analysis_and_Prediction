@@ -6,8 +6,78 @@
 <title>Journey Risk Analysis — Map View</title>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <link rel="stylesheet" href="/static/css/styles.css" />
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap');
+
+.hsap-header {
+  position: sticky; top: 0; z-index: 200;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 2rem; height: 56px;
+  background: rgba(12,15,18,.92);
+  border-bottom: 1px solid #2a3340;
+  backdrop-filter: blur(20px);
+  font-family: 'DM Sans', sans-serif;
+}
+
+.hsap-logo {
+  font-weight: 700; font-size: .9rem;
+  color: #c8d0da; display: flex; align-items: center; gap: .65rem;
+}
+
+.hsap-badge {
+  background: #d45a20; color: #fff;
+  font-family: 'DM Mono', monospace;
+  font-size: .54rem; letter-spacing: .1em;
+  padding: .22rem .55rem; border-radius: 4px; text-transform: uppercase;
+}
+
+.hsap-nav { display: flex; gap: 1.8rem; }
+
+.hsap-nav a {
+  font-size: .78rem; font-weight: 500;
+  color: #58697a; text-decoration: none; transition: color .18s;
+}
+.hsap-nav a:hover { color: #c8d0da; }
+.hsap-nav a:first-child { color: #2a8f85; }
+.hsap-nav a:first-child:hover { color: #3abfb1; }
+
+.hsap-status {
+  display: flex; align-items: center; gap: .4rem;
+  font-family: 'DM Mono', monospace;
+  font-size: .6rem; letter-spacing: .08em; color: #3a9e6e;
+}
+
+.hsap-pulse {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: #3a9e6e;
+  animation: hsap-blink 2s ease-in-out infinite;
+}
+
+@keyframes hsap-blink { 0%,100%{opacity:1} 50%{opacity:.15} }
+
+@media (max-width: 640px) { .hsap-nav { display: none; } }
+</style>
 </head>
 <body>
+<header class="hsap-header">
+  <div class="hsap-logo">
+    <div class="hsap-badge">&#9888; HSAP</div>
+    Hazard Analysis Platform
+  </div>
+  <nav class="hsap-nav">
+    <a href="../hsap-dashboard.html">&#8592; Dashboard</a>
+    <a href="../hsap-dashboard.html#map">Map</a>
+    <a href="../hsap-dashboard.html#incidents">Incidents</a>
+    <a href="../hsap-dashboard.html#analysis">Analysis</a>
+    <a href="../hsap-eda.html">EDA</a>
+    <a href="index.html">ML Travel Analysis</a>
+  </nav>
+  <div class="hsap-status">
+    <div class="hsap-pulse"></div>
+    System Live
+  </div>
+</header>
+
 <div class="app-layout">
 
   <!-- MAP PANEL -->
@@ -75,29 +145,23 @@
     <div id="error" style="display:none"></div>
     <div id="results"></div>
 
-    <details class="data-credits">
-      <summary>Data sources &amp; methods</summary>
-      <ul>
-        <li><b>Routing:</b> <a href="https://openrouteservice.org/" target="_blank">OpenRouteService</a> &mdash; <code>driving-hgv</code> profile (heavy goods vehicle, weight/height-restricted)</li>
-        <li><b>Road attributes:</b> <a href="https://vayla.fi/en/transport-network/data/digiroad" target="_blank">Digiroad WFS</a> &mdash; speed limits, road width, lighting (V&auml;yl&auml;virasto, CC BY 4.0)</li>
-        <li><b>Road weather:</b> <a href="https://www.digitraffic.fi/en/road-traffic/weather/" target="_blank">Digitraffic Weather</a> &mdash; surface, friction, road/air temp, wind (Fintraffic, CC BY 4.0)</li>
-        <li><b>Winter maintenance:</b> <a href="https://www.digitraffic.fi/en/road-traffic/maintenance/" target="_blank">Digitraffic Maintenance Tracking</a> &mdash; ploughing, salting, sanding, ice removal, last 24 h (Harja/V&auml;yl&auml;virasto, CC BY 4.0)</li>
-        <li><b>Traffic incidents:</b> <a href="https://www.digitraffic.fi/en/road-traffic/" target="_blank">Digitraffic Traffic Messages</a> (Fintraffic, CC BY 4.0)</li>
-        <li><b>Darkness / twilight:</b> <a href="https://astral.readthedocs.io/" target="_blank">Astral</a> solar elevation model (Europe/Helsinki TZ)</li>
-        <li><b>Wildlife (moose) risk:</b> <a href="https://www.luke.fi/en" target="_blank">LUKE</a> seasonal collision statistics</li>
-        <li><b>HGV stopping distance:</b> physics &mdash; <em>d = (t<sub>r</sub>+t<sub>lag</sub>)v + v&sup2;/(2&micro;g)</em>, t<sub>r</sub>=1.0&nbsp;s, t<sub>lag</sub>=0.5&nbsp;s air-brake; &micro; per surface from SWOV / Finnish road-friction studies</li>
-        <li><b>Map tiles:</b> &copy; <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> contributors</li>
-      </ul>
-    </details>
+    <div class="data-credits">
+      <strong>Data sources:</strong>
+      Route: OpenRouteService &bull;
+      Road attributes: Digiroad WFS (V&auml;yl&auml;virasto, CC BY 4.0) &bull;
+      Weather: Digitraffic (Fintraffic, CC BY 4.0) &bull;
+      Darkness: Astral solar model &bull;
+      Map tiles: &copy; <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> contributors
+    </div>
   </div>
 </div>
 
 <!-- JS: Leaflet lib first, then app modules in dependency order -->
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="/static/js/helpers.js?v=6"></script>
-<script src="/static/js/map.js?v=6"></script>
-<script src="/static/js/overlays.js?v=6"></script>
-<script src="/static/js/results.js?v=6"></script>
-<script src="/static/js/form.js?v=6"></script>
+<script src="/static/js/helpers.js"></script>
+<script src="/static/js/map.js"></script>
+<script src="/static/js/overlays.js"></script>
+<script src="/static/js/results.js"></script>
+<script src="/static/js/form.js"></script>
 </body>
 </html>

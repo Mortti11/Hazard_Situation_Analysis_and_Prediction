@@ -1,5 +1,6 @@
 import concurrent.futures
 import gzip
+import socket
 import hashlib
 import http.client
 import math
@@ -61,12 +62,50 @@ def _haversine_km(lat1, lon1, lat2, lon2):
     return 6371.0 * 2 * math.asin(math.sqrt(a))
 
 
+def _vertex_times_from_steps(decoded, segments, total_duration_s):
+
+    n = len(decoded)
+    if n < 2 or not segments:
+        return None
+    vt = [None] * n
+    vt[0] = 0.0
+    cursor_t = 0.0
+    for seg in segments:
+        for step in seg.get("steps") or []:
+            wp = step.get("way_points")
+            if not wp or len(wp) < 2:
+                continue
+            s, e = int(wp[0]), int(wp[1])
+            if s < 0 or e >= n or e <= s:
+                continue
+            d = float(step.get("duration", 0.0))
+            sub_lens = [
+                _haversine_km(decoded[s + k][0], decoded[s + k][1],
+                              decoded[s + k + 1][0], decoded[s + k + 1][1])
+                for k in range(e - s)]
+            total = sum(sub_lens) or 1e-9
+            if vt[s] is None:
+                vt[s] = cursor_t
+            running = 0.0
+            for k, l in enumerate(sub_lens):
+                running += l
+                vt[s + k + 1] = cursor_t + (running / total) * d
+            cursor_t += d
+    if any(v is None for v in vt):
+        return None
+    # Sanity: total stepped time must roughly match the reported route duration.
+    if total_duration_s > 0 and abs(cursor_t - total_duration_s) > max(60.0, 0.1 * total_duration_s):
+        return None
+    return vt
+
+
 def _sample_points_from_polyline(
     decoded,
     total_distance_km,
     total_duration_s,
     departure_time,
-    sampling_minutes):
+    sampling_minutes,
+    vertex_times=None):
 
     if not decoded:
         return []
@@ -75,19 +114,31 @@ def _sample_points_from_polyline(
         _haversine_km(a[0], a[1], b[0], b[1]) for a, b in pairwise(decoded))]
     polyline_total = cum_dist[-1] or 1e-9
 
+    use_time = vertex_times is not None and len(vertex_times) == len(decoded)
+
     sampling_s = sampling_minutes * 60
     n_samples = max(2, int(total_duration_s // sampling_s) + 1)
 
     points = []
     for i in range(n_samples):
         elapsed_s = min(i * sampling_s, total_duration_s)
-        progress = elapsed_s / total_duration_s if total_duration_s > 0 else 0.0
-        target_dist = progress * polyline_total
-        seg = max(0, min(bisect_left(cum_dist, target_dist) - 1, len(cum_dist) - 2))
-        seg_len = cum_dist[seg + 1] - cum_dist[seg]
-        frac = (target_dist - cum_dist[seg]) / seg_len if seg_len > 0 else 0.0
-        lat = decoded[seg][0] + frac * (decoded[seg + 1][0] - decoded[seg][0])
-        lon = decoded[seg][1] + frac * (decoded[seg + 1][1] - decoded[seg][1])
+        if use_time:
+            seg = max(0, min(bisect_left(vertex_times, elapsed_s) - 1, len(vertex_times) - 2))
+            seg_dt = vertex_times[seg + 1] - vertex_times[seg]
+            t_frac = (elapsed_s - vertex_times[seg]) / seg_dt if seg_dt > 0 else 0.0
+            lat = decoded[seg][0] + t_frac * (decoded[seg + 1][0] - decoded[seg][0])
+            lon = decoded[seg][1] + t_frac * (decoded[seg + 1][1] - decoded[seg][1])
+            cum_at_pt = cum_dist[seg] + t_frac * (cum_dist[seg + 1] - cum_dist[seg])
+            cum_km = round(cum_at_pt / polyline_total * total_distance_km, 2)
+        else:
+            progress = elapsed_s / total_duration_s if total_duration_s > 0 else 0.0
+            target_dist = progress * polyline_total
+            seg = max(0, min(bisect_left(cum_dist, target_dist) - 1, len(cum_dist) - 2))
+            seg_len = cum_dist[seg + 1] - cum_dist[seg]
+            frac = (target_dist - cum_dist[seg]) / seg_len if seg_len > 0 else 0.0
+            lat = decoded[seg][0] + frac * (decoded[seg + 1][0] - decoded[seg][0])
+            lon = decoded[seg][1] + frac * (decoded[seg + 1][1] - decoded[seg][1])
+            cum_km = round(progress * total_distance_km, 2)
         points.append(SampledPoint(
             index=i,
             lat=round(lat, 6),
@@ -95,7 +146,7 @@ def _sample_points_from_polyline(
             elapsed_minutes=round(elapsed_s / 60, 1),
             elapsed_seconds=round(elapsed_s, 1),
             estimated_timestamp=departure_time + timedelta(seconds=elapsed_s),
-            cumulative_distance_km=round(progress * total_distance_km, 2)))
+            cumulative_distance_km=cum_km))
 
     if points and points[-1].elapsed_seconds < total_duration_s:
         points.append(SampledPoint(
@@ -134,8 +185,8 @@ def _fetch_google_route(request):
                                             request.departure_time, request.sampling_minutes)
     return RouteSummary(
         route_id=_route_id(request),
-        departure=request.departure,
-        destination=request.destination,
+        departure=request.departure_label or request.departure,
+        destination=request.destination_label or request.destination,
         departure_time=request.departure_time,
         total_distance_km=total_distance_km,
         estimated_duration_minutes=round(duration_s / 60, 1),
@@ -161,8 +212,8 @@ def _stub_route(request):
         for i in range(n_points)]
     return RouteSummary(
         route_id=_route_id(request),
-        departure=request.departure,
-        destination=request.destination,
+        departure=request.departure_label or request.departure,
+        destination=request.destination_label or request.destination,
         departure_time=request.departure_time,
         total_distance_km=total_distance_km,
         estimated_duration_minutes=duration_minutes,
@@ -199,8 +250,51 @@ def _post_ors_directions(profile, body, api_key):
         data=_json.dumps(body).encode(),
         headers=headers,
         method="POST")
-    with urllib.request.urlopen(req, timeout=20) as resp:
-        return _json.loads(resp.read())
+    # ORS sometimes takes >20s on the first call after idling, then is fast
+    # on retry. One retry on timeout removes most of the spurious 503s
+    # without masking real failures (HTTPError still propagates).
+    for attempt in (1, 2):
+        try:
+            with urllib.request.urlopen(req, timeout=20) as resp:
+                return _json.loads(resp.read())
+        except socket.timeout:
+            if attempt == 2:
+                raise
+
+
+def _fetch_ors_alternatives(dep_lat, dep_lon, dst_lat, dst_lon, profile, api_key, want_instructions):
+    # Single source-of-truth ORS call shared by route preview and analysis.
+    # Keyed by rounded coords + profile + instructions flag so /route-options
+    # and /route-analysis with the same O-D hit the same cached payload.
+    cache_key = (round(dep_lat, 4), round(dep_lon, 4),
+                 round(dst_lat, 4), round(dst_lon, 4),
+                 profile, bool(want_instructions))
+    cached = _ors_route_cache.get(cache_key)
+    if cached is not None:
+        return cached
+
+    body = {
+        "coordinates": [[dep_lon, dep_lat], [dst_lon, dst_lat]],
+        "geometry": True,
+        "instructions": want_instructions,
+        "radiuses": [1000, 1000],
+        "alternative_routes": {
+            # share_factor lowered from 0.6 -> 0.4: ORS will accept alternatives
+            # that share up to 60% (1 - 0.4) less of the main route, surfacing
+            # genuinely different corridors (e.g. Oulu->Rovaniemi via Hwy 4 vs
+            # via Hwy 78). weight_factor 1.6 keeps alternatives within 60%
+            # extra cost of the optimal -- realistic for HGV.
+            "target_count": 3,
+            "weight_factor": 1.6,
+            "share_factor": 0.4}}
+    try:
+        data = _post_ors_directions(profile, body, api_key)
+    except urllib.error.HTTPError:
+        del body["alternative_routes"]
+        data = _post_ors_directions(profile, body, api_key)
+    routes = data.get("routes") or []
+    _ors_route_cache[cache_key] = routes
+    return routes
 
 
 def fetch_route_options(departure, destination):
@@ -208,50 +302,75 @@ def fetch_route_options(departure, destination):
     if not api_key:
         raise EnvironmentError("ORS_API_KEY not set")
     profile = os.environ.get("ORS_PROFILE", _ORS_DEFAULT_PROFILE)
-    dep_lat, dep_lon = _ors_geocode(departure, api_key)
-    dst_lat, dst_lon = _ors_geocode(destination, api_key)
+    # Two independent geocodes -- run them in parallel. When the input is a
+    # "lat,lng" string the Pelias call is skipped (in-memory shortcut), so
+    # this only matters for typed addresses, where it saves ~0.3-0.5s.
+    with concurrent.futures.ThreadPoolExecutor(max_workers=2) as ex:
+        fut_dep = ex.submit(_ors_geocode, departure, api_key)
+        fut_dst = ex.submit(_ors_geocode, destination, api_key)
+    dep_lat, dep_lon = fut_dep.result()
+    dst_lat, dst_lon = fut_dst.result()
 
-    body = {
-        "coordinates": [[dep_lon, dep_lat], [dst_lon, dst_lat]],
-        "geometry": True,
-        "instructions": False,
-        "radiuses": [1000, 1000],
-        "alternative_routes": {
-            "target_count": 3,
-            "weight_factor": 1.6,
-            "share_factor": 0.6}}
-    try:
-        data = _post_ors_directions(profile, body, api_key)
-    except urllib.error.HTTPError:
-        del body["alternative_routes"]
-        data = _post_ors_directions(profile, body, api_key)
-
+    routes = _fetch_ors_alternatives(dep_lat, dep_lon, dst_lat, dst_lon, profile, api_key, want_instructions=False)
     return [{
             "index": i,
             "distance_km": round(r["summary"]["distance"] / 1000, 2),
             "duration_minutes": round(r["summary"]["duration"] / 60, 1),
             "encoded_polyline": r["geometry"]}
-        for i, r in enumerate(data.get("routes", []))]
+        for i, r in enumerate(routes)]
 
 
-def _ors_geocode(place, api_key):
+_ors_geocode_cache = {}
+
+
+def _ors_geocode_request(place, api_key, layers):
     params = urllib.parse.urlencode({
         "api_key": api_key,
         "text": place,
         "size": 1,
         "boundary.country": "FI",
-        "layers": "locality,address,neighbourhood,borough"})
-    
+        "layers": layers})
     url = f"{_ORS_BASE}/geocode/search?{params}"
     req = urllib.request.Request(url, headers={"Accept": "application/json"})
     with urllib.request.urlopen(req, timeout=10) as resp:
-        data = _json.loads(resp.read())
+        return _json.loads(resp.read()).get("features", [])
 
-    features = data.get("features", [])
+
+def _ors_geocode(place, api_key):
+    # Cache by normalized text -- avoids paying for the same Pelias call on every
+    # /route-options + /route-analysis pair, and on repeated user submissions.
+    key = place.strip().lower()
+    cached = _ors_geocode_cache.get(key)
+    if cached is not None:
+        return cached
+
+    # Shortcut: "lat,lng" or "lat, lng" -- frontend sends this when the user
+    # picks a point on the map. Skips Pelias entirely so the route starts at
+    # the exact pin (was the source of the marker/route mismatch).
+    parts = [p.strip() for p in key.split(",")]
+    if len(parts) == 2:
+        try:
+            lat = float(parts[0]); lon = float(parts[1])
+            if -90 <= lat <= 90 and -180 <= lon <= 180:
+                _ors_geocode_cache[key] = (lat, lon)
+                return (lat, lon)
+        except ValueError:
+            pass
+
+    # Prefer 'locality' first: for short city queries like "Oulu" or "Rovaniemi"
+    # Pelias' top result with broad layers is often an address/POI off the main
+    # road, which makes ORS draw a tiny connector stub before the real route.
+    # Asking for the city centroid first snaps cleanly to the trunk road.
+    features = _ors_geocode_request(place, api_key, "locality")
+    if not features:
+        features = _ors_geocode_request(place, api_key, "locality,address,neighbourhood,borough")
     if not features:
         raise EnvironmentError(f"ORS geocoding found no results for: {place!r}")
+
     coords = features[0]["geometry"]["coordinates"]
-    return (coords[1], coords[0])
+    result = (coords[1], coords[0])
+    _ors_geocode_cache[key] = result
+    return result
 
 
 _reverse_geo_cache = {}
@@ -308,42 +427,36 @@ def _fetch_ors_route(request):
         )
     profile = os.environ.get("ORS_PROFILE", _ORS_DEFAULT_PROFILE)
 
-    dep_lat, dep_lon = _ors_geocode(request.departure, api_key)
-    dst_lat, dst_lon = _ors_geocode(request.destination, api_key)
+    # Parallel geocodes: same reasoning as fetch_route_options. The result is
+    # cached, so this also speeds up the typical /route-options -> /route-analysis
+    # pair only on a cold cache.
+    with concurrent.futures.ThreadPoolExecutor(max_workers=2) as ex:
+        fut_dep = ex.submit(_ors_geocode, request.departure, api_key)
+        fut_dst = ex.submit(_ors_geocode, request.destination, api_key)
+    dep_lat, dep_lon = fut_dep.result()
+    dst_lat, dst_lon = fut_dst.result()
     route_idx = getattr(request, "route_index", 0) or 0
 
-    ors_cache_key = (round(dep_lat, 4), round(dep_lon, 4),
-                     round(dst_lat, 4), round(dst_lon, 4),
-                     profile, route_idx)
-    cached = _ors_route_cache.get(ors_cache_key)
-    if cached:
-        distance_m, duration_s, encoded_poly = cached
-    else:
-        body = {
-            "coordinates": [[dep_lon, dep_lat], [dst_lon, dst_lat]],
-            "geometry": True,
-            "instructions": False,
-            "radiuses": [1000, 1000]}
-        if route_idx > 0:
-            body["alternative_routes"] = {"target_count": route_idx + 1, "weight_factor": 1.6, "share_factor": 0.6}
-        routes = _post_ors_directions(profile, body, api_key).get("routes") or []
-        if not routes:
-            raise EnvironmentError(f"ORS returned no routes for {request.departure} -> {request.destination}")
-        route = routes[min(route_idx, len(routes) - 1)]
-        distance_m = route["summary"]["distance"]
-        duration_s = route["summary"]["duration"]
-        encoded_poly = route["geometry"]
-        _ors_route_cache[ors_cache_key] = (distance_m, duration_s, encoded_poly)
+    routes = _fetch_ors_alternatives(dep_lat, dep_lon, dst_lat, dst_lon, profile, api_key, want_instructions=True)
+    if not routes:
+        raise EnvironmentError(f"ORS returned no routes for {request.departure} -> {request.destination}")
+    route = routes[min(route_idx, len(routes) - 1)]
+    distance_m = route["summary"]["distance"]
+    duration_s = route["summary"]["duration"]
+    encoded_poly = route["geometry"]
+    segments = route.get("segments") or []
 
     total_distance_km = round(distance_m / 1000, 2)
     decoded = _decode_polyline(encoded_poly)
+    vertex_times = _vertex_times_from_steps(decoded, segments, duration_s)
     sampled = _sample_points_from_polyline(decoded, total_distance_km, duration_s,
-                                            request.departure_time, request.sampling_minutes)
+                                            request.departure_time, request.sampling_minutes,
+                                            vertex_times=vertex_times)
 
     return RouteSummary(
         route_id=_route_id(request),
-        departure=request.departure,
-        destination=request.destination,
+        departure=request.departure_label or request.departure,
+        destination=request.destination_label or request.destination,
         departure_time=request.departure_time,
         total_distance_km=total_distance_km,
         estimated_duration_minutes=round(duration_s / 60, 1),
@@ -717,13 +830,12 @@ def _fetch_maintenance(points, departure_time):
         return []
     min_lat, min_lon, max_lat, max_lon = _points_bbox(points, _DIGITRAFFIC_BBOX_BUFFER_DEG)
     since = (departure_time.astimezone(timezone.utc) - timedelta(hours=_DT_MAINTENANCE_HOURS_BACK)).strftime("%Y-%m-%dT%H:%M:%SZ")
-    from urllib.parse import urlencode
     q = [("xMin", f"{min_lon:.5f}"), ("yMin", f"{min_lat:.5f}"),
          ("xMax", f"{max_lon:.5f}"), ("yMax", f"{max_lat:.5f}"),
          ("endFrom", since)] + [("taskId", t) for t in _DT_MAINTENANCE_TASKS]
     try:
         conn = http.client.HTTPSConnection("tie.digitraffic.fi", timeout=15)
-        conn.request("GET", "/api/maintenance/v1/tracking/routes/latest?" + urlencode(q),
+        conn.request("GET", "/api/maintenance/v1/tracking/routes/latest?" + urllib.parse.urlencode(q),
                      headers={"Accept-Encoding": "gzip", "Digitraffic-User": "HazardAnalysis/risk-pipeline"})
         resp = conn.getresponse(); raw = resp.read(); conn.close()
         if resp.status != 200:
@@ -796,10 +908,14 @@ def _pick_best_forecast(forecasts, target_ts):
             fc_time = fc_time.replace(tzinfo=timezone.utc)
         delta = abs((fc_time - target).total_seconds())
         if delta <= _DIGITRAFFIC_MAX_FORECAST_OFFSET_S:
-            candidates.append((fc.get("type") != "FORECAST", delta, fc))
+            # Pick closest in time. Tie-break prefers OBSERVATION (station-derived
+            # current state) over FORECAST so near-now trips get the live road state
+            # instead of the t+0 forecast row.
+            obs_priority = 0 if fc.get("type") == "OBSERVATION" else 1
+            candidates.append((delta, obs_priority, fc))
     if not candidates:
         return None, None
-    _, delta, fc = min(candidates, key=lambda x: (x[0], x[1]))
+    delta, _, fc = min(candidates, key=lambda x: (x[0], x[1]))
     return fc, delta
 
 
@@ -835,8 +951,14 @@ def _compute_road_weather(points, departure_time):
     min_lat, min_lon, max_lat, max_lon = _points_bbox(points, _DIGITRAFFIC_BBOX_BUFFER_DEG)
     bbox_qs = f"?xMin={min_lon}&yMin={min_lat}&xMax={max_lon}&yMax={max_lat}"
 
-    sections_geojson = _fetch_digitraffic_json(f"/forecast-sections-simple{bbox_qs}") or {}
-    forecasts_data = _fetch_digitraffic_json(f"/forecast-sections-simple/forecasts{bbox_qs}") or {}
+    # Two independent Digitraffic endpoints -- fetch them concurrently instead
+    # of waiting one then the other. Saves ~0.3-0.5s of round-trip latency on
+    # every analysis. The cache layer is thread-safe (lock around _digitraffic_cache).
+    with concurrent.futures.ThreadPoolExecutor(max_workers=2) as ex:
+        fut_sections = ex.submit(_fetch_digitraffic_json, f"/forecast-sections-simple{bbox_qs}")
+        fut_forecasts = ex.submit(_fetch_digitraffic_json, f"/forecast-sections-simple/forecasts{bbox_qs}")
+    sections_geojson = fut_sections.result() or {}
+    forecasts_data = fut_forecasts.result() or {}
 
     section_geometries = {
         str(sid): geom
@@ -852,6 +974,29 @@ def _compute_road_weather(points, departure_time):
 
     usable_ids = set(section_geometries) & set(section_forecasts)
 
+    # Per-section bbox prefilter. Forecast sections are long LineStrings, so the
+    # full point-to-line scan dominates the pipeline. Computing each section's
+    # bbox once and rejecting segments outside (bbox + max-match-distance buffer)
+    # cuts the inner loop from O(N_seg * N_sec * K_vertices) to O(N_sec) for the
+    # bbox build plus a small fraction of sections per segment.
+    deg_buf = _DIGITRAFFIC_MAX_MATCH_DISTANCE_M / 111_000.0
+    section_bboxes = {}
+    for sid in usable_ids:
+        geom = section_geometries[sid]
+        gtype = geom.get("type", "")
+        coords = geom.get("coordinates") or []
+        flat = (coords if gtype == "LineString"
+                else [c for line in coords for c in line] if gtype == "MultiLineString"
+                else [coords] if gtype == "Point" and len(coords) >= 2
+                else [])
+        if not flat:
+            continue
+        lats = [c[1] for c in flat if len(c) >= 2]
+        lons = [c[0] for c in flat if len(c) >= 2]
+        if lats and lons:
+            section_bboxes[sid] = (min(lats) - deg_buf, max(lats) + deg_buf,
+                                    min(lons) - deg_buf, max(lons) + deg_buf)
+
     results = []
     for i, (a, b) in enumerate(pairwise(points)):
         mid_lat = (a.lat + b.lat) / 2
@@ -864,6 +1009,11 @@ def _compute_road_weather(points, departure_time):
         best_sid = None
         best_dist = None
         for sid in usable_ids:
+            bbox = section_bboxes.get(sid)
+            if bbox is not None:
+                lat_lo, lat_hi, lon_lo, lon_hi = bbox
+                if mid_lat < lat_lo or mid_lat > lat_hi or mid_lon < lon_lo or mid_lon > lon_hi:
+                    continue
             dist = _min_distance_to_geometry_m(mid_lat, mid_lon, section_geometries[sid])
             if dist is None:
                 continue
@@ -1274,9 +1424,42 @@ def assess_journey(request):
         + [(tp, sampled_points[s.from_point_index].lat, sampled_points[s.from_point_index].lon)
            for tp, s in zip(top_risky, sorted_segments[:3]) if s.from_point_index < len(sampled_points)])
     if named_entries:
-        names = _batch_reverse_geocode([(lat, lon) for _, lat, lon in named_entries])
-        for entry, name in zip(named_entries, names):
-            entry[0].road_name = name
+        # Dedupe by rounded coords before fan-out. Different entries (a darkness
+        # transition, a top-risky part, a surface change) can land on the same
+        # ~100 m cell and currently each one triggered its own thread + cache
+        # lookup. Resolving each unique cell once and broadcasting the name
+        # back removes wasted thread work without changing what the user sees.
+        unique_coords = list({(round(lat, 3), round(lon, 3)): (lat, lon)
+                              for _, lat, lon in named_entries}.values())
+        unique_names = _batch_reverse_geocode(unique_coords)
+        coord_to_name = {(round(lat, 3), round(lon, 3)): name
+                         for (lat, lon), name in zip(unique_coords, unique_names)}
+        for entry, lat, lon in named_entries:
+            entry.road_name = coord_to_name.get((round(lat, 3), round(lon, 3)), "")
+
+        # Fill empty road names from the nearest neighbour on the journey.
+        # Nominatim sometimes returns nothing for points that fall between
+        # settlements (e.g. a darkness transition mid-forest), even though the
+        # vehicle is on the same long highway as the previous named entry.
+        # Forward-fill then backward-fill by km order is the simplest safe
+        # heuristic: it never invents a name, only reuses one already returned
+        # for an adjacent point on this same trip.
+        ordered = sorted(
+            ((getattr(e, "km", None) or getattr(e, "cumulative_distance_km", 0.0), e)
+             for e, _, _ in named_entries),
+            key=lambda x: x[0])
+        last_name = ""
+        for _km, entry in ordered:
+            if entry.road_name:
+                last_name = entry.road_name
+            elif last_name:
+                entry.road_name = last_name
+        next_name = ""
+        for _km, entry in reversed(ordered):
+            if entry.road_name:
+                next_name = entry.road_name
+            elif next_name:
+                entry.road_name = next_name
 
     for t in darkness_transitions:
         if t.event in ("enters_darkness", "enters_twilight"):
@@ -1318,7 +1501,7 @@ def assess_journey(request):
     first_slippery_ts = (ts.isoformat() if first_slippery and (ts := sampled_points[first_slippery.from_point_index].estimated_timestamp) else None)
 
     evidence = EvidenceForLlm(
-        journey=f"{request.departure} -> {request.destination}",
+        journey=f"{request.departure_label or request.departure} -> {request.destination_label or request.destination}",
         departure_time_local=request.departure_time.astimezone(_FINLAND_TZ).isoformat(),
         total_segments=n_segments,
         overall_risk_score=overall,

@@ -6,6 +6,12 @@ from pydantic import BaseModel, Field
 class JourneyRequest(BaseModel):
     departure: str
     destination: str
+    # Friendly labels shown in the UI / fed to the LLM. When the user picks on
+    # the map, `departure`/`destination` carry the routing coordinates while
+    # these labels carry the human-readable place names. Optional and falls
+    # back to the routing strings.
+    departure_label: str | None = None
+    destination_label: str | None = None
     departure_time: datetime
     sampling_minutes: int = Field(default=5, ge=1, le=60)
     route_index: int = Field(default=0, ge=0, description="Which ORS route alternative to use")

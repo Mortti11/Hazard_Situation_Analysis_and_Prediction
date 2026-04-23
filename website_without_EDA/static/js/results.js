@@ -22,7 +22,7 @@ function renderResults(data) {
   html += stat('Leaving',   jp ? jp.departure_local_time : fmtTime(rs.departure_time));
   html += stat('Arrival',   jp ? jp.arrival_local_time   : fmtTime(rs.arrival_time));
   html += stat('Distance',  jp ? jp.total_distance       : rs.total_distance_km + ' km');
-  html += stat('Duration',  jp ? jp.total_duration        : fmtHours((rs.estimated_duration_minutes || 0) * 60));
+  html += stat('Duration',  jp ? jp.total_duration        : rs.estimated_duration_minutes + ' min');
   html += stat('Checkpoints', jp ? jp.route_checkpoints  : ev.total_segments);
   html += stat('Spacing',     jp ? jp.checkpoint_interval : '~every 5 min');
   html += '</div></div>';
@@ -157,8 +157,7 @@ function renderResults(data) {
 
   // ── Speed Limit Changes ──
   if (ev.speed_zone_changes && ev.speed_zone_changes.length) {
-    html += '<div class="result-card card-speed"><details><summary><h2 style="display:inline">&#x26A1; Speed Limit Changes (' +
-            ev.speed_zone_changes.length + ')</h2></summary><div style="margin-top:.5rem">';
+    html += '<div class="result-card card-speed"><h2>&#x26A1; Speed Limit Changes</h2>';
     for (var szi2 = 0; szi2 < ev.speed_zone_changes.length; szi2++) {
       var sz2   = ev.speed_zone_changes[szi2];
       var isUp  = sz2.to_speed > sz2.from_speed;
@@ -167,7 +166,7 @@ function renderResults(data) {
               sz2.to_speed + ' km/h at ' + fmtTime(sz2.timestamp) +
               (sz2.road_name ? ' near ' + esc(sz2.road_name) : '') + '</div>';
     }
-    html += '</div></details></div>';
+    html += '</div>';
   }
 
   // ── Traffic Incidents (Fintraffic) ──

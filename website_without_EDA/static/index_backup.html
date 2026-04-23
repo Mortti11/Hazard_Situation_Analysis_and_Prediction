@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Journey Risk Analysis</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f5f6fa; color: #2d3436; padding: 2rem 1rem; }
+  .container { max-width: 720px; margin: 0 auto; }
+  h1 { font-size: 1.5rem; margin-bottom: 1.5rem; color: #0984e3; }
+
+  /* Form */
+  .form-card { background: #fff; border-radius: 8px; padding: 1.5rem; box-shadow: 0 1px 4px rgba(0,0,0,.08); margin-bottom: 1.5rem; }
+  label { display: block; font-size: .85rem; font-weight: 600; margin-bottom: .3rem; color: #636e72; }
+  input[type="text"], input[type="datetime-local"] { width: 100%; padding: .55rem .7rem; border: 1px solid #dfe6e9; border-radius: 5px; font-size: .95rem; margin-bottom: 1rem; }
+  input:focus { outline: none; border-color: #0984e3; box-shadow: 0 0 0 2px rgba(9,132,227,.15); }
+  .checkbox-row { display: flex; align-items: center; gap: .5rem; margin-bottom: 1rem; }
+  .checkbox-row input { width: 1.1rem; height: 1.1rem; }
+  .checkbox-row label { margin-bottom: 0; font-weight: 400; }
+  button { background: #0984e3; color: #fff; border: none; padding: .65rem 1.6rem; font-size: .95rem; border-radius: 5px; cursor: pointer; }
+  button:hover { background: #0773c5; }
+  button:disabled { background: #b2bec3; cursor: not-allowed; }
+
+  /* States */
+  .loading { text-align: center; padding: 2rem; color: #636e72; font-size: .95rem; }
+  .loading::after { content: ""; display: block; width: 28px; height: 28px; margin: .8rem auto 0; border: 3px solid #dfe6e9; border-top-color: #0984e3; border-radius: 50%; animation: spin .7s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .error-box { background: #ffeaa7; border-left: 4px solid #fdcb6e; padding: .8rem 1rem; border-radius: 4px; margin-bottom: 1rem; font-size: .9rem; }
+  .error-box.fatal { background: #fab1a0; border-left-color: #e17055; }
+
+  /* Results */
+  .result-card { background: #fff; border-radius: 8px; padding: 1.5rem; box-shadow: 0 1px 4px rgba(0,0,0,.08); margin-bottom: 1rem; }
+  .trip-summary-banner { background: #eef2ff; border-left: 4px solid #4f46e5; border-radius: 6px; padding: .75rem 1rem; margin-bottom: 1rem; font-size: .93rem; color: #1e1b4b; font-weight: 500; }
+  .result-card h2 { font-size: 1.1rem; margin-bottom: .8rem; color: #2d3436; }
+  .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: .6rem; margin-bottom: .8rem; }
+  .stat { background: #f5f6fa; padding: .5rem .7rem; border-radius: 5px; }
+  .stat .label { font-size: .75rem; color: #636e72; }
+  .stat .value { font-size: 1.05rem; font-weight: 600; }
+  .risk-badge { display: inline-block; padding: .2rem .6rem; border-radius: 3px; font-size: .8rem; font-weight: 600; text-transform: uppercase; }
+  .risk-low { background: #00b894; color: #fff; }
+  .risk-moderate { background: #fdcb6e; color: #2d3436; }
+  .risk-high { background: #e17055; color: #fff; }
+  .risk-critical { background: #d63031; color: #fff; }
+  .risky-part { border-left: 3px solid #dfe6e9; padding: .5rem .8rem; margin-bottom: .5rem; background: #fafafa; border-radius: 0 5px 5px 0; }
+  .risky-part .seg-header { font-weight: 600; font-size: .9rem; margin-bottom: .3rem; }
+  .risky-part ul { margin-left: 1.2rem; font-size: .85rem; color: #636e72; }
+
+  /* AI summary */
+  .ai-card { border-left: 4px solid #6c5ce7; }
+  .ai-card h2 { color: #6c5ce7; }
+  .ai-card p { margin-bottom: .7rem; line-height: 1.5; font-size: .93rem; }
+  .ai-card ul { margin-left: 1.2rem; margin-bottom: .7rem; font-size: .9rem; }
+  .ai-card ul li { margin-bottom: .25rem; }
+  .ai-label { font-size: .8rem; font-weight: 600; color: #6c5ce7; margin-bottom: .3rem; }
+  .confidence { font-size: .82rem; color: #636e72; font-style: italic; margin-top: .5rem; }
+  #results { display: none; }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>&#128663; Journey Risk Analysis</h1>
+
+  <div class="form-card">
+    <label for="departure">Departure</label>
+    <input type="text" id="departure" placeholder="e.g. Helsinki" />
+
+    <label for="destination">Destination</label>
+    <input type="text" id="destination" placeholder="e.g. Tampere" />
+
+    <label for="departure_time">Leaving date &amp; time</label>
+    <input type="datetime-local" id="departure_time" />
+
+    <div class="checkbox-row">
+      <input type="checkbox" id="include_ai" checked />
+      <label for="include_ai">Include AI summary</label>
+    </div>
+
+    <button id="submit-btn" onclick="submitAnalysis()">Analyse Journey</button>
+  </div>
+
+  <div id="loading" class="loading" style="display:none">Analysing your journey&hellip;</div>
+  <div id="error" style="display:none"></div>
+  <div id="results"></div>
+</div>
+
+<script>
+// Default departure_time to now + 1 hour rounded to nearest 15 min
+(function() {
+  const d = new Date(Date.now() + 3600000);
+  d.setMinutes(Math.round(d.getMinutes() / 15) * 15, 0, 0);
+  const pad = n => String(n).padStart(2, '0');
+  document.getElementById('departure_time').value =
+    d.getFullYear() + '-' + pad(d.getMonth()+1) + '-' + pad(d.getDate()) +
+    'T' + pad(d.getHours()) + ':' + pad(d.getMinutes());
+})();
+
+async function submitAnalysis() {
+  const departure = document.getElementById('departure').value.trim();
+  const destination = document.getElementById('destination').value.trim();
+  const dtVal = document.getElementById('departure_time').value;
+  const includeAi = document.getElementById('include_ai').checked;
+
+  if (!departure || !destination || !dtVal) {
+    showError('Please fill in all fields.', false);
+    return;
+  }
+
+  const btn = document.getElementById('submit-btn');
+  const loadingEl = document.getElementById('loading');
+  const errorEl = document.getElementById('error');
+  const resultsEl = document.getElementById('results');
+
+  btn.disabled = true;
+  loadingEl.style.display = 'block';
+  errorEl.style.display = 'none';
+  // Clear any stale results immediately so nothing old lingers while loading.
+  resultsEl.innerHTML = '';
+  resultsEl.style.display = 'none';
+
+  try {
+    // Send the datetime-local value as a naive string (no timezone suffix).
+    // The backend treats naive datetimes as Europe/Helsinki local time,
+    // which is exactly what the user typed.  This prevents UTC/local
+    // mismatches that would occur if we used .toISOString() here.
+    const body = {
+      departure: departure,
+      destination: destination,
+      departure_time: dtVal + ':00',   // e.g. "2026-03-25T21:30:00" (no Z)
+      sampling_minutes: 5
+    };
+
+    const url = '/api/v1/route-analysis' + (includeAi ? '?include_ai=true' : '');
+    const resp = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    });
+
+    if (!resp.ok) {
+      const detail = await resp.json().catch(() => ({}));
+      throw new Error(detail.detail || `Server error ${resp.status}`);
+    }
+
+    const data = await resp.json();
+    renderResults(data);
+  } catch (err) {
+    showError(err.message, true);
+  } finally {
+    btn.disabled = false;
+    loadingEl.style.display = 'none';
+  }
+}
+
+function showError(msg, fatal) {
+  const el = document.getElementById('error');
+  el.className = fatal ? 'error-box fatal' : 'error-box';
+  el.textContent = msg;
+  el.style.display = 'block';
+}
+
+function riskClass(level) {
+  return 'risk-badge risk-' + (level || 'low');
+}
+
+// ── Time helpers — always show Europe/Helsinki local time ──────────────
+// Using a fixed timezone ensures the UI and AI summary always agree,
+// regardless of the browser's own timezone setting.
+const FI_TZ = 'Europe/Helsinki';
+
+function fmtTime(isoStr) {
+  if (!isoStr) return '';
+  return new Date(isoStr).toLocaleTimeString('fi-FI', {
+    hour: '2-digit', minute: '2-digit', timeZone: FI_TZ
+  });
+}
+
+function fmtDateTime(isoStr) {
+  if (!isoStr) return '';
+  const d = new Date(isoStr);
+  return d.toLocaleDateString('fi-FI', { timeZone: FI_TZ }) + ', ' +
+         d.toLocaleTimeString('fi-FI', { hour: '2-digit', minute: '2-digit', timeZone: FI_TZ });
+}
+
+function fmtHours(min) {
+  const h = Math.floor(min / 60);
+  const m = Math.round(min % 60);
+  return h > 0 ? h + 'h ' + m + 'min' : m + 'min';
+}
+
+// Map raw internal risk reason strings to plain user-facing text.
+const REASON_CLEAN = {
+  'driving in darkness': 'Driving in darkness',
+  'driving in twilight': 'Driving in twilight',
+  'extremely poor road condition': 'Extremely poor road condition',
+  'poor road condition': 'Poor road condition',
+  'very slippery friction condition': 'Very slippery road surface',
+  'slippery friction condition': 'Slippery road surface',
+  'winter slipperiness warning': 'Winter slipperiness',
+  'known recurring hazard segment': 'Known recurring road hazard',
+};
+
+function cleanReason(r) {
+  const low = r.toLowerCase().trim();
+  if (REASON_CLEAN[low]) return REASON_CLEAN[low];
+  if (low.startsWith('surface condition: ')) {
+    const cond = r.split(': ')[1] || '';
+    return cond.charAt(0).toUpperCase() + cond.slice(1) + ' road surface';
+  }
+  if (low.includes('moose') || low.includes('wildlife')) {
+    return low.includes('twilight') ? 'Moose/wildlife risk in twilight' : 'Moose/wildlife risk in darkness';
+  }
+  if (low.includes('narrow road')) return 'Narrow road at high speed';
+  if (low.includes('high speed') && low.includes('darkness')) return 'High speed in darkness (unlit road)';
+  if (low.includes('not scored') || low.includes('confidence=')) return '';
+  if (low.includes('grip') && low.includes('(')) return 'Reduced road grip';
+  return r.charAt(0).toUpperCase() + r.slice(1);
+}
+
+function renderResults(data) {
+  const el = document.getElementById('results');
+  const rs = data.route_summary;
+  const jr = data.journey_risk_summary;
+  const ev = data.evidence_for_llm;
+  // Prefer the clean presentation fields when available (always present
+  // for responses from this version of the backend).
+  const jp = data.journey_presentation || null;
+  let html = '';
+
+  // ── Trip summary line (one-sentence character of the trip) ───────
+  if (jp && jp.trip_summary_line) {
+    html += '<div class="trip-summary-banner">' + escHtml(jp.trip_summary_line) + '</div>';
+  }
+
+  // ── Journey at a Glance ──────────────────────────────────────────
+  html += '<div class="result-card"><h2>Journey at a Glance</h2>';
+  html += '<div class="stat-grid">';
+  html += stat('From', jp ? jp.departure_place : rs.departure);
+  html += stat('To', jp ? jp.destination_place : rs.destination);
+  html += stat('Leaving at', jp ? jp.departure_local_time : fmtTime(rs.departure_time));
+  html += stat('Estimated arrival', jp ? jp.arrival_local_time : fmtTime(rs.arrival_time));
+  html += stat('Total distance', jp ? jp.total_distance : rs.total_distance_km + ' km');
+  html += stat('Travel time', jp ? jp.total_duration : fmtHours(rs.estimated_duration_minutes));
+  html += stat('Route checkpoints checked', jp ? jp.route_checkpoints : ev.total_segments);
+  html += stat('Checkpoint spacing', jp ? jp.checkpoint_interval : 'about every 5 minutes');
+  html += '</div></div>';
+
+  // ── Risk Assessment ──────────────────────────────────────────────
+  html += '<div class="result-card"><h2>Risk Assessment</h2>';
+  html += '<div class="stat-grid">';
+  const riskLevel = jp ? jp.overall_risk : jr.overall_risk_level;
+  html += '<div class="stat"><div class="label">Overall trip risk</div><div class="value"><span class="' + riskClass(riskLevel) + '">' + riskLevel.charAt(0).toUpperCase() + riskLevel.slice(1) + '</span></div></div>';
+
+  // Top risk reasons (cleaned to plain language)
+  const reasons = jp && jp.top_risk_reasons && jp.top_risk_reasons.length
+    ? jp.top_risk_reasons
+    : [];
+  if (reasons.length) {
+    html += '<div class="stat" style="grid-column:1/-1"><div class="label">Main reasons for this risk level</div>';
+    html += '<ul style="margin:.3rem 0 0 1.2rem;font-size:.88rem">';
+    for (const r of reasons) html += '<li>' + escHtml(r) + '</li>';
+    html += '</ul></div>';
+  } else {
+    html += '<div class="stat" style="grid-column:1/-1"><div class="label">Main reasons</div><div class="value">No significant risks identified.</div></div>';
+  }
+
+  // When extra care is most needed
+  if (jp && jp.extra_care_when) {
+    html += stat('When extra care is needed', jp.extra_care_when);
+  } else {
+    const hrRoad = jr.highest_risk_road || 'N/A';
+    html += stat('Highest risk location', hrRoad + ' (score: ' + jr.highest_segment_score + ')');
+  }
+
+  // Weather coverage note
+  if (jp && jp.weather_coverage_note) {
+    html += stat('Weather data coverage', jp.weather_coverage_note);
+  } else {
+    html += stat('Weather data', jr.usable_weather_segment_count + ' of ' + ev.total_segments + ' checkpoints');
+  }
+
+  if (jr.poor_weather_segment_count > 0) html += stat('Poor road conditions', jr.poor_weather_segment_count + ' checkpoints affected');
+  if (jr.slippery_segment_count > 0) html += stat('Slippery conditions', jr.slippery_segment_count + ' checkpoints affected');
+  html += '</div></div>';
+
+  // ── Top Risky Locations ──────────────────────────────────────────
+  if (data.top_risky_parts && data.top_risky_parts.length) {
+    html += '<div class="result-card"><h2>Top Risky Locations</h2>';
+    for (const p of data.top_risky_parts) {
+      const sr = data.segment_risks && data.segment_risks[p.segment_id];
+      const road = p.road_name || 'Unknown road';
+      const timeStr = p.estimated_time ? fmtTime(p.estimated_time) : '';
+      const speedStr = sr && sr.speed_limit_kmh ? sr.speed_limit_kmh + ' km/h limit' : '';
+      const litStr = sr ? (sr.road_lit ? 'lit road' : 'unlit road') : '';
+      const metaParts = [speedStr, litStr].filter(Boolean);
+      const metaStr = metaParts.length ? ' — ' + metaParts.join(', ') : '';
+
+      html += '<div class="risky-part">';
+      html += '<div class="seg-header">' + escHtml(road) + ' &mdash; <span class="' + riskClass(p.risk_level) + '">' + p.risk_level + '</span>' + metaStr + '</div>';
+      if (timeStr) html += '<div style="font-size:.82rem;color:#636e72;margin-bottom:.3rem">Around ' + timeStr + '</div>';
+      const cleanedReasons = p.reasons.map(cleanReason).filter(Boolean);
+      html += '<ul>' + cleanedReasons.map(r => '<li>' + escHtml(r) + '</li>').join('') + '</ul>';
+      html += '</div>';
+    }
+    html += '</div>';
+  }
+
+  // ── Darkness & Light ─────────────────────────────────────────────
+  const hasJpDarkness = jp && (jp.darkness_events.length || jp.dark_from || jp.twilight_from);
+  if (hasJpDarkness || (ev.darkness_transitions && ev.darkness_transitions.length)) {
+    html += '<div class="result-card"><h2>&#127761; Darkness &amp; Light</h2>';
+
+    // Totals row
+    const darkDur = jp ? jp.darkness_duration : fmtHours(ev.darkness_total_minutes || 0);
+    const darkKm = jp ? jp.distance_in_dark : (ev.darkness_total_km || 0) + ' km';
+    const dayDur = jp ? jp.daylight_duration : fmtHours(ev.daylight_total_minutes || 0);
+    const dayKm = ev.daylight_total_km || 0;
+    const noDaylight = jp && jp.has_daylight === false;
+    const daylightStr = noDaylight
+      ? '<em>No daylight on this journey</em>'
+      : 'Daylight: <strong>' + dayDur + '</strong> (' + dayKm + ' km)';
+    html += '<p style="font-size:.88rem;color:#636e72;margin-bottom:.8rem">'
+      + 'Dark/twilight: <strong>' + darkDur + '</strong> (' + darkKm + ') &bull; '
+      + daylightStr + '</p>';
+
+    if (hasJpDarkness) {
+      // Use clean presentation events
+      for (const sentence of jp.darkness_events) {
+        html += '<div class="risky-part"><div class="seg-header">'
+          + (sentence.startsWith('Dark') ? '&#9790; ' : sentence.startsWith('Twi') ? '&#127768; ' : '&#9728; ')
+          + escHtml(sentence) + '</div></div>';
+      }
+    } else {
+      // Fallback: raw transitions with improved labels
+      for (const t of ev.darkness_transitions) {
+        const icon = t.event.includes('enters') ? (t.event.includes('twilight') ? '&#127768;' : '&#9790;') : '&#9728;';
+        const labelMap = {
+          enters_darkness: 'Darkness begins',
+          enters_twilight: 'Twilight begins',
+          exits_darkness: 'Returns to daylight',
+          exits_twilight: 'Returns to daylight',
+        };
+        const label = labelMap[t.event] || t.event.replace(/_/g, ' ');
+        const time = fmtTime(t.timestamp);
+        const road = t.road_name || (t.lat.toFixed(2) + ', ' + t.lon.toFixed(2));
+        html += '<div class="risky-part"><div class="seg-header">' + icon + ' ' + label + ' at ' + time + (road ? ' near ' + escHtml(road) : '') + '</div></div>';
+      }
+    }
+
+    // Moose risk note
+    if (jr.moose_risk_segment_count > 0) {
+      const pct = Math.round(jr.moose_risk_segment_count / ev.total_segments * 100);
+      html += '<p style="font-size:.85rem;color:#636e72;margin-top:.6rem">&#9888; Wildlife/moose risk on '
+        + pct + '% of the route (' + jr.moose_risk_segment_count + ' checkpoints on unlit rural roads)</p>';
+    }
+    html += '</div>';
+  }
+
+  // ── Road Surface Changes ─────────────────────────────────────────
+  const hasJpSurface = jp && jp.surface_change_descriptions && jp.surface_change_descriptions.length;
+  const hasFallbackSurface = ev.surface_changes && ev.surface_changes.length;
+  if (hasJpSurface || hasFallbackSurface) {
+    html += '<div class="result-card"><h2>&#128739; Road Surface Changes</h2>';
+    if (hasJpSurface) {
+      for (const sentence of jp.surface_change_descriptions) {
+        html += '<div class="risky-part">' + escHtml(sentence) + '</div>';
+      }
+    } else {
+      for (const c of ev.surface_changes) {
+        const time = fmtTime(c.timestamp);
+        const road = c.road_name || (c.lat.toFixed(2) + ', ' + c.lon.toFixed(2));
+        const from_c = c.from_condition.replace(/_/g, ' ');
+        const to_c = c.to_condition.replace(/_/g, ' ');
+        html += '<div class="risky-part">Around ' + time + ' near ' + escHtml(road)
+          + ', road changes from ' + escHtml(from_c) + ' to ' + escHtml(to_c) + '</div>';
+      }
+    }
+    html += '</div>';
+  }
+
+  // ── Speed Limit Changes ──────────────────────────────────────────
+  if (ev.speed_zone_changes && ev.speed_zone_changes.length) {
+    html += '<div class="result-card"><h2>&#9888; Speed Limit Changes</h2>';
+    for (const sz of ev.speed_zone_changes) {
+      const time = fmtTime(sz.timestamp);
+      const road = sz.road_name || '';
+      const arrow = sz.to_speed > sz.from_speed ? '&#9650;' : '&#9660;';
+      html += '<div class="risky-part">' + arrow + ' Speed limit changes from '
+        + sz.from_speed + ' to ' + sz.to_speed + ' km/h at ' + time
+        + (road ? ' near ' + escHtml(road) : '') + '</div>';
+    }
+    html += '</div>';
+  }
+
+  // ── AI Summary ───────────────────────────────────────────────────
+  if (data.ai_summary) {
+    const ai = data.ai_summary;
+    html += '<div class="result-card ai-card"><h2>&#10024; AI Summary</h2>';
+    html += '<p>' + escHtml(ai.summary) + '</p>';
+    if (ai.key_risks.length) {
+      html += '<div class="ai-label">Key Risks</div><ul>' + ai.key_risks.map(r => '<li>' + escHtml(r) + '</li>').join('') + '</ul>';
+    }
+    if (ai.advice.length) {
+      html += '<div class="ai-label">Advice</div><ul>' + ai.advice.map(r => '<li>' + escHtml(r) + '</li>').join('') + '</ul>';
+    }
+    if (ai.unknowns.length) {
+      html += '<div class="ai-label">Unknowns</div><ul>' + ai.unknowns.map(r => '<li>' + escHtml(r) + '</li>').join('') + '</ul>';
+    }
+    if (ai.confidence_note) {
+      html += '<div class="confidence">' + escHtml(ai.confidence_note) + '</div>';
+    }
+    html += '</div>';
+  } else if (data.ai_summary_error) {
+    html += '<div class="error-box">' + escHtml(data.ai_summary_error) + '</div>';
+  } else if (document.getElementById('include_ai').checked) {
+    html += '<div class="error-box">AI summary not available (API key may not be configured).</div>';
+  }
+
+  el.innerHTML = html;
+  el.style.display = 'block';
+  el.scrollIntoView({ behavior: 'smooth' });
+}
+
+function stat(label, value) {
+  return '<div class="stat"><div class="label">' + escHtml(label) + '</div><div class="value">' + escHtml(String(value)) + '</div></div>';
+}
+
+function escHtml(s) {
+  const d = document.createElement('div');
+  d.textContent = s;
+  return d.innerHTML;
+}
+</script>
+</body>
+</html>

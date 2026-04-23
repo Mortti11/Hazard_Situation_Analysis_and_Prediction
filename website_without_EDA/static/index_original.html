@@ -1,0 +1,829 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Journey Risk Analysis — Map View</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<style>
+/* ── Reset & Base ────────────────────────────────────────────────── */
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:#f5f6fa;color:#2d3436}
+
+/* ── Layout ──────────────────────────────────────────────────────── */
+.app-layout{display:flex;height:100vh;overflow:hidden}
+.map-panel{flex:3;position:relative;min-width:0;background:#dfe6e9}
+#map{width:100%;height:100%}
+.sidebar{flex:2;min-width:350px;max-width:500px;overflow-y:auto;padding:1.5rem;background:#f5f6fa}
+.sidebar h1{font-size:1.35rem;margin-bottom:1.2rem;color:#0984e3}
+
+/* ── Map Pick Bar ────────────────────────────────────────────────── */
+.map-pick-bar{position:absolute;top:10px;left:55px;z-index:1000;display:flex;gap:6px;align-items:center}
+.pick-btn{display:flex;align-items:center;gap:4px;padding:6px 12px;border:2px solid #fff;border-radius:6px;background:#fff;font-size:.82rem;font-weight:600;cursor:pointer;box-shadow:0 2px 6px rgba(0,0,0,.2);transition:all .15s}
+.pick-btn:hover{background:#eef2ff}
+.pick-btn.active{background:#0984e3;color:#fff;border-color:#0984e3}
+.pick-btn .dot{width:10px;height:10px;border-radius:50%;display:inline-block}
+.pick-hint{font-size:.78rem;color:#636e72;background:rgba(255,255,255,.92);padding:4px 8px;border-radius:4px;box-shadow:0 1px 3px rgba(0,0,0,.1)}
+
+/* ── Map Legend ───────────────────────────────────────────────────── */
+.map-legend{background:#fff;padding:10px 14px;border-radius:6px;box-shadow:0 2px 6px rgba(0,0,0,.2);font-size:.78rem;line-height:1.6}
+.map-legend h4{margin-bottom:4px;font-size:.82rem;color:#2d3436}
+.map-legend .row{display:flex;align-items:center;gap:6px}
+.map-legend .swatch{width:14px;height:14px;border-radius:3px;display:inline-block;border:1px solid rgba(0,0,0,.1)}
+
+/* ── Form ────────────────────────────────────────────────────────── */
+.form-card{background:#fff;border-radius:8px;padding:1.2rem;box-shadow:0 1px 4px rgba(0,0,0,.08);margin-bottom:1.2rem}
+label{display:block;font-size:.82rem;font-weight:600;margin-bottom:.25rem;color:#636e72}
+input[type="text"],input[type="datetime-local"]{width:100%;padding:.5rem .6rem;border:1px solid #dfe6e9;border-radius:5px;font-size:.9rem;margin-bottom:.8rem}
+input:focus{outline:none;border-color:#0984e3;box-shadow:0 0 0 2px rgba(9,132,227,.15)}
+.row-2{display:grid;grid-template-columns:1fr 1fr;gap:.6rem}
+.checkbox-row{display:flex;align-items:center;gap:.5rem;margin-bottom:.8rem}
+.checkbox-row input{width:1rem;height:1rem}
+.checkbox-row label{margin-bottom:0;font-weight:400}
+button#submit-btn{width:100%;background:#0984e3;color:#fff;border:none;padding:.6rem;font-size:.92rem;border-radius:5px;cursor:pointer;font-weight:600}
+button#submit-btn:hover{background:#0773c5}
+button#submit-btn:disabled{background:#b2bec3;cursor:not-allowed}
+
+/* ── States ──────────────────────────────────────────────────────── */
+.loading{text-align:center;padding:1.5rem;color:#636e72;font-size:.9rem}
+.loading::after{content:"";display:block;width:24px;height:24px;margin:.6rem auto 0;border:3px solid #dfe6e9;border-top-color:#0984e3;border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.error-box{background:#ffeaa7;border-left:4px solid #fdcb6e;padding:.7rem .9rem;border-radius:4px;margin-bottom:.8rem;font-size:.85rem}
+.error-box.fatal{background:#fab1a0;border-left-color:#e17055}
+
+/* ── Result Cards ────────────────────────────────────────────────── */
+.result-card{background:#fff;border-radius:8px;padding:1.2rem;box-shadow:0 1px 4px rgba(0,0,0,.08);margin-bottom:.8rem}
+.trip-summary-banner{background:#eef2ff;border-left:4px solid #4f46e5;border-radius:6px;padding:.65rem .9rem;margin-bottom:.8rem;font-size:.88rem;color:#1e1b4b;font-weight:500}
+.result-card h2{font-size:1rem;margin-bottom:.6rem;color:#2d3436}
+.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:.5rem;margin-bottom:.6rem}
+.stat{background:#f5f6fa;padding:.4rem .6rem;border-radius:5px}
+.stat .label{font-size:.72rem;color:#636e72}
+.stat .value{font-size:.95rem;font-weight:600}
+.risk-badge{display:inline-block;padding:.15rem .5rem;border-radius:3px;font-size:.75rem;font-weight:600;text-transform:uppercase}
+.risk-low{background:#00b894;color:#fff}
+.risk-moderate{background:#fdcb6e;color:#2d3436}
+.risk-high{background:#e67e22;color:#fff}
+.risk-critical{background:#d63031;color:#fff}
+.risky-part{border-left:3px solid #dfe6e9;padding:.4rem .7rem;margin-bottom:.4rem;background:#fafafa;border-radius:0 5px 5px 0;font-size:.85rem}
+.risky-part .seg-header{font-weight:600;font-size:.85rem;margin-bottom:.2rem}
+.risky-part ul{margin-left:1rem;font-size:.8rem;color:#636e72}
+
+/* ── AI Card ─────────────────────────────────────────────────────── */
+.ai-card{border-left:4px solid #6c5ce7}
+.ai-card h2{color:#6c5ce7}
+.ai-card p{margin-bottom:.5rem;line-height:1.45;font-size:.88rem}
+.ai-card ul{margin-left:1rem;margin-bottom:.5rem;font-size:.85rem}
+.ai-card ul li{margin-bottom:.2rem}
+.ai-label{font-size:.76rem;font-weight:600;color:#6c5ce7;margin-bottom:.2rem}
+.confidence{font-size:.78rem;color:#636e72;font-style:italic;margin-top:.4rem}
+#results{display:none}
+
+/* ── Map Popups ──────────────────────────────────────────────────── */
+.leaflet-popup-content{min-width:220px}
+.seg-popup{font-size:.82rem;line-height:1.4}
+.seg-popup-hdr{font-weight:700;font-size:.88rem;margin-bottom:4px;display:flex;align-items:center;gap:6px}
+.seg-props{width:100%;border-collapse:collapse;margin:4px 0}
+.seg-props td{padding:2px 5px;border-bottom:1px solid #f0f0f0}
+.seg-props td:first-child{white-space:nowrap;color:#636e72}
+.seg-props td:last-child{font-weight:500}
+.seg-reasons{margin-top:5px;color:#636e72;font-size:.78rem}
+.seg-reasons div{padding:1px 0}
+
+.data-credits{margin-top:1rem;padding:.6rem;background:#eee;border-radius:5px;font-size:.7rem;color:#636e72;line-height:1.4}
+
+/* ── Responsive ──────────────────────────────────────────────────── */
+@media(max-width:900px){
+  .app-layout{flex-direction:column}
+  .map-panel{height:50vh;flex:none}
+  .sidebar{max-width:none;min-width:0}
+}
+</style>
+</head>
+<body>
+<div class="app-layout">
+
+  <!-- MAP PANEL -->
+  <div class="map-panel">
+    <div id="map"></div>
+    <div class="map-pick-bar">
+      <button class="pick-btn" id="pick-dep-btn" onclick="startPick('departure')">
+        <span class="dot" style="background:#27ae60"></span> Set Departure
+      </button>
+      <button class="pick-btn" id="pick-dest-btn" onclick="startPick('destination')">
+        <span class="dot" style="background:#e74c3c"></span> Set Destination
+      </button>
+      <span class="pick-hint" id="pick-hint">Click buttons then click map, or type addresses in sidebar</span>
+    </div>
+  </div>
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <h1>&#128663; Journey Risk Analysis</h1>
+
+    <div class="form-card">
+      <label for="departure">Departure</label>
+      <input type="text" id="departure" placeholder="e.g. Oulu — or click map" />
+
+      <label for="destination">Destination</label>
+      <input type="text" id="destination" placeholder="e.g. Tampere — or click map" />
+
+      <div class="row-2">
+        <div>
+          <label for="departure_time">Leaving date &amp; time</label>
+          <input type="datetime-local" id="departure_time" />
+        </div>
+        <div>
+          <label for="sampling">Sampling (min)</label>
+          <input type="text" id="sampling" value="5" style="width:100%" />
+        </div>
+      </div>
+
+      <div class="checkbox-row">
+        <input type="checkbox" id="include_ai" checked />
+        <label for="include_ai">Include AI summary</label>
+      </div>
+
+      <button id="submit-btn" onclick="submitAnalysis()">Analyse Journey</button>
+    </div>
+
+    <div id="loading" class="loading" style="display:none">Analysing your journey &hellip; this may take 30-60 s</div>
+    <div id="error" style="display:none"></div>
+    <div id="results"></div>
+
+    <div class="data-credits">
+      <strong>Data sources:</strong>
+      Route: OpenRouteService &bull;
+      Road attributes: Digiroad WFS (V&auml;yl&auml;virasto, CC BY 4.0) &bull;
+      Weather: Digitraffic (Fintraffic, CC BY 4.0) &bull;
+      Darkness: Astral solar model &bull;
+      Map tiles: &copy; <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> contributors
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+// ═════════════════════════════════════════════════════════════════════
+// CONSTANTS
+// ═════════════════════════════════════════════════════════════════════
+const FI_TZ = 'Europe/Helsinki';
+const RISK_COLORS  = {low:'#2ecc71', moderate:'#f1c40f', high:'#e67e22', critical:'#e74c3c'};
+const RISK_WEIGHT  = {low:4, moderate:5, high:7, critical:8};
+
+// ═════════════════════════════════════════════════════════════════════
+// MAP INIT — centred on Finland
+// ═════════════════════════════════════════════════════════════════════
+const map = L.map('map', {zoomControl: true}).setView([64.0, 26.0], 5);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  attribution: '&copy; OpenStreetMap contributors',
+  maxZoom: 18
+}).addTo(map);
+
+// Layer groups for toggle control
+const routeGroup    = L.layerGroup().addTo(map);
+const darknessGroup = L.layerGroup().addTo(map);
+const surfaceGroup  = L.layerGroup().addTo(map);
+const speedGroup    = L.layerGroup().addTo(map);
+const mooseGroup    = L.layerGroup().addTo(map);
+const topRiskGroup  = L.layerGroup().addTo(map);
+
+L.control.layers(null, {
+  '&#x1F6E4;&#xFE0F; Route & Segments': routeGroup,
+  '&#x1F319; Darkness / Light':          darknessGroup,
+  '&#x1F6E3;&#xFE0F; Road Surface':      surfaceGroup,
+  '&#x26A1; Speed Zones':                speedGroup,
+  '&#x1F98C; Wildlife / Moose':          mooseGroup,
+  '&#x26A0;&#xFE0F; Top Risk Areas':     topRiskGroup,
+}, {position: 'topright', collapsed: true}).addTo(map);
+
+// Legend
+const legend = L.control({position: 'bottomleft'});
+legend.onAdd = function () {
+  const d = L.DomUtil.create('div', 'map-legend');
+  d.innerHTML =
+    '<h4>Segment Risk Level</h4>' +
+    '<div class="row"><span class="swatch" style="background:#2ecc71"></span> Low (&lt;0.25)</div>' +
+    '<div class="row"><span class="swatch" style="background:#f1c40f"></span> Moderate (0.25–0.49)</div>' +
+    '<div class="row"><span class="swatch" style="background:#e67e22"></span> High (0.50–0.74)</div>' +
+    '<div class="row"><span class="swatch" style="background:#e74c3c"></span> Critical (&ge;0.75)</div>' +
+    '<h4 style="margin-top:6px">Map Icons</h4>' +
+    '<div class="row">&#x1F69B; Departure &nbsp; &#x1F3C1; Destination</div>' +
+    '<div class="row">&#x1F319; Darkness &nbsp; &#x2600;&#xFE0F; Daylight</div>' +
+    '<div class="row">&#x1F6E3;&#xFE0F; Surface change &nbsp; &#x26A1; Speed zone</div>' +
+    '<div class="row">&#x1F98C; Wildlife risk &nbsp; &#x26A0;&#xFE0F; High risk area</div>';
+  return d;
+};
+legend.addTo(map);
+
+// ═════════════════════════════════════════════════════════════════════
+// ICON FACTORY — circular emoji-based icons
+// ═════════════════════════════════════════════════════════════════════
+function mkIcon(emoji, bg, size) {
+  size = size || 30;
+  return L.divIcon({
+    className: '',
+    html: '<div style="background:' + bg + ';width:' + size + 'px;height:' + size +
+          'px;border-radius:50%;display:flex;align-items:center;justify-content:center;' +
+          'font-size:' + Math.round(size * 0.50) + 'px;border:2px solid #fff;' +
+          'box-shadow:0 2px 6px rgba(0,0,0,.3);cursor:pointer;line-height:1">' + emoji + '</div>',
+    iconSize: [size, size],
+    iconAnchor: [size / 2, size / 2],
+    popupAnchor: [0, -size / 2]
+  });
+}
+
+const ICONS = {
+  departure:       mkIcon('&#x1F69B;', '#27ae60', 38),
+  destination:     mkIcon('&#x1F3C1;', '#e74c3c', 38),
+  entersDark:      mkIcon('&#x1F319;', '#2c3e50', 30),
+  entersTwilight:  mkIcon('&#x1F317;', '#34495e', 28),
+  exitsDark:       mkIcon('&#x2600;&#xFE0F;', '#f39c12', 30),
+  surfaceChange:   mkIcon('&#x1F6E3;&#xFE0F;', '#795548', 28),
+  speedChange:     mkIcon('&#x26A1;', '#2980b9', 28),
+  mooseRisk:       mkIcon('&#x1F98C;', '#1b5e20', 32),
+  topRisk:         mkIcon('&#x26A0;&#xFE0F;', '#c0392b', 34),
+  checkpoint:      mkIcon('&#x1F4CD;', '#607d8b', 20),
+};
+
+// ═════════════════════════════════════════════════════════════════════
+// PICK DEPARTURE / DESTINATION FROM MAP
+// ═════════════════════════════════════════════════════════════════════
+let pickMode = null;
+let pickDepMarker = null, pickDestMarker = null;
+
+function startPick(type) {
+  pickMode = type;
+  document.getElementById('pick-dep-btn').classList.toggle('active', type === 'departure');
+  document.getElementById('pick-dest-btn').classList.toggle('active', type === 'destination');
+  map.getContainer().style.cursor = 'crosshair';
+  document.getElementById('pick-hint').textContent = 'Click on the map to set ' + type;
+}
+
+function endPick() {
+  pickMode = null;
+  document.getElementById('pick-dep-btn').classList.remove('active');
+  document.getElementById('pick-dest-btn').classList.remove('active');
+  map.getContainer().style.cursor = '';
+  document.getElementById('pick-hint').textContent = 'Click buttons then click map, or type addresses in sidebar';
+}
+
+map.on('click', function (e) {
+  if (!pickMode) return;
+  var lat = e.latlng.lat, lng = e.latlng.lng;
+  var type = pickMode;
+  if (type === 'departure') {
+    if (pickDepMarker) map.removeLayer(pickDepMarker);
+    pickDepMarker = L.marker([lat, lng], {icon: ICONS.departure, draggable: true}).addTo(map);
+    pickDepMarker.on('dragend', function () { reverseGeocode(pickDepMarker.getLatLng(), 'departure'); });
+  } else {
+    if (pickDestMarker) map.removeLayer(pickDestMarker);
+    pickDestMarker = L.marker([lat, lng], {icon: ICONS.destination, draggable: true}).addTo(map);
+    pickDestMarker.on('dragend', function () { reverseGeocode(pickDestMarker.getLatLng(), 'destination'); });
+  }
+  reverseGeocode({lat: lat, lng: lng}, type);
+  endPick();
+});
+
+document.addEventListener('keydown', function (e) { if (e.key === 'Escape') endPick(); });
+
+async function reverseGeocode(ll, field) {
+  var inp = document.getElementById(field);
+  inp.value = ll.lat.toFixed(4) + ', ' + ll.lng.toFixed(4);  // immediate feedback
+  try {
+    var r = await fetch(
+      'https://nominatim.openstreetmap.org/reverse?lat=' + ll.lat +
+      '&lon=' + ll.lng + '&format=json&zoom=10&addressdetails=1',
+      {headers: {'User-Agent': 'HazardAnalysis/1.0 (school-project)'}}
+    );
+    var d = await r.json();
+    if (d.address) {
+      var a = d.address;
+      var city = a.city || a.town || a.village || a.municipality || '';
+      var road = a.road || '';
+      inp.value = city ? (road ? road + ', ' + city : city) : (d.display_name || '').split(',').slice(0, 3).join(',');
+    }
+  } catch (err) { console.warn('Reverse geocode failed:', err); }
+}
+
+// ═════════════════════════════════════════════════════════════════════
+// POLYLINE DECODER (Google / ORS encoding)
+// ═════════════════════════════════════════════════════════════════════
+function decodePolyline(enc) {
+  var pts = [], idx = 0, lat = 0, lng = 0;
+  while (idx < enc.length) {
+    for (var ci = 0; ci < 2; ci++) {
+      var shift = 0, result = 0;
+      while (true) {
+        var b = enc.charCodeAt(idx++) - 63;
+        result |= (b & 0x1f) << shift;
+        shift += 5;
+        if (b < 0x20) break;
+      }
+      var delta = (result & 1) ? ~(result >> 1) : (result >> 1);
+      if (ci === 0) lat += delta; else lng += delta;
+    }
+    pts.push([lat / 1e5, lng / 1e5]);
+  }
+  return pts;
+}
+
+// ═════════════════════════════════════════════════════════════════════
+// MAP OVERLAY RENDERERS
+// ═════════════════════════════════════════════════════════════════════
+function clearMapOverlays() {
+  [routeGroup, darknessGroup, surfaceGroup, speedGroup, mooseGroup, topRiskGroup]
+    .forEach(function (g) { g.clearLayers(); });
+}
+
+function renderMapOverlays(data) {
+  clearMapOverlays();
+  var pts  = data.sampled_points;
+  var segs = data.segment_risks;
+  var ev   = data.evidence_for_llm;
+  var rs   = data.route_summary;
+  if (!pts || pts.length < 2) return;
+
+  // Remove pick markers (route markers replace them)
+  if (pickDepMarker)  { map.removeLayer(pickDepMarker);  pickDepMarker = null; }
+  if (pickDestMarker) { map.removeLayer(pickDestMarker); pickDestMarker = null; }
+
+  // ── Full route polyline (gray base) ──
+  if (rs.encoded_polyline) {
+    var decoded = decodePolyline(rs.encoded_polyline);
+    L.polyline(decoded, {color: '#636e72', weight: 3, opacity: 0.3, dashArray: '6 4'}).addTo(routeGroup);
+  }
+
+  // ── Risk-colored segment lines ──
+  for (var i = 0; i < segs.length; i++) {
+    var s  = segs[i];
+    var p1 = pts[s.from_point_index];
+    var p2 = pts[s.to_point_index];
+    if (!p1 || !p2) continue;
+    var col = RISK_COLORS[s.risk_level] || '#95a5a6';
+    var w   = RISK_WEIGHT[s.risk_level] || 4;
+    var line = L.polyline([[p1.lat, p1.lon], [p2.lat, p2.lon]], {
+      color: col, weight: w, opacity: 0.85
+    });
+    line.bindPopup(buildSegPopup(s, p1));
+    line.addTo(routeGroup);
+  }
+
+  // ── Departure & Destination markers ──
+  L.marker([pts[0].lat, pts[0].lon], {icon: ICONS.departure})
+    .bindPopup('<b>&#x1F69B; Departure</b><br>' + esc(rs.departure) + '<br>' + fmtTime(pts[0].estimated_timestamp))
+    .addTo(routeGroup);
+  var last = pts[pts.length - 1];
+  L.marker([last.lat, last.lon], {icon: ICONS.destination})
+    .bindPopup('<b>&#x1F3C1; Destination</b><br>' + esc(rs.destination) + '<br>' + fmtTime(last.estimated_timestamp))
+    .addTo(routeGroup);
+
+  // ── Darkness transition markers ──
+  var darkTransitions = ev.darkness_transitions || [];
+  for (var di = 0; di < darkTransitions.length; di++) {
+    var t = darkTransitions[di];
+    var isExit = t.event.indexOf('exits') >= 0;
+    var isTwi  = t.event.indexOf('twilight') >= 0;
+    var icon   = isExit ? ICONS.exitsDark : isTwi ? ICONS.entersTwilight : ICONS.entersDark;
+    var labels = {
+      enters_darkness:  '&#x1F319; Enters Darkness',
+      enters_twilight:  '&#x1F317; Enters Twilight',
+      exits_darkness:   '&#x2600;&#xFE0F; Returns to Daylight',
+      exits_twilight:   '&#x2600;&#xFE0F; Returns to Daylight'
+    };
+    var lbl = labels[t.event] || t.event;
+    var popup = '<b>' + lbl + '</b>' +
+      '<br><b>Time:</b> ' + fmtTime(t.timestamp) +
+      '<br><b>km:</b> ' + t.km +
+      (t.road_name ? '<br><b>Near:</b> ' + esc(t.road_name) : '');
+    L.marker([t.lat, t.lon], {icon: icon}).bindPopup(popup).addTo(darknessGroup);
+  }
+
+  // ── Darkness shading on segments (subtle overlay) ──
+  for (var di2 = 0; di2 < segs.length; di2++) {
+    var ds = segs[di2];
+    if (!ds.is_dark && !ds.is_twilight) continue;
+    var dp1 = pts[ds.from_point_index];
+    var dp2 = pts[ds.to_point_index];
+    if (!dp1 || !dp2) continue;
+    var dCol = ds.is_dark ? '#1a1a2e' : '#2d3436';
+    L.polyline([[dp1.lat, dp1.lon], [dp2.lat, dp2.lon]], {
+      color: dCol, weight: 12, opacity: 0.15
+    }).addTo(darknessGroup);
+  }
+
+  // ── Surface change markers ──
+  var surfaceChanges = ev.surface_changes || [];
+  for (var si = 0; si < surfaceChanges.length; si++) {
+    var c = surfaceChanges[si];
+    var from_c = c.from_condition.replace(/_/g, ' ');
+    var to_c   = c.to_condition.replace(/_/g, ' ');
+    var sPopup = '<b>&#x1F6E3;&#xFE0F; Surface Change</b>' +
+      '<br><b>From:</b> ' + esc(from_c) +
+      '<br><b>To:</b> ' + esc(to_c) +
+      '<br><b>Time:</b> ' + fmtTime(c.timestamp) +
+      (c.road_name ? '<br><b>Near:</b> ' + esc(c.road_name) : '');
+    L.marker([c.lat, c.lon], {icon: ICONS.surfaceChange}).bindPopup(sPopup).addTo(surfaceGroup);
+  }
+
+  // ── Speed zone change markers ──
+  var speedChanges = ev.speed_zone_changes || [];
+  for (var szi = 0; szi < speedChanges.length; szi++) {
+    var sz    = speedChanges[szi];
+    var arrow = sz.to_speed > sz.from_speed ? '&#x2B06;' : '&#x2B07;';
+    var szPopup = '<b>&#x26A1; Speed Limit Change</b>' +
+      '<br>' + sz.from_speed + ' &#x2192; ' + sz.to_speed + ' km/h ' + arrow +
+      '<br><b>Time:</b> ' + fmtTime(sz.timestamp) +
+      (sz.road_name ? '<br><b>Near:</b> ' + esc(sz.road_name) : '');
+    L.marker([sz.lat, sz.lon], {icon: ICONS.speedChange}).bindPopup(szPopup).addTo(speedGroup);
+  }
+
+  // ── Moose / wildlife risk zones ──
+  var prevMoose = false;
+  for (var mi = 0; mi < segs.length; mi++) {
+    var ms = segs[mi];
+    // Place a marker at the start of each contiguous moose risk zone
+    if (ms.moose_risk && !prevMoose) {
+      var mp = pts[ms.from_point_index];
+      if (mp) {
+        var mPopup = '<b>&#x1F98C; Wildlife / Moose Risk Zone</b>' +
+          '<br><b>Speed:</b> ' + (ms.speed_limit_kmh || '?') + ' km/h' +
+          '<br><b>Lighting:</b> ' + (ms.road_lit ? '&#x1F4A1; Lit' : 'Unlit road') +
+          '<br><b>Time:</b> ' + fmtTime(mp.estimated_timestamp) +
+          '<br><span style="font-size:.78rem;color:#636e72">' +
+          'Sources: LUKE (Natural Resources Institute Finland),<br>' +
+          'Finnish Transport Infrastructure Agency</span>';
+        L.marker([mp.lat, mp.lon], {icon: ICONS.mooseRisk}).bindPopup(mPopup).addTo(mooseGroup);
+      }
+    }
+    // Overlay moose segments with dashed orange line
+    if (ms.moose_risk) {
+      var mp1 = pts[ms.from_point_index];
+      var mp2 = pts[ms.to_point_index];
+      if (mp1 && mp2) {
+        L.polyline([[mp1.lat, mp1.lon], [mp2.lat, mp2.lon]], {
+          color: '#d35400', weight: 10, opacity: 0.25, dashArray: '4 8'
+        }).addTo(mooseGroup);
+      }
+    }
+    prevMoose = ms.moose_risk;
+  }
+
+  // ── Top risky area markers ──
+  var topRisky = data.top_risky_parts || [];
+  for (var ti = 0; ti < topRisky.length; ti++) {
+    var tp  = topRisky[ti];
+    var tSeg = segs[tp.segment_id];
+    var tPt  = tSeg ? pts[tSeg.from_point_index] : null;
+    if (!tPt) continue;
+    var tReasons = tp.reasons.map(cleanReason).filter(Boolean);
+    var tPopup = '<b>&#x26A0;&#xFE0F; High Risk Area (#' + (ti + 1) + ')</b>' +
+      (tp.road_name ? '<br>' + esc(tp.road_name) : '') +
+      '<br><b>Score:</b> ' + tp.risk_score + ' (' + tp.risk_level + ')' +
+      '<br><b>Time:</b> ' + fmtTime(tp.estimated_time) +
+      (tReasons.length ? '<hr style="margin:4px 0">' + tReasons.map(function (r) { return '&bull; ' + esc(r); }).join('<br>') : '');
+    L.marker([tPt.lat, tPt.lon], {icon: ICONS.topRisk}).bindPopup(tPopup).addTo(topRiskGroup);
+  }
+
+  // ── Fit map to route bounds ──
+  var bounds = L.latLngBounds(pts.map(function (p) { return [p.lat, p.lon]; }));
+  map.fitBounds(bounds, {padding: [40, 40]});
+}
+
+// ── Segment popup HTML builder ──
+function buildSegPopup(seg, pt) {
+  var darkLabel = seg.is_dark ? '&#x1F311; Dark' : seg.is_twilight ? '&#x1F317; Twilight' : '&#x2600;&#xFE0F; Daylight';
+  var litLabel  = seg.road_lit ? '&#x1F4A1; Lit road' : 'Unlit road';
+  var surface   = (seg.surface_condition || 'unknown').replace(/_/g, ' ');
+  var reasons   = seg.reasons.map(cleanReason).filter(Boolean);
+
+  var h = '<div class="seg-popup">';
+  h += '<div class="seg-popup-hdr"><span class="risk-badge risk-' + seg.risk_level + '">' +
+       seg.risk_level + '</span> Score: ' + seg.risk_score + '</div>';
+  h += '<table class="seg-props">';
+  h += '<tr><td>&#x1F3CE;&#xFE0F; Speed limit</td><td>' + (seg.speed_limit_kmh || '?') + ' km/h</td></tr>';
+  h += '<tr><td>&#x1F4CF; Road width</td><td>' + (seg.road_width_m || '?') + ' m</td></tr>';
+  h += '<tr><td>&#x1F6E3;&#xFE0F; Surface</td><td>' + esc(surface) + '</td></tr>';
+  h += '<tr><td>' + darkLabel + '</td><td>' + litLabel + '</td></tr>';
+  if (seg.road_temperature_c !== null && seg.road_temperature_c !== undefined)
+    h += '<tr><td>&#x1F321;&#xFE0F; Road temp</td><td>' + seg.road_temperature_c + ' &deg;C</td></tr>';
+  if (seg.air_temperature_c !== null && seg.air_temperature_c !== undefined)
+    h += '<tr><td>&#x1F32C;&#xFE0F; Air temp</td><td>' + seg.air_temperature_c + ' &deg;C</td></tr>';
+  if (seg.wind_speed_ms !== null && seg.wind_speed_ms !== undefined)
+    h += '<tr><td>&#x1F4A8; Wind</td><td>' + seg.wind_speed_ms + ' m/s</td></tr>';
+  if (seg.overall_road_condition)
+    h += '<tr><td>&#x1F6A7; Road cond.</td><td>' + esc(seg.overall_road_condition.replace(/_/g, ' ').toLowerCase()) + '</td></tr>';
+  if (seg.friction_condition)
+    h += '<tr><td>&#x1F9CA; Friction</td><td>' + esc(seg.friction_condition.replace(/_/g, ' ').toLowerCase()) + '</td></tr>';
+  h += '<tr><td>&#x1F98C; Moose risk</td><td>' + (seg.moose_risk ? '<b style="color:#e74c3c">Yes</b>' : 'No') + '</td></tr>';
+  if (seg.weather_confidence && seg.weather_confidence !== 'none')
+    h += '<tr><td>&#x1F4E1; Wx confidence</td><td>' + seg.weather_confidence + '</td></tr>';
+  if (seg.weather_source)
+    h += '<tr><td>&#x1F4E1; Wx source</td><td>' + esc(seg.weather_source) + '</td></tr>';
+  h += '</table>';
+  if (reasons.length) {
+    h += '<div class="seg-reasons">' + reasons.map(function (r) { return '<div>&bull; ' + esc(r) + '</div>'; }).join('') + '</div>';
+  }
+  h += '</div>';
+  return h;
+}
+
+// ═════════════════════════════════════════════════════════════════════
+// TIME & FORMATTING HELPERS
+// ═════════════════════════════════════════════════════════════════════
+function fmtTime(s) {
+  if (!s) return '';
+  return new Date(s).toLocaleTimeString('fi-FI', {hour: '2-digit', minute: '2-digit', timeZone: FI_TZ});
+}
+function fmtDateTime(s) {
+  if (!s) return '';
+  var d = new Date(s);
+  return d.toLocaleDateString('fi-FI', {timeZone: FI_TZ}) + ', ' +
+         d.toLocaleTimeString('fi-FI', {hour: '2-digit', minute: '2-digit', timeZone: FI_TZ});
+}
+function fmtHours(m) {
+  var h = Math.floor(m / 60), mn = Math.round(m % 60);
+  return h > 0 ? h + 'h ' + mn + 'min' : mn + 'min';
+}
+
+var REASON_CLEAN = {
+  'driving in darkness': 'Driving in darkness',
+  'driving in twilight': 'Driving in twilight',
+  'extremely poor road condition': 'Extremely poor road condition',
+  'poor road condition': 'Poor road condition',
+  'very slippery friction condition': 'Very slippery road surface',
+  'slippery friction condition': 'Slippery road surface',
+  'winter slipperiness warning': 'Winter slipperiness',
+  'known recurring hazard segment': 'Known recurring road hazard',
+};
+function cleanReason(r) {
+  var l = r.toLowerCase().trim();
+  if (REASON_CLEAN[l]) return REASON_CLEAN[l];
+  if (l.indexOf('surface condition: ') === 0) {
+    var c = r.split(': ')[1] || '';
+    return c.charAt(0).toUpperCase() + c.slice(1).replace(/_/g, ' ') + ' road surface';
+  }
+  if (l.indexOf('moose') >= 0 || l.indexOf('wildlife') >= 0)
+    return l.indexOf('twilight') >= 0 ? 'Moose/wildlife risk in twilight' : 'Moose/wildlife risk in darkness';
+  if (l.indexOf('narrow road') >= 0) return 'Narrow road at high speed';
+  if (l.indexOf('high speed') >= 0 && l.indexOf('darkness') >= 0) return 'High speed in darkness (unlit road)';
+  if (l.indexOf('not scored') >= 0 || l.indexOf('confidence=') >= 0) return '';
+  if (l.indexOf('grip') >= 0 && l.indexOf('(') >= 0) return 'Reduced road grip';
+  return r.charAt(0).toUpperCase() + r.slice(1);
+}
+
+function riskClass(lv) { return 'risk-badge risk-' + (lv || 'low'); }
+function esc(s) { var d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+function stat(label, value) {
+  return '<div class="stat"><div class="label">' + esc(label) + '</div><div class="value">' + esc(String(value)) + '</div></div>';
+}
+
+// ═════════════════════════════════════════════════════════════════════
+// FORM INIT & SUBMIT
+// ═════════════════════════════════════════════════════════════════════
+(function () {
+  var d = new Date(Date.now() + 3600000);
+  d.setMinutes(Math.round(d.getMinutes() / 15) * 15, 0, 0);
+  var pad = function (n) { return String(n).padStart(2, '0'); };
+  document.getElementById('departure_time').value =
+    d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()) +
+    'T' + pad(d.getHours()) + ':' + pad(d.getMinutes());
+})();
+
+async function submitAnalysis() {
+  var departure   = document.getElementById('departure').value.trim();
+  var destination = document.getElementById('destination').value.trim();
+  var dtVal       = document.getElementById('departure_time').value;
+  var sampling    = parseInt(document.getElementById('sampling').value) || 5;
+  var includeAi   = document.getElementById('include_ai').checked;
+
+  if (!departure || !destination || !dtVal) {
+    showError('Please fill in all fields.', false);
+    return;
+  }
+
+  var btn       = document.getElementById('submit-btn');
+  var loadingEl = document.getElementById('loading');
+  var errorEl   = document.getElementById('error');
+  var resultsEl = document.getElementById('results');
+
+  btn.disabled = true;
+  loadingEl.style.display = 'block';
+  errorEl.style.display = 'none';
+  resultsEl.innerHTML = '';
+  resultsEl.style.display = 'none';
+
+  try {
+    var body = {
+      departure: departure,
+      destination: destination,
+      departure_time: dtVal + ':00',
+      sampling_minutes: sampling
+    };
+    var url = '/api/v1/route-analysis' + (includeAi ? '?include_ai=true' : '');
+    var resp = await fetch(url, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify(body)
+    });
+    if (!resp.ok) {
+      var det = await resp.json().catch(function () { return {}; });
+      throw new Error(det.detail || 'Server error ' + resp.status);
+    }
+    var data = await resp.json();
+    renderResults(data);
+    renderMapOverlays(data);
+  } catch (err) {
+    showError(err.message, true);
+  } finally {
+    btn.disabled = false;
+    loadingEl.style.display = 'none';
+  }
+}
+
+function showError(msg, fatal) {
+  var el = document.getElementById('error');
+  el.className = fatal ? 'error-box fatal' : 'error-box';
+  el.textContent = msg;
+  el.style.display = 'block';
+}
+
+// ═════════════════════════════════════════════════════════════════════
+// SIDEBAR RESULTS RENDERER
+// ═════════════════════════════════════════════════════════════════════
+function renderResults(data) {
+  var el = document.getElementById('results');
+  var rs = data.route_summary;
+  var jr = data.journey_risk_summary;
+  var ev = data.evidence_for_llm;
+  var jp = data.journey_presentation || null;
+  var html = '';
+
+  // ── Trip summary banner ──
+  if (jp && jp.trip_summary_line)
+    html += '<div class="trip-summary-banner">' + esc(jp.trip_summary_line) + '</div>';
+
+  // ── Journey at a Glance ──
+  html += '<div class="result-card"><h2>Journey at a Glance</h2><div class="stat-grid">';
+  html += stat('From',      jp ? jp.departure_place   : rs.departure);
+  html += stat('To',        jp ? jp.destination_place  : rs.destination);
+  html += stat('Leaving',   jp ? jp.departure_local_time : fmtTime(rs.departure_time));
+  html += stat('Arrival',   jp ? jp.arrival_local_time   : fmtTime(rs.arrival_time));
+  html += stat('Distance',  jp ? jp.total_distance       : rs.total_distance_km + ' km');
+  html += stat('Duration',  jp ? jp.total_duration        : fmtHours(rs.estimated_duration_minutes));
+  html += stat('Checkpoints', jp ? jp.route_checkpoints  : ev.total_segments);
+  html += stat('Spacing',     jp ? jp.checkpoint_interval : '~every 5 min');
+  html += '</div></div>';
+
+  // ── Risk Assessment ──
+  html += '<div class="result-card"><h2>Risk Assessment</h2><div class="stat-grid">';
+  var rl = jp ? jp.overall_risk : jr.overall_risk_level;
+  html += '<div class="stat"><div class="label">Overall risk</div><div class="value">' +
+          '<span class="' + riskClass(rl) + '">' + rl.charAt(0).toUpperCase() + rl.slice(1) + '</span>' +
+          ' (' + (jp ? jp.risk_score : jr.overall_risk_score) + ')' +
+          '</div></div>';
+  var reasons = jp && jp.top_risk_reasons && jp.top_risk_reasons.length ? jp.top_risk_reasons : [];
+  if (reasons.length) {
+    html += '<div class="stat" style="grid-column:1/-1"><div class="label">Main reasons</div>' +
+            '<ul style="margin:.2rem 0 0 1rem;font-size:.83rem">';
+    for (var ri = 0; ri < reasons.length; ri++) html += '<li>' + esc(reasons[ri]) + '</li>';
+    html += '</ul></div>';
+  }
+  if (jp && jp.extra_care_when)       html += stat('Extra care needed', jp.extra_care_when);
+  if (jp && jp.weather_coverage_note) html += stat('Weather coverage',  jp.weather_coverage_note);
+  if (jr.poor_weather_segment_count > 0) html += stat('Poor road cond.', jr.poor_weather_segment_count + ' checkpoints');
+  if (jr.slippery_segment_count > 0)     html += stat('Slippery',        jr.slippery_segment_count + ' checkpoints');
+  html += '</div></div>';
+
+  // ── Top Risky Locations ──
+  if (data.top_risky_parts && data.top_risky_parts.length) {
+    html += '<div class="result-card"><h2>Top Risky Locations</h2>';
+    for (var tri = 0; tri < data.top_risky_parts.length; tri++) {
+      var p  = data.top_risky_parts[tri];
+      var sr = data.segment_risks ? data.segment_risks[p.segment_id] : null;
+      var road = p.road_name || 'Unknown road';
+      var ts   = p.estimated_time ? fmtTime(p.estimated_time) : '';
+      var meta = [];
+      if (sr && sr.speed_limit_kmh) meta.push(sr.speed_limit_kmh + ' km/h');
+      if (sr) meta.push(sr.road_lit ? 'lit' : 'unlit');
+      html += '<div class="risky-part">';
+      html += '<div class="seg-header">' + esc(road) + ' &mdash; <span class="' + riskClass(p.risk_level) + '">' +
+              p.risk_level + '</span>' + (meta.length ? ' — ' + meta.join(', ') : '') + '</div>';
+      if (ts) html += '<div style="font-size:.78rem;color:#636e72">Around ' + ts + '</div>';
+      var cr = p.reasons.map(cleanReason).filter(Boolean);
+      if (cr.length) html += '<ul>' + cr.map(function (r) { return '<li>' + esc(r) + '</li>'; }).join('') + '</ul>';
+      html += '</div>';
+    }
+    html += '</div>';
+  }
+
+  // ── Darkness & Light ──
+  var hasDk   = jp && ((jp.darkness_events && jp.darkness_events.length) || jp.dark_from || jp.twilight_from);
+  var hasDkFb = ev.darkness_transitions && ev.darkness_transitions.length;
+  if (hasDk || hasDkFb) {
+    html += '<div class="result-card"><h2>&#x1F319; Darkness &amp; Light</h2>';
+    var dkD = jp ? jp.darkness_duration : fmtHours(ev.darkness_total_minutes || 0);
+    var dkK = jp ? jp.distance_in_dark  : (ev.darkness_total_km || 0) + ' km';
+    var dyD = jp ? jp.daylight_duration  : fmtHours(ev.daylight_total_minutes || 0);
+    var dyK = ev.daylight_total_km || 0;
+    var noDay = jp && jp.has_daylight === false;
+    html += '<p style="font-size:.84rem;color:#636e72;margin-bottom:.6rem">' +
+            'Dark/twilight: <strong>' + dkD + '</strong> (' + dkK + ') &bull; ' +
+            (noDay ? '<em>No daylight on this journey</em>' :
+                     'Daylight: <strong>' + dyD + '</strong> (' + dyK + ' km)') + '</p>';
+    if (jp && jp.darkness_events && jp.darkness_events.length) {
+      for (var dei = 0; dei < jp.darkness_events.length; dei++) {
+        var s = jp.darkness_events[dei];
+        var ico = s.indexOf('Dark') === 0 ? '&#x263E; ' : s.indexOf('Twi') === 0 ? '&#x1F318; ' : '&#x2600;&#xFE0F; ';
+        html += '<div class="risky-part"><div class="seg-header">' + ico + esc(s) + '</div></div>';
+      }
+    } else if (hasDkFb) {
+      var labels2 = {enters_darkness: 'Darkness begins', enters_twilight: 'Twilight begins',
+                     exits_darkness: 'Returns to daylight', exits_twilight: 'Returns to daylight'};
+      for (var dt2 = 0; dt2 < ev.darkness_transitions.length; dt2++) {
+        var t2 = ev.darkness_transitions[dt2];
+        var ico2 = t2.event.indexOf('enters') >= 0 ? (t2.event.indexOf('twilight') >= 0 ? '&#x1F318;' : '&#x263E;') : '&#x2600;&#xFE0F;';
+        var lbl2 = labels2[t2.event] || t2.event;
+        html += '<div class="risky-part"><div class="seg-header">' + ico2 + ' ' + lbl2 + ' at ' +
+                fmtTime(t2.timestamp) + (t2.road_name ? ' near ' + esc(t2.road_name) : '') + '</div></div>';
+      }
+    }
+    if (jr.moose_risk_segment_count > 0) {
+      var pct = Math.round(jr.moose_risk_segment_count / ev.total_segments * 100);
+      html += '<p style="font-size:.82rem;color:#636e72;margin-top:.5rem">&#x26A0;&#xFE0F; Wildlife/moose risk on ' +
+              pct + '% of the route (' + jr.moose_risk_segment_count + ' checkpoints on unlit rural roads)</p>';
+    }
+    html += '</div>';
+  }
+
+  // ── Road Surface Changes ──
+  var hasSJ = jp && jp.surface_change_descriptions && jp.surface_change_descriptions.length;
+  var hasSF = ev.surface_changes && ev.surface_changes.length;
+  if (hasSJ || hasSF) {
+    html += '<div class="result-card"><h2>&#x1F6E3;&#xFE0F; Road Surface Changes</h2>';
+    if (hasSJ) {
+      for (var sci = 0; sci < jp.surface_change_descriptions.length; sci++)
+        html += '<div class="risky-part">' + esc(jp.surface_change_descriptions[sci]) + '</div>';
+    } else {
+      for (var sc2 = 0; sc2 < ev.surface_changes.length; sc2++) {
+        var cv = ev.surface_changes[sc2];
+        html += '<div class="risky-part">Around ' + fmtTime(cv.timestamp) + ' near ' +
+                esc(cv.road_name || 'km ' + cv.km) + ', road changes from ' +
+                esc(cv.from_condition.replace(/_/g, ' ')) + ' to ' +
+                esc(cv.to_condition.replace(/_/g, ' ')) + '</div>';
+      }
+    }
+    html += '</div>';
+  }
+
+  // ── Speed Limit Changes ──
+  if (ev.speed_zone_changes && ev.speed_zone_changes.length) {
+    html += '<div class="result-card"><h2>&#x26A1; Speed Limit Changes</h2>';
+    for (var szi2 = 0; szi2 < ev.speed_zone_changes.length; szi2++) {
+      var sz2   = ev.speed_zone_changes[szi2];
+      var arr2  = sz2.to_speed > sz2.from_speed ? '&#x25B2;' : '&#x25BC;';
+      html += '<div class="risky-part">' + arr2 + ' ' + sz2.from_speed + ' &#x2192; ' +
+              sz2.to_speed + ' km/h at ' + fmtTime(sz2.timestamp) +
+              (sz2.road_name ? ' near ' + esc(sz2.road_name) : '') + '</div>';
+    }
+    html += '</div>';
+  }
+
+  // ── AI Summary ──
+  if (data.ai_summary) {
+    var ai = data.ai_summary;
+    html += '<div class="result-card ai-card"><h2>&#x2728; AI Summary</h2>';
+    html += '<p>' + esc(ai.summary) + '</p>';
+    if (ai.key_risks && ai.key_risks.length) {
+      html += '<div class="ai-label">Key Risks</div><ul>' +
+              ai.key_risks.map(function (r) { return '<li>' + esc(r) + '</li>'; }).join('') + '</ul>';
+    }
+    if (ai.advice && ai.advice.length) {
+      html += '<div class="ai-label">Advice</div><ul>' +
+              ai.advice.map(function (r) { return '<li>' + esc(r) + '</li>'; }).join('') + '</ul>';
+    }
+    if (ai.unknowns && ai.unknowns.length) {
+      html += '<div class="ai-label">Unknowns</div><ul>' +
+              ai.unknowns.map(function (r) { return '<li>' + esc(r) + '</li>'; }).join('') + '</ul>';
+    }
+    if (ai.confidence_note) {
+      html += '<div class="confidence">' + esc(ai.confidence_note) + '</div>';
+    }
+    html += '</div>';
+  } else if (data.ai_summary_error) {
+    html += '<div class="error-box">' + esc(data.ai_summary_error) + '</div>';
+  } else if (document.getElementById('include_ai').checked) {
+    html += '<div class="error-box">AI summary not available (API key may not be configured).</div>';
+  }
+
+  el.innerHTML = html;
+  el.style.display = 'block';
+}
+
+// ═════════════════════════════════════════════════════════════════════
+// INIT
+// ═════════════════════════════════════════════════════════════════════
+setTimeout(function () { map.invalidateSize(); }, 100);
+</script>
+</body>
+</html>

@@ -103,8 +103,11 @@ def _extra_care_sentence(top_risky):
     if not top_risky:
         return ""
     part = top_risky[0]
-    time_str = fmt_time(part.estimated_time) if part.estimated_time else ""
-    pieces = [p for p in (f"around {time_str}" if time_str else "", f"near {part.road_name}" if part.road_name else "") if p]
+    pieces = []
+    if part.estimated_time:
+        pieces.append(f"around {fmt_time(part.estimated_time)}")
+    if part.road_name:
+        pieces.append(f"near {part.road_name}")
     return f"Most care needed {' '.join(pieces)}" if pieces else ""
 
 

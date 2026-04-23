@@ -1,0 +1,835 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>HSAP — Hazard Situation Analysis & Prediction</title>
+  <link rel="stylesheet" href="hsap-style.css"/>
+</head>
+<body>
+
+<!-- ════════════════════════════════════════════════════════════════════
+     DATA SOURCE — CSV AUTO-LOADER
+     ════════════════════════════════════════════════════════════════════
+
+  Place your CSV file in the SAME folder as this HTML file.
+  The file must be named:  dummyfile.csv
+
+  Expected columns (semicolon-separated):
+    datetime; press; lat; lon; street; town; is_dark;
+    heighest_acceleration; speed_at_press_kmh; grip;
+    surface_condition_name; Traffic Amount
+
+  To export from Pandas:
+    df.to_csv("dummyfile.csv", index=False, sep=";")
+
+  To view the dashboard, serve it with a local server:
+    python -m http.server 8000
+    then open → http://localhost:8000/hsap-dashboard.html
+
+════════════════════════════════════════════════════════════════════ -->
+
+
+<!-- ── WEATHER FX LAYERS ── -->
+<div id="sky-layer"></div>
+<div id="grid-layer"></div>
+<canvas id="rain-canvas"></canvas>
+<canvas id="snow-canvas"></canvas>
+<div id="fog-layer"></div>
+
+<!-- ── LIVE WEATHER WIDGET (Rovaniemi) ── -->
+<div id="weather-widget">
+  <div class="w-icon" id="w-icon">&#9203;</div>
+  <div class="w-info">
+    <div class="w-loc">Rovaniemi, FI</div>
+    <div class="w-temp" id="w-temp">&#8212;&#176;C</div>
+    <div class="w-desc" id="w-desc">Loading&#8230;</div>
+    <div class="w-extras">
+      <span id="w-wind">&#8212; km/h</span>
+      <span id="w-humid">&#8212; %RH</span>
+      <span id="w-precip">&#8212; mm</span>
+    </div>
+  </div>
+</div>
+
+<!-- ── TODO WIDGET ── -->
+<div id="todo-widget">
+  <div id="todo-header">
+    <span>&#9998; Notes &amp; To-Do</span>
+    <button id="todo-toggle" title="Collapse">&#8210;</button>
+  </div>
+  <div id="todo-body">
+    <ul id="todo-list"></ul>
+    <div id="todo-input-row">
+      <input id="todo-input" type="text" placeholder="Add item&#8230;" maxlength="80"/>
+      <button id="todo-add">+</button>
+    </div>
+  </div>
+</div>
+
+<style>
+#todo-widget {
+  position: fixed;
+  bottom: 1.5rem; right: 1.5rem;
+  z-index: 9998;
+  background: rgba(12,16,22,.94);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  width: 240px;
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
+  box-shadow: 0 4px 24px rgba(0,0,0,.4);
+  font-family: var(--hf);
+  overflow: hidden;
+  transition: box-shadow .2s;
+}
+#todo-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: .55rem .8rem;
+  border-bottom: 1px solid var(--border);
+  font-size: .68rem; font-weight: 600; color: var(--text-soft);
+  cursor: default; user-select: none;
+}
+#todo-toggle {
+  background: none; border: none; color: var(--muted);
+  font-size: 1rem; line-height: 1; cursor: pointer; padding: 0 .2rem;
+  transition: color .15s;
+}
+#todo-toggle:hover { color: var(--text); }
+#todo-body { padding: .6rem .8rem .8rem; }
+#todo-list {
+  list-style: none; margin: 0 0 .6rem; padding: 0;
+  max-height: 220px; overflow-y: auto;
+  display: flex; flex-direction: column; gap: .3rem;
+}
+#todo-list::-webkit-scrollbar { width: 4px; }
+#todo-list::-webkit-scrollbar-track { background: transparent; }
+#todo-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+#todo-list li {
+  display: flex; align-items: center; gap: .5rem;
+  font-size: .7rem; color: var(--text);
+  padding: .3rem .4rem; border-radius: 5px;
+  transition: background .12s;
+}
+#todo-list li:hover { background: var(--surface); }
+#todo-list li.done .todo-text {
+  text-decoration: line-through;
+  color: var(--muted);
+}
+.todo-check {
+  width: 13px; height: 13px; border-radius: 3px; flex-shrink: 0;
+  border: 1.5px solid var(--border2); background: transparent;
+  cursor: pointer; appearance: none; -webkit-appearance: none;
+  transition: background .15s, border-color .15s;
+}
+.todo-check:checked {
+  background: var(--teal); border-color: var(--teal);
+}
+.todo-text {
+  flex: 1; cursor: pointer; line-height: 1.4;
+  word-break: break-word;
+}
+.todo-del {
+  background: none; border: none; color: var(--muted);
+  font-size: .75rem; cursor: pointer; padding: 0 .1rem;
+  opacity: 0; transition: opacity .15s, color .15s; line-height: 1;
+}
+#todo-list li:hover .todo-del { opacity: 1; }
+.todo-del:hover { color: var(--red); }
+#todo-input-row { display: flex; gap: .4rem; }
+#todo-input {
+  flex: 1; background: var(--surface); border: 1px solid var(--border);
+  border-radius: 5px; padding: .35rem .6rem;
+  font-family: var(--hf); font-size: .68rem; color: var(--text);
+  outline: none; transition: border-color .15s;
+}
+#todo-input:focus { border-color: var(--teal); }
+#todo-input::placeholder { color: var(--muted); }
+#todo-add {
+  background: var(--teal); border: none; border-radius: 5px;
+  color: #fff; font-size: 1rem; line-height: 1;
+  width: 28px; cursor: pointer; flex-shrink: 0;
+  transition: background .15s;
+}
+#todo-add:hover { background: var(--green); }
+/* collapsed state */
+#todo-widget.collapsed #todo-body { display: none; }
+#todo-widget.collapsed { border-radius: 10px; }
+</style>
+
+<script>
+(function() {
+  var STORE_KEY = 'hsap_todo_v1';
+  var widget    = document.getElementById('todo-widget');
+  var list      = document.getElementById('todo-list');
+  var input     = document.getElementById('todo-input');
+  var addBtn    = document.getElementById('todo-add');
+  var toggle    = document.getElementById('todo-toggle');
+  var collapsed = false;
+
+  /* ── load from localStorage ── */
+  function load() {
+    try { return JSON.parse(localStorage.getItem(STORE_KEY)) || []; }
+    catch(e) { return []; }
+  }
+  function save(items) {
+    localStorage.setItem(STORE_KEY, JSON.stringify(items));
+  }
+
+  /* ── render list ── */
+  function renderList() {
+    var items = load();
+    list.innerHTML = '';
+    items.forEach(function(item, i) {
+      var li   = document.createElement('li');
+      if (item.done) li.classList.add('done');
+
+      var chk  = document.createElement('input');
+      chk.type = 'checkbox'; chk.className = 'todo-check';
+      if (item.done) chk.checked = true;
+      chk.addEventListener('change', function() { toggle_item(i); });
+
+      var txt  = document.createElement('span');
+      txt.className = 'todo-text';
+      txt.textContent = item.text;
+      txt.addEventListener('click', function() { toggle_item(i); });
+
+      var del  = document.createElement('button');
+      del.className = 'todo-del'; del.textContent = '✕';
+      del.addEventListener('click', function(ev) { ev.stopPropagation(); remove_item(i); });
+
+      li.appendChild(chk); li.appendChild(txt); li.appendChild(del);
+      list.appendChild(li);
+    });
+  }
+
+  function toggle_item(i) {
+    var items = load();
+    items[i].done = !items[i].done;
+    save(items); renderList();
+  }
+
+  function remove_item(i) {
+    var items = load();
+    items.splice(i, 1);
+    save(items); renderList();
+  }
+
+  function add_item() {
+    var text = input.value.trim();
+    if (!text) return;
+    var items = load();
+    items.push({ text: text, done: false });
+    save(items); renderList();
+    input.value = '';
+    input.focus();
+    /* scroll list to bottom */
+    list.scrollTop = list.scrollHeight;
+  }
+
+  addBtn.addEventListener('click', add_item);
+  input.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') add_item();
+  });
+
+  toggle.addEventListener('click', function() {
+    collapsed = !collapsed;
+    widget.classList.toggle('collapsed', collapsed);
+    toggle.innerHTML = collapsed ? '&#43;' : '&#8210;';
+  });
+
+  renderList();
+})();
+</script>
+
+<!-- ── HEADER ── -->
+<header>
+  <div class="logo">
+    <div class="logo-badge">&#9888; HSAP</div>
+    Hazard Analysis Platform
+  </div>
+  <nav>
+    <a href="#map">Map</a>
+    <a href="#incidents">Incidents</a>
+    <a href="#analysis">Analysis</a>
+    <a href="hsap-eda.html" style="color:var(--teal)">EDA ↗</a>
+    <a href="miau2.jpg" style="color:var(--teal)">ML Travel Analysis ↗</a>
+  </nav>
+  <div class="sys-status">
+    <div class="pulse"></div>
+    System Live
+  </div>
+</header>
+
+<!-- ── TICKER ── -->
+<div class="ticker">
+  <div class="ticker-tag">&#9889; Events</div>
+  <div class="ticker-scroll" id="tickerScroll">
+    <span class="tick-item">Loading dummyfile.csv&#8230;</span>
+  </div>
+</div>
+
+<!-- ── PAGE ── -->
+<div class="page">
+
+  <!-- HERO -->
+  <div class="hero">
+    <div>
+      <div class="hero-eyebrow">LAPLAND UAS PROJECT &middot; Team 3</div>
+      <h1>Hazard <mark>Situation</mark><br>Analysis &amp;<br>Prediction</h1>
+      <p class="hero-sub">
+        Truck drivers press an in-cab button when a dangerous situation occurs.
+        That signal is timestamped, geotagged, and fused with road surface
+        conditions and movement anomaly data to classify and predict hazards
+        across the fleet.
+      </p>
+    </div>
+    <div class="kpi-grid">
+      <div class="kpi k-red">
+        <div class="kpi-label">Total Presses</div>
+        <div class="kpi-val" id="kpi-total">&#8212;</div>
+        <div class="kpi-note">Hazard button presses</div>
+      </div>
+      <div class="kpi k-amber">
+        <div class="kpi-label">Avg Speed</div>
+        <div class="kpi-val" id="kpi-high">&#8212;<sup style="font-size:.8rem">km/h</sup></div>
+        <div class="kpi-note">At time of press</div>
+      </div>
+      <div class="kpi k-teal">
+        <div class="kpi-label">Top Surface</div>
+        <div class="kpi-val" id="kpi-surface" style="font-size:.85rem;line-height:1.2">&#8212;</div>
+        <div class="kpi-note">Most common condition</div>
+      </div>
+      <div class="kpi k-green">
+        <div class="kpi-label">Night Presses</div>
+        <div class="kpi-val" id="kpi-anomaly">&#8212;</div>
+        <div class="kpi-note">Presses in darkness</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAP -->
+  <div class="sec" id="map">
+    <div class="sec-hd">
+      <div class="sec-title">Incident Map</div>
+    </div>
+    <div class="map-shell">
+      <div class="map-bar">
+        <div class="map-bar-title">&#128506; Geospatial Hazard Overlay</div>
+
+      </div>
+
+      <iframe
+        src="all_hazard_final_map_v10.html"
+        width="100%"
+        height="500"
+        frameborder="0"
+        loading="lazy"
+        style="display:block;">
+      </iframe>
+
+
+
+      <!-- LEGEND NEEDS TO BE REMOVED OR CHANGED TO BE LOOKING A LOT SMARTER, ASK SuBASH FOR WISHES ON THE LEGEND-->
+
+
+
+      <div class="map-legend">
+        <div class="leg"><div class="leg-dot" style="background:#c44040"></div>High Severity</div>
+        <div class="leg"><div class="leg-dot" style="background:#c49a2a"></div>Medium Severity</div>
+        <div class="leg"><div class="leg-dot" style="background:#3a9e6e"></div>Low Severity</div>
+        <div class="leg"><div class="leg-dot" style="background:#2a8f85"></div>Weather / Surface</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- INCIDENTS + SIDEBAR -->
+  <div class="sec" id="incidents">
+    <div class="sec-hd">
+      <div class="sec-title">Incident Log</div>
+      <div class="sec-tag" id="event-count-tag">Loading&#8230;</div>
+    </div>
+    <div class="content-grid">
+
+      <!-- TABLE — columns match new CSV exactly -->
+      <div class="table-shell">
+        <div class="table-bar">
+          <div class="table-title">All Hazard Button Presses</div>
+          <span class="badge badge-red" id="high-badge">&#8212; total</span>
+        </div>
+        <div style="overflow-x:auto;">
+          <table>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Datetime</th>
+                <th>Street</th>
+                <th>Town</th>
+                <th>Surface Condition</th>
+                <th>Speed (km/h)</th>
+                <th>Peak Accel (g)</th>
+                <th>Grip</th>
+                <th>Traffic</th>
+                <th>Dark?</th>
+                <th>Coordinates</th>
+              </tr>
+            </thead>
+            <tbody id="event-tbody">
+              <tr>
+                <td colspan="11" class="muted" style="text-align:center;padding:2rem;">
+                  Loading dummyfile.csv&#8230;
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      
+      <!-- SIDEBAR -->
+      <div class="sidebar">
+
+        <!-- SURFACE CONDITION BREAKDOWN -->
+        <div class="panel">
+          <div class="panel-hd">Surface Condition <span>by count</span></div>
+          <div class="surface-list" id="anomaly-list">
+            <!-- populated from surface_condition_name column -->
+          </div>
+        </div>
+
+        <!-- TRAFFIC AMOUNT BREAKDOWN -->
+        <div class="panel">
+          <div class="panel-hd">Traffic Amount <span>by count</span></div>
+          <div class="surface-list" id="surface-list">
+            <!-- populated from Traffic Amount column -->
+          </div>
+        </div>
+
+        <!-- RECENT TIMELINE -->
+        <div class="panel">
+          <div class="panel-hd">Recent Timeline</div>
+          <div class="timeline" id="timeline">
+            <!-- last 5 events by datetime -->
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ANALYSIS — computed from new CSV columns -->
+  <div class="sec" id="analysis">
+    <div class="sec-hd">
+      <div class="sec-title">Dataset Analysis</div>
+      <div class="sec-tag">Computed from dummyfile.csv</div>
+    </div>
+    <div class="analysis-grid">
+      <div class="ac">
+        <div class="ac-icon">Avg Speed at Press</div>
+        <div class="ac-val" id="ac-sev-rate" style="color:#c44040">&#8212;</div>
+        <div class="ac-desc">Average vehicle speed in km/h recorded at the moment of button press.</div>
+      </div>
+      <div class="ac">
+        <div class="ac-icon">Peak Acceleration</div>
+        <div class="ac-val" id="ac-danger-surface" style="color:#c49a2a">&#8212;</div>
+        <div class="ac-desc">Highest acceleration g-force recorded across all hazard events.</div>
+      </div>
+      <div class="ac">
+        <div class="ac-icon">Avg Grip</div>
+        <div class="ac-val" id="ac-top-anomaly" style="color:#2a8f85">&#8212;</div>
+        <div class="ac-desc">Mean grip value across all recorded hazard button press events.</div>
+      </div>
+      <div class="ac">
+        <div class="ac-icon">Towns Affected</div>
+        <div class="ac-val" id="ac-cities" style="color:#3a9e6e">&#8212;</div>
+        <div class="ac-desc">Number of distinct towns where hazard events were recorded.</div>
+      </div>
+      <div class="ac">
+        <div class="ac-icon">Most Affected Town</div>
+        <div class="ac-val" id="ac-top-city" style="color:#c49a2a">&#8212;</div>
+        <div class="ac-desc">Town with the highest total number of recorded hazard button presses.</div>
+      </div>
+      <div class="ac">
+        <div class="ac-icon">Night Press Rate</div>
+        <div class="ac-val" id="ac-low-rate" style="color:#3a9e6e">&#8212;</div>
+        <div class="ac-desc">Proportion of hazard presses that occurred in dark / night conditions.</div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /page -->
+
+<footer>
+  <span>HSAP &middot; Hazard Situation Analysis &amp; Prediction &middot; Rovaniemi Fleet</span>
+  <span id="footer-clock"></span>
+</footer>
+
+
+<!-- ════════════════════════════════════════════════════════════════
+     WEATHER ENGINE — Open-Meteo · Rovaniemi · No API key needed
+     ════════════════════════════════════════════════════════════════ -->
+<script>
+var WMO = {
+  0:  ['Clear sky',          '☀️'],  1:  ['Mainly clear',       '🌤️'],
+  2:  ['Partly cloudy',      '⛅'],  3:  ['Overcast',           '☁️'],
+  45: ['Fog',                '🌫️'], 48: ['Icy fog',            '🌫️'],
+  51: ['Light drizzle',      '🌦️'], 53: ['Moderate drizzle',   '🌦️'],
+  55: ['Dense drizzle',      '🌧️'], 61: ['Slight rain',        '🌧️'],
+  63: ['Moderate rain',      '🌧️'], 65: ['Heavy rain',         '🌧️'],
+  71: ['Slight snow',        '🌨️'], 73: ['Moderate snow',      '❄️'],
+  75: ['Heavy snow',         '❄️'],  77: ['Snow grains',        '🌨️'],
+  80: ['Slight showers',     '🌦️'], 81: ['Moderate showers',   '🌧️'],
+  82: ['Violent showers',    '⛈️'], 85: ['Snow showers',       '🌨️'],
+  86: ['Heavy snow showers', '❄️'],  95: ['Thunderstorm',       '⛈️'],
+  96: ['Thunder + hail',     '⛈️'], 99: ['Thunder + hail',     '⛈️'],
+};
+
+function wmoClass(code) {
+  if ([45,48].includes(code))                       return 'wx-fog';
+  if ([51,53,55,61,63,65,80,81,82].includes(code)) return 'wx-rain';
+  if ([71,73,75,77,85,86].includes(code))           return 'wx-snow';
+  if ([95,96,99].includes(code))                    return 'wx-thunder';
+  if (code === 3)                                   return 'wx-cloudy';
+  return 'wx-clear';
+}
+
+async function fetchWeather() {
+  var LAT = 66.5039, LON = 25.7294;
+  var url = 'https://api.open-meteo.com/v1/forecast'
+    + '?latitude=' + LAT + '&longitude=' + LON
+    + '&current=temperature_2m,relative_humidity_2m,wind_speed_10m,precipitation,weather_code'
+    + '&wind_speed_unit=kmh&timezone=Europe%2FHelsinki';
+  try {
+    var res  = await fetch(url);
+    var data = await res.json();
+    var c    = data.current;
+    var code = c.weather_code != null ? c.weather_code : 0;
+    var info = WMO[code] || ['Unknown', '🌡️'];
+
+    document.getElementById('w-icon').textContent   = info[1];
+    document.getElementById('w-temp').textContent   = (c.temperature_2m != null ? c.temperature_2m.toFixed(1) : '—') + '°C';
+    document.getElementById('w-desc').textContent   = info[0];
+    document.getElementById('w-wind').textContent   = (c.wind_speed_10m != null ? c.wind_speed_10m.toFixed(0) : '—') + ' km/h';
+    document.getElementById('w-humid').textContent  = (c.relative_humidity_2m != null ? c.relative_humidity_2m : '—') + '%';
+    document.getElementById('w-precip').textContent = (c.precipitation != null ? c.precipitation.toFixed(1) : '0.0') + ' mm';
+
+    var cls = wmoClass(code);
+    document.body.classList.add(cls);
+    if (cls === 'wx-rain' || cls === 'wx-thunder') startRain(cls === 'wx-thunder' ? 'heavy' : 'normal');
+    if (cls === 'wx-snow') startSnow();
+    if (c.temperature_2m != null && c.temperature_2m < -10) {
+      document.getElementById('sky-layer').style.background =
+        'radial-gradient(ellipse at 30% 0%, rgba(30,55,95,.55) 0%, transparent 60%),' +
+        'linear-gradient(180deg,#080b11 0%,#0e1217 100%)';
+    }
+  } catch(e) {
+    document.getElementById('w-desc').textContent = 'Weather unavailable';
+  }
+}
+
+/* shared scroll-pause flag */
+var _scrolling = false, _scrollTimer;
+window.addEventListener('scroll', function() {
+  _scrolling = true;
+  clearTimeout(_scrollTimer);
+  _scrollTimer = setTimeout(function(){ _scrolling = false; }, 150);
+}, { passive: true });
+
+function startRain(intensity) {
+  var canvas = document.getElementById('rain-canvas');
+  var ctx    = canvas.getContext('2d');
+  var COUNT  = intensity === 'heavy' ? 280 : intensity === 'normal' ? 160 : 70;
+  var ANGLE  = 12;
+  var drops  = [];
+
+  function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+  resize();
+  window.addEventListener('resize', resize, { passive: true });
+
+  for (var i = 0; i < COUNT; i++) {
+    drops.push({
+      x:     Math.random() * window.innerWidth,
+      y:     Math.random() * window.innerHeight,
+      len:   Math.random() * 18  + 8,
+      /* speed in px/second — divide by 60 gives old per-frame value at 60Hz */
+      speed: (Math.random() * 8  + 6) * 60,
+      op:    Math.random() * 0.35 + 0.1,
+      w:     Math.random() * 0.8  + 0.3
+    });
+  }
+
+  var rad = ANGLE * Math.PI / 180, dx = Math.sin(rad), dy = Math.cos(rad);
+  var lastTs = 0;
+
+  (function frame(ts) {
+    if (document.hidden) { requestAnimationFrame(frame); return; }
+
+    /* delta in seconds since last frame — clamp to 100ms to avoid huge jumps
+       when tab was hidden or browser stalled */
+    var delta = Math.min((ts - lastTs) / 1000, 0.1);
+    lastTs = ts;
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    drops.forEach(function(d) {
+      ctx.beginPath(); ctx.moveTo(d.x, d.y);
+      ctx.lineTo(d.x + dx * d.len, d.y + dy * d.len);
+      ctx.strokeStyle = 'rgba(160,200,230,' + d.op + ')';
+      ctx.lineWidth   = d.w; ctx.stroke();
+
+      /* move by speed * seconds elapsed — same distance on 60Hz and 144Hz */
+      d.x += dx * d.speed * delta;
+      d.y += dy * d.speed * delta;
+
+      if (d.y > canvas.height + 20 || d.x > canvas.width + 20) {
+        d.x = Math.random() * canvas.width - 50; d.y = -20;
+      }
+    });
+    requestAnimationFrame(frame);
+  })(0);
+}
+
+function startSnow() {
+  var canvas = document.getElementById('snow-canvas');
+  var ctx    = canvas.getContext('2d');
+  var flakes = [];
+
+  function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+  resize();
+  window.addEventListener('resize', resize, { passive: true });
+
+  for (var i = 0; i < 140; i++) {
+    flakes.push({
+      x:     Math.random() * window.innerWidth,
+      y:     Math.random() * window.innerHeight,
+      r:     Math.random() * 2.5  + 0.8,
+      /* px/second */
+      speed: (Math.random() * 1.2 + 0.4) * 60,
+      drift: (Math.random() - 0.5) * 0.5 * 60,
+      op:    Math.random() * 0.6  + 0.2
+    });
+  }
+
+  var lastTs = 0;
+
+  (function frame(ts) {
+    if (document.hidden) { requestAnimationFrame(frame); return; }
+
+    var delta = Math.min((ts - lastTs) / 1000, 0.1);
+    lastTs = ts;
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    flakes.forEach(function(f) {
+      ctx.beginPath(); ctx.arc(f.x, f.y, f.r, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(220,235,255,' + f.op + ')'; ctx.fill();
+
+      f.y += f.speed * delta;
+      f.x += f.drift * delta;
+
+      if (f.y >  canvas.height + 10) { f.y = -10; f.x = Math.random() * canvas.width; }
+      if (f.x >  canvas.width  + 10)   f.x = -10;
+      if (f.x < -10)                    f.x =  canvas.width + 10;
+    });
+    requestAnimationFrame(frame);
+  })(0);
+}
+
+fetchWeather();
+</script>
+
+
+<!-- ════════════════════════════════════════════════════════════════
+     CSV LOADER + RENDERING ENGINE
+     Reads dummyfile.csv, maps your exact column names,
+     then populates every element on the page.
+     ════════════════════════════════════════════════════════════════ -->
+<script>
+/* ── tiny CSV parser (no dependencies) ── */
+function parseCSV(text) {
+  /* strip ALL carriage returns first — fixes Windows \r\n line endings */
+  text = text.replace(/\r/g, '');
+  var lines = text.trim().split('\n');
+  var headers = lines[0].split(',').map(function(h){ return h.trim().replace(/^"|"$/g,''); });
+  return lines.slice(1).map(function(line) {
+    if (!line.trim()) return null;
+    /* handle quoted fields that may contain commas */
+    var cols = [], cur = '', inQ = false;
+    for (var i = 0; i < line.length; i++) {
+      var ch = line[i];
+      if (ch === '"') { inQ = !inQ; }
+      else if (ch === ',' && !inQ) { cols.push(cur.trim()); cur = ''; }
+      else { cur += ch; }
+    }
+    cols.push(cur.trim());
+    var obj = {};
+    headers.forEach(function(h,i){ obj[h] = (cols[i]||'').replace(/^"|"$/g,''); });
+    return obj;
+  }).filter(function(row){ return row && row.event_id && row.event_id !== ''; });
+}
+
+/* ── count occurrences in an array ── */
+function countBy(arr, key) {
+  var map = {};
+  arr.forEach(function(r){ var v=r[key]||'Unknown'; map[v]=(map[v]||0)+1; });
+  return map;
+}
+
+/* ── render everything once CSV is loaded ── */
+function render(events) {
+
+  /* ── KPIs ── */
+  var highCount = events.filter(function(e){ return e.severity==='High'; }).length;
+  var surfMap   = countBy(events, 'road_surface');
+  var anomMap   = countBy(events, 'movement_anomaly');
+  var topSurf   = Object.keys(surfMap).sort(function(a,b){return surfMap[b]-surfMap[a];})[0] || '—';
+  var topAnom   = Object.keys(anomMap).sort(function(a,b){return anomMap[b]-anomMap[a];})[0] || '—';
+
+  document.getElementById('kpi-total').textContent   = events.length;
+  document.getElementById('kpi-high').textContent    = highCount;
+  document.getElementById('kpi-surface').textContent = topSurf;
+  document.getElementById('kpi-anomaly').textContent = topAnom;
+  document.getElementById('event-count-tag').textContent = events.length + ' events loaded';
+  document.getElementById('high-badge').textContent  = highCount + ' High';
+
+  /* ── TABLE ── */
+  var tbody = document.getElementById('event-tbody');
+  tbody.innerHTML = '';
+  events.forEach(function(e) {
+    var sc  = e.severity==='High' ? 'sev-high' : e.severity==='Medium' ? 'sev-medium' : 'sev-low';
+    var lat = parseFloat(e.lat), lon = parseFloat(e.lon);
+    var tr  = document.createElement('tr');
+    tr.innerHTML =
+      '<td class="muted">' + e.event_id + '</td>' +
+      '<td class="muted" style="white-space:nowrap">' + e.datetime + '</td>' +
+      '<td>' + (e.street || '—') + '</td>' +
+      '<td>' + (e.city   || '—') + '</td>' +
+      '<td>' + (e.road_surface || '—') + '</td>' +
+      '<td><span class="type-tag">' + (e.movement_anomaly || '—') + '</span></td>' +
+      '<td><span class="sev-chip ' + sc + '">' + e.severity + '</span></td>' +
+      '<td class="muted">' + (isNaN(lat)?'—':lat.toFixed(4)) + ', ' + (isNaN(lon)?'—':lon.toFixed(4)) + '</td>' +
+      '<td>' + (e.lighting_condition || '—') + '</td>';
+    tbody.appendChild(tr);
+  });
+
+  /* ── MOVEMENT ANOMALY BREAKDOWN (sidebar) ── */
+  var anomList = document.getElementById('anomaly-list');
+  anomList.innerHTML = '';
+  var maxAnom = Math.max.apply(null, Object.values(anomMap).concat([1]));
+  Object.keys(anomMap).sort(function(a,b){return anomMap[b]-anomMap[a];}).forEach(function(k) {
+    var pct = (anomMap[k] / maxAnom) * 100;
+    var row = document.createElement('div');
+    row.className = 'surf-row';
+    row.innerHTML =
+      '<span class="surf-name" style="min-width:80px">' + k + '</span>' +
+      '<div class="surf-bar"><div class="surf-fill" style="width:'+pct+'%;background:linear-gradient(90deg,var(--red),var(--amber))"></div></div>' +
+      '<span class="surf-count">' + anomMap[k] + '</span>';
+    anomList.appendChild(row);
+  });
+
+  /* ── ROAD SURFACE BREAKDOWN (sidebar) ── */
+  var surfList = document.getElementById('surface-list');
+  surfList.innerHTML = '';
+  var maxSurf = Math.max.apply(null, Object.values(surfMap).concat([1]));
+  Object.keys(surfMap).sort(function(a,b){return surfMap[b]-surfMap[a];}).forEach(function(k) {
+    var pct = (surfMap[k] / maxSurf) * 100;
+    var row = document.createElement('div');
+    row.className = 'surf-row';
+    row.innerHTML =
+      '<span class="surf-name">' + k + '</span>' +
+      '<div class="surf-bar"><div class="surf-fill" style="width:'+pct+'%"></div></div>' +
+      '<span class="surf-count">' + surfMap[k] + '</span>';
+    surfList.appendChild(row);
+  });
+
+  /* ── TIMELINE — last 5 events ── */
+  var tl     = document.getElementById('timeline');
+  tl.innerHTML = '';
+  var sorted = events.slice().sort(function(a,b){ return (b.datetime||'').localeCompare(a.datetime||''); });
+  sorted.slice(0,5).forEach(function(e) {
+    var col  = e.severity==='High' ? 'red' : e.severity==='Medium' ? 'amber' : 'teal';
+    var time = (e.datetime||'').split(' ')[1] || e.datetime || '—';
+    var div  = document.createElement('div');
+    div.className = 'tl-item';
+    div.innerHTML =
+      '<div class="tl-time">' + time + '</div>' +
+      '<div class="tl-dot ' + col + '"></div>' +
+      '<div class="tl-body"><div class="tl-title">' + (e.movement_anomaly||'—') + ' &mdash; ' + e.event_id + '</div>' +
+      '<div class="tl-sub">' + (e.street||'—') + ', ' + (e.city||'—') + ' &middot; ' + e.severity + '</div></div>';
+    tl.appendChild(div);
+  });
+
+  /* ── ANALYSIS CARDS ── */
+  var sevRate  = ((highCount / events.length) * 100).toFixed(0);
+  var lowRate  = (((events.length - highCount) / events.length) * 100).toFixed(0);
+
+  /* most dangerous surface = highest % high-severity */
+  var surfDanger = {};
+  events.forEach(function(e){
+    var s = e.road_surface||'Unknown';
+    if (!surfDanger[s]) surfDanger[s]={total:0,high:0};
+    surfDanger[s].total++;
+    if (e.severity==='High') surfDanger[s].high++;
+  });
+  var dangerSurf = Object.keys(surfDanger).sort(function(a,b){
+    return (surfDanger[b].high/surfDanger[b].total)-(surfDanger[a].high/surfDanger[a].total);
+  })[0] || '—';
+
+  /* cities */
+  var cityMap   = countBy(events, 'city');
+  var cityCount = Object.keys(cityMap).length;
+  var topCity   = Object.keys(cityMap).sort(function(a,b){return cityMap[b]-cityMap[a];})[0] || '—';
+
+  document.getElementById('ac-sev-rate').textContent      = sevRate + '%';
+  document.getElementById('ac-danger-surface').textContent= dangerSurf;
+  document.getElementById('ac-top-anomaly').textContent   = topAnom;
+  document.getElementById('ac-cities').textContent        = cityCount;
+  document.getElementById('ac-top-city').textContent      = topCity;
+  document.getElementById('ac-low-rate').textContent      = lowRate + '%';
+
+  /* ── TICKER ── */
+  var track = document.getElementById('tickerScroll');
+  track.innerHTML = '';
+  var items = events.concat(events); /* duplicate for seamless loop */
+  items.forEach(function(e) {
+    var col  = e.severity==='High' ? 'var(--red)' : e.severity==='Medium' ? 'var(--amber)' : 'var(--teal)';
+    var span = document.createElement('span');
+    span.className = 'tick-item';
+    span.innerHTML =
+      '<span class="tick-dot" style="background:'+col+'"></span>' +
+      e.event_id + ' &mdash; ' + (e.movement_anomaly||'—') +
+      ' &middot; ' + (e.street||'—') + ', ' + (e.city||'—');
+    track.appendChild(span);
+  });
+}
+
+/* ── LOAD CSV ── */
+fetch('dummyfile.csv')
+  .then(function(res) {
+    if (!res.ok) throw new Error('Could not load dummyfile.csv (status ' + res.status + ')');
+    return res.text();
+  })
+  .then(function(text) {
+    var events = parseCSV(text);
+    if (events.length === 0) throw new Error('CSV parsed but no rows found — check the file.');
+    render(events);
+  })
+  .catch(function(err) {
+    console.error('HSAP CSV Error:', err.message);
+    document.getElementById('event-tbody').innerHTML =
+      '<tr><td colspan="9" style="text-align:center;padding:2rem;color:var(--red);">' +
+      '&#9888; ' + err.message + '<br>' +
+      '<span style="color:var(--muted);font-size:.65rem;">Make sure dummyfile.csv is in the same folder and you are running a local server (python -m http.server 8000)</span>' +
+      '</td></tr>';
+    document.getElementById('event-count-tag').textContent = 'Error loading CSV';
+    document.getElementById('tickerScroll').innerHTML =
+      '<span class="tick-item">&#9888; dummyfile.csv not found &mdash; run: python -m http.server 8000</span>';
+  });
+
+/* ── CLOCK ── */
+(function tick() {
+  document.getElementById('footer-clock').textContent =
+    new Date().toUTCString().replace('GMT','UTC');
+  setTimeout(tick, 1000);
+})();
+</script>
+
+</body>
+</html>

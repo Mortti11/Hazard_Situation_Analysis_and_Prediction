@@ -1,0 +1,17 @@
+event_id,datetime,lighting_condition,street,city,road_surface,movement_anomaly,severity,lat,lon
+x.1,2024-06-15 22:14:33,Night,Sunset Blvd,Los Angeles,Dry,Sharp Turn,Medium,34.0983,-118.3267
+x.2,2024-06-14 05:42:11,Dawn,Market St,San Francisco,Wet,Hard Braking,High,37.7749,-122.4194
+x.3,2024-06-13 18:25:50,Dusk,Broadway,New York,Dry,Swerving,Medium,40.7128,-74.0060
+x.4,2024-06-12 12:03:27,Daylight,King St,Toronto,Gravel,Rapid Acceleration,Low,43.6532,-79.3832
+x.5,2024-06-11 23:55:02,Night,Oxford St,London,Wet,Loss of Control,High,51.5074,-0.1278
+x.6,2024-06-10 07:18:44,Daylight,Champs-Élysées,Paris,Dry,Sharp Turn,Medium,48.8566,2.3522
+x.7,2024-06-09 19:47:36,Dusk,Friedrichstrasse,Berlin,Ice,Hard Braking,High,52.5200,13.4050
+x.8,2024-06-08 04:29:15,Dawn,Shibuya Crossing,Tokyo,Wet,Swerving,Medium,35.6895,139.6917
+x.9,2024-06-07 16:11:08,Daylight,George St,Sydney,Dry,Rapid Acceleration,Low,-33.8688,151.2093
+x.10,2024-06-06 21:33:59,Night,Queen St,Auckland,Wet,Loss of Control,High,-36.8485,174.7633
+x.11,2024-06-05 09:56:41,Daylight,Gran Via,Madrid,Dry,Sharp Turn,Medium,40.4168,-3.7038
+x.12,2024-06-04 14:22:10,Daylight,Drottninggatan,Stockholm,Gravel,Swerving,Medium,59.3293,18.0686
+x.13,2024-06-03 20:05:55,Dusk,Karl Johans gate,Oslo,Wet,Hard Braking,High,59.9139,10.7522
+x.14,2024-06-02 06:37:29,Dawn,Mannerheimintie,Helsinki,Ice,Loss of Control,High,60.1699,24.9384
+x.15,2024-06-01 11:48:03,Daylight,Via del Corso,Rome,Dry,Rapid Acceleration,Low,41.9028,12.4964
+
